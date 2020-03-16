@@ -68,7 +68,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>915C251B84EC8367410ACD88FA15B77682D042C8</ManifestCertificateThumbprint>
@@ -77,14 +78,17 @@
     <ManifestKeyFile>RaceAdmin_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>RaceAdmin.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="iRacingSdkWrapper">
-      <HintPath>..\iRacingSdkWrapper\bin\Release\iRacingSdkWrapper.dll</HintPath>
+      <HintPath>lib\iRacingSdkWrapper.dll</HintPath>
     </Reference>
     <Reference Include="iRSDKSharp">
-      <HintPath>..\iRacingSdkWrapper\bin\Release\iRSDKSharp.dll</HintPath>
+      <HintPath>lib\iRSDKSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -100,7 +104,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="YamlDotNet">
-      <HintPath>..\iRacingSdkWrapper\bin\Release\YamlDotNet.dll</HintPath>
+      <HintPath>lib\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -126,7 +130,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="key.snk" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -137,7 +140,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="RaceAdmin_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
