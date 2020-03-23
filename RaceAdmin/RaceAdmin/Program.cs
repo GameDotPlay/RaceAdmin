@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Data;
+using iRacingSdkWrapper;
 
 namespace RaceAdmin
 {
@@ -14,7 +15,15 @@ namespace RaceAdmin
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new RaceAdminMain());
+
+            // create the main form and add a proxy layer between our application and the iRacingSdkWrapper;
+            // this will make it easier for us to add both unit tests and full system tests with wrapper event
+            // replay later
+            SdkWrapper wrapper = new SdkWrapper();
+            SdkWrapperProxy proxy = new SdkWrapperProxy(wrapper);
+            RaceAdminMain form = new RaceAdminMain(proxy);
+
+            Application.Run(form);
         }
     }
 }

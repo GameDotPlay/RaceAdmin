@@ -61,27 +61,26 @@ namespace RaceAdmin
         private List<Driver> drivers = new List<Driver>();
 
         /// <summary>
-        /// SdkWrapper object.
+        /// ISdkWrapper object.
         /// </summary>
-        private readonly SdkWrapper wrapper;
+        private ISdkWrapper wrapper;
 
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
         /// </summary>
-        public RaceAdminMain()
+        public RaceAdminMain(ISdkWrapper wrapper)
         {
+            this.wrapper = wrapper;
+
             // Initialize WinForm
             InitializeComponent();
 
-            // Create instance of wrapper.
-            wrapper = new SdkWrapper();
-
             // Listen to events
-            wrapper.TelemetryUpdated += OnTelemetryUpdated;
-            wrapper.SessionInfoUpdated += OnSessionInfoUpdated;
+            wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
+            wrapper.AddSessionInfoUpdateHandler(OnSessionInfoUpdated);
 
             // Set telemetry update rate.
-            wrapper.TelemetryUpdateFrequency = 4;
+            wrapper.SetTelemetryUpdateFrequency(4); // Hz
 
             // Start the wrapper.
             wrapper.Start();
@@ -235,7 +234,7 @@ namespace RaceAdmin
         {
             // Check for incident limit reached for caution.
             // Animate color changes on CautionPanel.
-            if((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
+            if ((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
             {
                 if (this.count % 2 == 0)
                 {
@@ -266,10 +265,10 @@ namespace RaceAdmin
             // Update incident count fields.
             TotalIncidentCountNum.Text = this.totalIncCount.ToString();
             IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
-            
+
             // Update SessionUniqueID.
             var tempInt = wrapper.GetTelemetryValue<int>("SessionUniqueID");
-            if(tempInt.Value > this.liveUniqueSessionID)
+            if (tempInt.Value > this.liveUniqueSessionID)
             {
                 this.sessionInitializationComplete = false;
                 this.liveUniqueSessionID = tempInt.Value;
@@ -284,12 +283,12 @@ namespace RaceAdmin
             {
                 this.incsReset = false;
             }
-            if((flagField & greenFlag) != 0 && (this.incsReset == false))
+            if ((flagField & greenFlag) != 0 && (this.incsReset == false))
             {
                 this.incCountSinceCaution = 0;
                 this.incsReset = true;
             }
-            
+
             // To get telemetry values not defined in Nick's wrapper...
             //var fictionalObject = wrapper.GetTelemetryValue<int>("VariableName");
             //int fictionalValue = fictionalObject.Value;
@@ -315,7 +314,7 @@ namespace RaceAdmin
             this.incCountSinceCaution += delta;
             TotalIncidentCountNum.Text = this.totalIncCount.ToString();
             IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
-            if(delta == 4)
+            if (delta == 4)
             {
                 newRow.DefaultCellStyle.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_IndianRed);
             }
@@ -333,10 +332,10 @@ namespace RaceAdmin
             string fullName;
             int incidentCount;
             YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            while(carIdx <= this.numStarters + 1)
+            while (carIdx <= this.numStarters + 1)
             {
                 query.TryGetValue(out fullName);
-                if(fullName == null)
+                if (fullName == null)
                 {
                     carIdx++;
                     query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
@@ -397,7 +396,7 @@ namespace RaceAdmin
                 var cells = row.Cells.Cast<DataGridViewCell>();
                 csvString.AppendLine(string.Join(",", cells.Select(cell => "\"" + cell.Value + "\"").ToArray()));
             }
-            
+
             // Write to the csv file.
             File.WriteAllText(csvPath.ToString(), csvString.ToString());
         }
@@ -411,7 +410,7 @@ namespace RaceAdmin
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             wrapper.Stop();
-            if(ExportToCsvCheckBox.Checked == true)
+            if (ExportToCsvCheckBox.Checked == true)
             {
                 ExportIncidentTableToCsv();
             }
@@ -427,9 +426,9 @@ namespace RaceAdmin
         /// <param name="e">KeyEvent event.</param>
         private void IncsRequiredForCautionTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if(e.KeyData == Keys.Enter)
+            if (e.KeyData == Keys.Enter)
             {
-                if(System.Int32.TryParse(IncsRequiredForCautionTextBox.Text, out this.incsRequiredForCaution) == false)
+                if (System.Int32.TryParse(IncsRequiredForCautionTextBox.Text, out this.incsRequiredForCaution) == false)
                 {
                     MessageBox.Show(Properties.Resources.ErrorMessage_ValidNumberNotEntered);
                 }
