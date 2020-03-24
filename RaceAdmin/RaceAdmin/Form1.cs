@@ -8,6 +8,8 @@ using System.Windows.Forms;
 
 namespace RaceAdmin
 {
+    using SessionFlags = iRacingSdkWrapper.Bitfields.SessionFlags;
+
     public partial class RaceAdminMain : Form
     {
         /// <summary>
@@ -284,13 +286,11 @@ namespace RaceAdmin
             // Check for change in flag state.
             tempInt = wrapper.GetTelemetryValue<int>("SessionFlags");
             int flagField = tempInt.Value();
-            int greenFlag = 0x00000004;   // Bit flag defined as "green" in iRacing sdk.
-            int cautionFlag = 0x00004000; // Bit flag defined as "caution" in iRacing sdk.
-            if ((flagField & cautionFlag) != 0)
+            if ((flagField & (uint)SessionFlags.Caution) != 0)
             {
                 this.incsReset = false;
             }
-            if ((flagField & greenFlag) != 0 && (this.incsReset == false))
+            if ((flagField & (uint)SessionFlags.Green) != 0 && (this.incsReset == false))
             {
                 this.incCountSinceCaution = 0;
                 this.incsReset = true;
