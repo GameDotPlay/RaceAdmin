@@ -65,7 +65,12 @@ namespace RaceAdmin
         /// </summary>
         private ISdkWrapper wrapper;
 
+        // these are added for testing only
         public int LiveUniqueSessionID { get => liveUniqueSessionID; }
+        public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
+        public List<Driver> Drivers { get => drivers; }
+        public int TotalIncCount { get => totalIncCount; }
+        public int IncCountSinceCaution { get => incCountSinceCaution; }
 
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
@@ -96,7 +101,7 @@ namespace RaceAdmin
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">Session string changed event. Contains info from session string that can be queried.</param>
-        private void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
+        public void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             // Perform some initialization if this is the first time being called in this session...
             if (this.sessionInitializationComplete == false)
