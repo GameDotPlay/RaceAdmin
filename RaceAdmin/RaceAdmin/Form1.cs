@@ -65,6 +65,8 @@ namespace RaceAdmin
         /// </summary>
         private ISdkWrapper wrapper;
 
+        public int LiveUniqueSessionID { get => liveUniqueSessionID; }
+
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
         /// </summary>
@@ -230,7 +232,7 @@ namespace RaceAdmin
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">Telemetry data changed event.</param>
-        private void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        public void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
             // Check for incident limit reached for caution.
             // Animate color changes on CautionPanel.
@@ -268,15 +270,15 @@ namespace RaceAdmin
 
             // Update SessionUniqueID.
             var tempInt = wrapper.GetTelemetryValue<int>("SessionUniqueID");
-            if (tempInt.Value > this.liveUniqueSessionID)
+            if (tempInt.Value() > this.liveUniqueSessionID)
             {
                 this.sessionInitializationComplete = false;
-                this.liveUniqueSessionID = tempInt.Value;
+                this.liveUniqueSessionID = tempInt.Value();
             }
 
             // Check for change in flag state.
             tempInt = wrapper.GetTelemetryValue<int>("SessionFlags");
-            int flagField = tempInt.Value;
+            int flagField = tempInt.Value();
             int greenFlag = 0x00000004;   // Bit flag defined as "green" in iRacing sdk.
             int cautionFlag = 0x00004000; // Bit flag defined as "caution" in iRacing sdk.
             if ((flagField & cautionFlag) != 0)

@@ -21,7 +21,7 @@ namespace RaceAdmin
         void Start();
         void Stop();
 
-        TelemetryValue<T> GetTelemetryValue<T>(string name);
+        ITelemetryValue<T> GetTelemetryValue<T>(string name);
 
     }
 }

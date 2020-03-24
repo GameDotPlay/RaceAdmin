@@ -7,11 +7,11 @@ using iRacingSdkWrapper;
 
 namespace RaceAdmin
 {
-   /// <summary>
-   /// Provides a passthrough proxy implementation of the ISdkWrapper interface which 
-   /// simply delegates to the SdkWrapper provided in the constructor.
-   /// </summary>
-   public class SdkWrapperProxy : ISdkWrapper
+    /// <summary>
+    /// Provides a passthrough proxy implementation of the ISdkWrapper interface which 
+    /// simply delegates to the SdkWrapper provided in the constructor.
+    /// </summary>
+    public class SdkWrapperProxy : ISdkWrapper
     {
         private readonly SdkWrapper wrapper;
 
@@ -44,9 +44,9 @@ namespace RaceAdmin
             wrapper.Stop();
         }
 
-        public TelemetryValue<T> GetTelemetryValue<T>(string name)
+        public ITelemetryValue<T> GetTelemetryValue<T>(string name)
         {
-            return wrapper.GetTelemetryValue<T>(name);
+            return new TelemetryValueProxy<T>(wrapper.GetTelemetryValue<T>(name));
         }
 
     }
