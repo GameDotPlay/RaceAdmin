@@ -115,6 +115,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultCautionHandler.cs" />
     <Compile Include="Driver.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -122,6 +123,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="ICautionHandler.cs" />
     <Compile Include="ISdkWrapper.cs" />
     <Compile Include="ITelemetryValue.cs" />
     <Compile Include="Program.cs" />

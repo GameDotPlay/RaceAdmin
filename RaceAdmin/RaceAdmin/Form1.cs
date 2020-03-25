@@ -23,6 +23,11 @@ namespace RaceAdmin
         private bool incsReset = false;
 
         /// <summary>
+        /// Counter to track whether the caution handler has been notified of the current yellow flag conditions
+        /// </summary>
+        private int cautionNotification= 0; // TODO: should use enum or constants
+
+        /// <summary>
         /// The total count of incidents since the current session started.
         /// </summary>
         private int totalIncCount = 0;
@@ -67,6 +72,11 @@ namespace RaceAdmin
         /// </summary>
         private ISdkWrapper wrapper;
 
+        /// <summary>
+        /// The ICautionHandler used to notify the user that a caution is advised.
+        /// </summary>
+        private ICautionHandler cautionHandler;
+
         // these are added for testing only
         public int LiveUniqueSessionID { get => liveUniqueSessionID; }
         public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
@@ -77,9 +87,10 @@ namespace RaceAdmin
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
         /// </summary>
-        public RaceAdminMain(ISdkWrapper wrapper)
+        public RaceAdminMain(ISdkWrapper wrapper, ICautionHandler cautionHandler)
         {
             this.wrapper = wrapper;
+            this.cautionHandler = cautionHandler;
 
             // Initialize WinForm
             InitializeComponent();
@@ -265,6 +276,12 @@ namespace RaceAdmin
                 {
                     this.count++;
                 }
+
+                if (cautionNotification == 0)
+                {
+                    cautionHandler.YellowFlagNeeded();
+                    cautionNotification = 1;
+                }
             }
             else
             {
@@ -288,10 +305,20 @@ namespace RaceAdmin
             int flagField = tempInt.Value();
             if ((flagField & (uint)SessionFlags.Caution) != 0)
             {
+                if (cautionNotification == 1)
+                {
+                    cautionHandler.YellowFlagThrown();
+                    cautionNotification = 2;
+                }
                 this.incsReset = false;
             }
             if ((flagField & (uint)SessionFlags.Green) != 0 && (this.incsReset == false))
             {
+                if (cautionNotification == 2)
+                {
+                    cautionHandler.GreenFlagThrown();
+                    cautionNotification = 0;
+                }
                 this.incCountSinceCaution = 0;
                 this.incsReset = true;
             }
