@@ -13,11 +13,6 @@ namespace RaceAdmin
     public partial class RaceAdminMain : Form
     {
         /// <summary>
-        /// Counter used to animate CautionPanel.
-        /// </summary>
-        private int count = 0;
-
-        /// <summary>
         /// Flag to indicate whether the incidents since last caution field has been reset to 0.
         /// </summary>
         private bool incsReset = false;
@@ -25,7 +20,7 @@ namespace RaceAdmin
         /// <summary>
         /// Counter to track whether the caution handler has been notified of the current yellow flag conditions
         /// </summary>
-        private int cautionNotification= 0; // TODO: should use enum or constants
+        private int cautionNotification = 0; // TODO: should use enum or constants
 
         /// <summary>
         /// The total count of incidents since the current session started.
@@ -104,6 +99,9 @@ namespace RaceAdmin
 
             // Start the wrapper.
             wrapper.Start();
+
+            // TODO: this is horrible but I don't see a better solution yet
+            cautionHandler.CautionPanel = CautionPanel;
         }
 
         /// <summary>
@@ -256,36 +254,11 @@ namespace RaceAdmin
             // Animate color changes on CautionPanel.
             if ((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
             {
-                if (this.count % 2 == 0)
-                {
-                    if (CautionPanel.BackColor == System.Drawing.Color.FromName(Properties.Resources.ColorName_Control))
-                    {
-                        CautionPanel.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_Gold);
-                    }
-                    else if (CautionPanel.BackColor == System.Drawing.Color.FromName(Properties.Resources.ColorName_Gold))
-                    {
-                        CautionPanel.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_Control);
-                    }
-                }
-
-                if (this.count >= 3)
-                {
-                    this.count = 0;
-                }
-                else
-                {
-                    this.count++;
-                }
-
                 if (cautionNotification == 0)
                 {
                     cautionHandler.YellowFlagNeeded();
                     cautionNotification = 1;
                 }
-            }
-            else
-            {
-                CautionPanel.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_Control);
             }
 
             // Update incident count fields.

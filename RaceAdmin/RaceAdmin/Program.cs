@@ -1,7 +1,6 @@
-﻿using System;
+﻿using iRacingSdkWrapper;
+using System;
 using System.Windows.Forms;
-using System.Data;
-using iRacingSdkWrapper;
 
 namespace RaceAdmin
 {

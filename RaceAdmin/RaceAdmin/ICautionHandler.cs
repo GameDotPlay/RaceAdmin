@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Windows.Forms;
 
 namespace RaceAdmin
 {
@@ -11,5 +7,6 @@ namespace RaceAdmin
         void YellowFlagNeeded();
         void YellowFlagThrown();
         void GreenFlagThrown();
+        Panel CautionPanel { get; set; }
     }
 }

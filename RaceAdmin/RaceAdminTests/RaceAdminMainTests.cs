@@ -1,8 +1,7 @@
-﻿using System;
+﻿using iRacingSdkWrapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RaceAdmin;
 using Moq;
-using iRacingSdkWrapper;
+using RaceAdmin;
 
 namespace RaceAdminTests
 {
@@ -58,14 +57,21 @@ DriverInfo:
           CurDriverIncidentCount: 2
 ";
 
+        private Mock<ISdkWrapper> mockWrapper;
+        private Mock<ICautionHandler> mockCautionHandler;
+
+        [TestInitialize]
+        public void Before()
+        {
+            mockWrapper = new Mock<ISdkWrapper>();
+            mockCautionHandler = new Mock<ICautionHandler>();
+        }
+
         [TestMethod]
         public void TestOnSessionInfoUpdate_ReadsDriverInfo()
         {
-            var mock = new Mock<ISdkWrapper>();
-            var sessionInfo = new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0);
-
-            RaceAdminMain ram = new RaceAdminMain(mock.Object, null);
-            ram.OnSessionInfoUpdated(null, sessionInfo);
+            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
 
             Assert.AreEqual(1, ram.Drivers.Count);
             Assert.AreEqual("Clark Archer", ram.Drivers[0].FullName);
@@ -77,9 +83,7 @@ DriverInfo:
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewDrivers()
         {
-            var mock = new Mock<ISdkWrapper>();
-
-            RaceAdminMain ram = new RaceAdminMain(mock.Object, null);
+            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
             Assert.AreEqual(1, ram.Drivers.Count);
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 1.0));
@@ -89,9 +93,7 @@ DriverInfo:
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewIncidents()
         {
-            var mock = new Mock<ISdkWrapper>();
-
-            RaceAdminMain ram = new RaceAdminMain(mock.Object, null);
+            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
 
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 0.0));
             Assert.AreEqual(0, ram.TotalIncCount);
@@ -107,11 +109,10 @@ DriverInfo:
         {
             var sessionId = 1;
 
-            var mock = new Mock<ISdkWrapper>();
-            mock.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionUniqueID")).Returns(new FakeTelemetryValue<int>(sessionId));
-            mock.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionFlags")).Returns(new FakeTelemetryValue<int>(0));
+            mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionUniqueID")).Returns(new FakeTelemetryValue<int>(sessionId));
+            mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionFlags")).Returns(new FakeTelemetryValue<int>(0));
 
-            RaceAdminMain ram = new RaceAdminMain(mock.Object, null);
+            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
             ram.OnTelemetryUpdated(null, null);
 
             Assert.AreEqual(sessionId, ram.LiveUniqueSessionID);
@@ -120,7 +121,6 @@ DriverInfo:
         [TestMethod]
         public void TestOnTelemetryUpdated_NotifiesCautionNeeded()
         {
-            var mockWrapper = new Mock<ISdkWrapper>();
             mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionUniqueID")).Returns(new FakeTelemetryValue<int>(0));
             var sessionFlagsCalls = 0;
             mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionFlags"))
@@ -144,8 +144,6 @@ DriverInfo:
                         return new FakeTelemetryValue<int>(0);
                     }
                 });
-
-            var mockCautionHandler = new Mock<ICautionHandler>();
 
             RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object)
             {

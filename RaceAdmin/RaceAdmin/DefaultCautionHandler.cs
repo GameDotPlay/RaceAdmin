@@ -1,21 +1,64 @@
-﻿namespace RaceAdmin
+﻿using System.Drawing;
+using System.Threading;
+using System.Windows.Forms;
+
+namespace RaceAdmin
 {
-    internal class DefaultCautionHandler : ICautionHandler
+    public class DefaultCautionHandler : ICautionHandler
     {
-        public void GreenFlagThrown()
+        private static readonly Color control, gold;
+
+        private System.Threading.Timer timer;
+
+        public Panel CautionPanel { get; set; }
+        public uint Interval { get; set; } = 500; // ms
+
+        static DefaultCautionHandler()
         {
-            throw new System.NotImplementedException();
+            control = Color.FromName(RaceAdmin.Properties.Resources.ColorName_Control);
+            gold = Color.FromName(RaceAdmin.Properties.Resources.ColorName_Gold);
         }
+
 
         public void YellowFlagNeeded()
         {
-            throw new System.NotImplementedException();
+            // start a timer to flash the caution panel
+            timer = new System.Threading.Timer(
+                callback: new System.Threading.TimerCallback(OnTick),
+                state: CautionPanel,
+                dueTime: 0,
+                period: Interval);
+        }
+
+        private static void OnTick(object cautionPanel)
+        {
+            // set the panel to the next color in the rotation
+            var panel = cautionPanel as Panel;
+            panel.BackColor = NextColor(panel.BackColor);
+        }
+
+        private static Color NextColor(Color current)
+        {
+            return current == control ? gold : control;
         }
 
         public void YellowFlagThrown()
         {
-            throw new System.NotImplementedException();
+            // nothing to do
         }
+
+        public void GreenFlagThrown()
+        {
+            // stop the timer and wait for for any in-progress callbacks
+            var dispose = new ManualResetEvent(false);
+            timer.Dispose(dispose);
+            dispose.WaitOne();
+            dispose.Dispose();
+
+            // reset panel to original color
+            CautionPanel.BackColor = control;
+        }
+
     }
 
 }
