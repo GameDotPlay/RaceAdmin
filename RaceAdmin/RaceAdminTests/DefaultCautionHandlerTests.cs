@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RaceAdmin;
 using System;
+using System.Drawing;
 using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
@@ -10,8 +11,7 @@ namespace RaceAdminTests
     [TestClass]
     public class DefaultCautionHandlerTests
     {
-        private static System.Drawing.Color control;
-        private static System.Drawing.Color gold;
+        private static Color control, gold;
 
         private Panel panel;
         private DefaultCautionHandler handler;
@@ -19,8 +19,8 @@ namespace RaceAdminTests
         [ClassInitialize]
         public static void BeforeClass(TestContext ctx)
         {
-            control = System.Drawing.Color.FromName(RaceAdmin.Properties.Resources.ColorName_Control);
-            gold = System.Drawing.Color.FromName(RaceAdmin.Properties.Resources.ColorName_Gold);
+            control = Color.FromName(RaceAdmin.Properties.Resources.ColorName_Control);
+            gold = Color.FromName(RaceAdmin.Properties.Resources.ColorName_Gold);
         }
 
         [TestInitialize]
