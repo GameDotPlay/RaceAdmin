@@ -2,7 +2,6 @@
 using RaceAdmin;
 using System;
 using System.Drawing;
-using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -38,7 +37,7 @@ namespace RaceAdminTests
         }
 
         [TestMethod]
-        public void TestYellowFlagNeeded_FlashesCautionPanel()
+        public void TestCautionThresholdReached_FlashesCautionPanel()
         {
             var colorChangeCount = 0;
             var lastColor = panel.BackColor;
@@ -64,8 +63,9 @@ namespace RaceAdminTests
                 colorChangeCount++;
             };
 
-            // inform the handler than a caution is needed and then wait a short time to let the panel flash
-            handler.YellowFlagNeeded();
+            // inform the handler than the caution threshold has been reached and
+            // then wait a short time to let the panel flash
+            handler.CautionThresholdReached();
             Thread.Sleep(200); // ms
 
             // make sure we got at least three color change events
@@ -86,7 +86,7 @@ namespace RaceAdminTests
             };
 
             // start flashing the panel first
-            handler.YellowFlagNeeded();
+            handler.CautionThresholdReached();
             Thread.Sleep(200); // ms
 
             // then throw the green to stop the flashing
@@ -98,13 +98,11 @@ namespace RaceAdminTests
             // event handler to make sure the flashisg actually stopped on time
             Assert.AreEqual(control, panel.BackColor);
             Assert.AreEqual(control, lastColor);
-            Assert.IsTrue(greenTime > lastTime, "expected greenTime {0} to be after {1}", DateISO(greenTime), DateISO(lastTime));
+            Assert.IsTrue(
+                greenTime > lastTime,
+                "expected greenTime {0} to be after {1}",
+                DateUtil.ToStringISO(greenTime), DateUtil.ToStringISO(lastTime));
         }
 
-        // TODO: this should live elsewhere
-        private string DateISO(DateTime dt)
-        {
-            return dt.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture);
-        }
     }
 }

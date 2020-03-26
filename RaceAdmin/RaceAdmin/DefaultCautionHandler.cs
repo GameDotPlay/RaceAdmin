@@ -20,7 +20,7 @@ namespace RaceAdmin
         }
 
 
-        public void YellowFlagNeeded()
+        public void CautionThresholdReached()
         {
             // start a timer to flash the caution panel
             timer = new System.Threading.Timer(

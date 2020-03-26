@@ -10,6 +10,13 @@ namespace RaceAdmin
 {
     using SessionFlags = iRacingSdkWrapper.Bitfields.SessionFlags;
 
+    internal enum CautionState
+    {
+        None,
+        ThresholdReached,
+        YellowFlagDeployed
+    }
+
     public partial class RaceAdminMain : Form
     {
         /// <summary>
@@ -18,9 +25,9 @@ namespace RaceAdmin
         private bool incsReset = false;
 
         /// <summary>
-        /// Counter to track whether the caution handler has been notified of the current yellow flag conditions
+        /// Tracks the current caution state on track.
         /// </summary>
-        private int cautionNotification = 0; // TODO: should use enum or constants
+        private CautionState cautionState = CautionState.None;
 
         /// <summary>
         /// The total count of incidents since the current session started.
@@ -100,7 +107,10 @@ namespace RaceAdmin
             // Start the wrapper.
             wrapper.Start();
 
-            // TODO: this is horrible but I don't see a better solution yet
+            // TODO: this is horrible but I don't see a better solution yet; the
+            // issue is that the cautionHandler needs access to the CautionPanel
+            // in order to flash the yellow indicator, but the CautionHandler is
+            // a dependency of RaceAdminMain's OnTelemetryUpdated event handler
             cautionHandler.CautionPanel = CautionPanel;
         }
 
@@ -254,10 +264,10 @@ namespace RaceAdmin
             // Animate color changes on CautionPanel.
             if ((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
             {
-                if (cautionNotification == 0)
+                if (cautionState == 0)
                 {
-                    cautionHandler.YellowFlagNeeded();
-                    cautionNotification = 1;
+                    cautionHandler.CautionThresholdReached();
+                    cautionState = CautionState.ThresholdReached;
                 }
             }
 
@@ -278,19 +288,19 @@ namespace RaceAdmin
             int flagField = tempInt.Value();
             if ((flagField & (uint)SessionFlags.Caution) != 0)
             {
-                if (cautionNotification == 1)
+                if (cautionState == CautionState.ThresholdReached)
                 {
                     cautionHandler.YellowFlagThrown();
-                    cautionNotification = 2;
+                    cautionState = CautionState.YellowFlagDeployed;
                 }
                 this.incsReset = false;
             }
             if ((flagField & (uint)SessionFlags.Green) != 0 && (this.incsReset == false))
             {
-                if (cautionNotification == 2)
+                if (cautionState == CautionState.YellowFlagDeployed)
                 {
                     cautionHandler.GreenFlagThrown();
-                    cautionNotification = 0;
+                    cautionState = CautionState.None;
                 }
                 this.incCountSinceCaution = 0;
                 this.incsReset = true;

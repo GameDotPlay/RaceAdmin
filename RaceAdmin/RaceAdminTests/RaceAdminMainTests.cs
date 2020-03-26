@@ -160,7 +160,7 @@ DriverInfo:
             ram.OnTelemetryUpdated(null, null);
 
             // but we want to notify the caution handler only once
-            mockCautionHandler.Verify(handler => handler.YellowFlagNeeded(), Times.Once());
+            mockCautionHandler.Verify(handler => handler.CautionThresholdReached(), Times.Once());
 
             // on the second and third calls, the mock wrapper will return SessionFlags indicating a caution has been thrown
             ram.OnTelemetryUpdated(null, null);
