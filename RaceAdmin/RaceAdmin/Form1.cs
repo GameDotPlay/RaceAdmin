@@ -264,7 +264,7 @@ namespace RaceAdmin
             // Animate color changes on CautionPanel.
             if ((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
             {
-                if (cautionState == 0)
+                if (cautionState == CautionState.None)
                 {
                     cautionHandler.CautionThresholdReached();
                     cautionState = CautionState.ThresholdReached;
