@@ -54,6 +54,7 @@
             this.ExportToCsvCheckBox = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.AudioNotificationCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.IncidentsTableView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -334,12 +335,25 @@
             this.label4.Text = "Incs required for caution";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // AudioNotificationCheckBox
+            // 
+            this.AudioNotificationCheckBox.AutoSize = true;
+            this.AudioNotificationCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.AudioNotificationCheckBox.Location = new System.Drawing.Point(661, 557);
+            this.AudioNotificationCheckBox.Name = "AudioNotificationCheckBox";
+            this.AudioNotificationCheckBox.Size = new System.Drawing.Size(151, 20);
+            this.AudioNotificationCheckBox.TabIndex = 6;
+            this.AudioNotificationCheckBox.Text = "Use audio notification";
+            this.AudioNotificationCheckBox.UseVisualStyleBackColor = true;
+            this.AudioNotificationCheckBox.CheckedChanged += new System.EventHandler(this.AudioNotificationCheckBox_CheckedChanged);
+            // 
             // RaceAdminMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(954, 612);
+            this.Controls.Add(this.AudioNotificationCheckBox);
             this.Controls.Add(this.ExportToCsvCheckBox);
             this.Controls.Add(this.CautionPanel);
             this.Controls.Add(this.IncsRequiredForCautionTextBox);
@@ -388,6 +402,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Total;
         private System.Windows.Forms.DataGridViewTextBoxColumn DriverLapNum;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox AudioNotificationCheckBox;
     }
 }
 

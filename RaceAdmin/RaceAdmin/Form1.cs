@@ -451,5 +451,13 @@ namespace RaceAdmin
                 }
             }
         }
+
+        private void AudioNotificationCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (AudioNotificationCheckBox.Checked)
+            {
+
+            }
+        }
     }
 }

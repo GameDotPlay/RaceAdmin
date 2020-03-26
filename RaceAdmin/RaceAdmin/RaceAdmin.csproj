@@ -115,6 +115,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioCautionHandler.cs" />
     <Compile Include="DateUtil.cs" />
     <Compile Include="DefaultCautionHandler.cs" />
     <Compile Include="Driver.cs" />
@@ -126,6 +127,7 @@
     </Compile>
     <Compile Include="ICautionHandler.cs" />
     <Compile Include="ISdkWrapper.cs" />
+    <Compile Include="ISoundPlayer.cs" />
     <Compile Include="ITelemetryValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
