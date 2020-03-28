@@ -20,7 +20,7 @@ namespace RaceAdmin
             // replay later
             SdkWrapper wrapper = new SdkWrapper();
             SdkWrapperProxy proxy = new SdkWrapperProxy(wrapper);
-            RaceAdminMain form = new RaceAdminMain(proxy, new DefaultCautionHandler());
+            RaceAdminMain form = new RaceAdminMain(proxy);
 
             Application.Run(form);
         }

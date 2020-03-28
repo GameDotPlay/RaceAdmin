@@ -10,7 +10,7 @@ namespace RaceAdmin
 
         private System.Threading.Timer timer;
 
-        public Panel CautionPanel { get; set; }
+        private Panel cautionPanel;
         public uint Interval { get; set; } = 500; // ms
 
         static DefaultCautionHandler()
@@ -19,13 +19,17 @@ namespace RaceAdmin
             gold = Color.FromName(RaceAdmin.Properties.Resources.ColorName_Gold);
         }
 
+        public DefaultCautionHandler(Panel cautionPanel)
+        {
+            this.cautionPanel = cautionPanel;
+        }
 
         public void CautionThresholdReached()
         {
             // start a timer to flash the caution panel
             timer = new System.Threading.Timer(
                 callback: new System.Threading.TimerCallback(OnTick),
-                state: CautionPanel,
+                state: cautionPanel,
                 dueTime: 0,
                 period: Interval);
         }
@@ -56,7 +60,7 @@ namespace RaceAdmin
             dispose.Dispose();
 
             // reset panel to original color
-            CautionPanel.BackColor = control;
+            cautionPanel.BackColor = control;
         }
 
     }

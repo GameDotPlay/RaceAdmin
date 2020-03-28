@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Windows.Forms;
 
@@ -75,9 +76,9 @@ namespace RaceAdmin
         private ISdkWrapper wrapper;
 
         /// <summary>
-        /// The ICautionHandler used to notify the user that a caution is advised.
+        /// The caution handlers used to notify the user that a caution is advised.
         /// </summary>
-        private ICautionHandler cautionHandler;
+        private Dictionary<string, ICautionHandler> cautionHandlers;
 
         // these are added for testing only
         public int LiveUniqueSessionID { get => liveUniqueSessionID; }
@@ -86,16 +87,18 @@ namespace RaceAdmin
         public int TotalIncCount { get => totalIncCount; }
         public int IncCountSinceCaution { get => incCountSinceCaution; }
 
+
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
         /// </summary>
-        public RaceAdminMain(ISdkWrapper wrapper, ICautionHandler cautionHandler)
+        public RaceAdminMain(ISdkWrapper wrapper)
         {
-            this.wrapper = wrapper;
-            this.cautionHandler = cautionHandler;
-
             // Initialize WinForm
             InitializeComponent();
+
+            this.wrapper = wrapper;
+            this.cautionHandlers = new Dictionary<string, ICautionHandler>();
+            this.cautionHandlers.Add("default", new DefaultCautionHandler(this.CautionPanel));
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -106,13 +109,14 @@ namespace RaceAdmin
 
             // Start the wrapper.
             wrapper.Start();
-
-            // TODO: this is horrible but I don't see a better solution yet; the
-            // issue is that the cautionHandler needs access to the CautionPanel
-            // in order to flash the yellow indicator, but the CautionHandler is
-            // a dependency of RaceAdminMain's OnTelemetryUpdated event handler
-            cautionHandler.CautionPanel = CautionPanel;
         }
+
+        // used for testing only
+        public void SetTestCautionHandlers(Dictionary<string, ICautionHandler> cautionHandlers)
+        {
+            this.cautionHandlers = cautionHandlers;
+        }
+
 
         /// <summary>
         /// Called when the session string has been updated by the simulator.
@@ -266,7 +270,7 @@ namespace RaceAdmin
             {
                 if (cautionState == CautionState.None)
                 {
-                    cautionHandler.CautionThresholdReached();
+                    cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
                     cautionState = CautionState.ThresholdReached;
                 }
             }
@@ -290,7 +294,7 @@ namespace RaceAdmin
             {
                 if (cautionState == CautionState.ThresholdReached)
                 {
-                    cautionHandler.YellowFlagThrown();
+                    cautionHandlers.Values.ToList().ForEach(h => h.YellowFlagThrown());
                     cautionState = CautionState.YellowFlagDeployed;
                 }
                 this.incsReset = false;
@@ -299,7 +303,7 @@ namespace RaceAdmin
             {
                 if (cautionState == CautionState.YellowFlagDeployed)
                 {
-                    cautionHandler.GreenFlagThrown();
+                    cautionHandlers.Values.ToList().ForEach(h => h.GreenFlagThrown());
                     cautionState = CautionState.None;
                 }
                 this.incCountSinceCaution = 0;
@@ -456,8 +460,20 @@ namespace RaceAdmin
         {
             if (AudioNotificationCheckBox.Checked)
             {
+                var player = new AudioCautionHandler(
+                    new SoundPlayerProxy(new SoundPlayer(RaceAdmin.Resources.Caution)))
+                {
+                    Repeat = 5, // times
+                    Interval = 1000 // ms
+                };
 
+                cautionHandlers.Add("audio", player);
+            }
+            else
+            {
+                cautionHandlers.Remove("audio");
             }
         }
+
     }
 }

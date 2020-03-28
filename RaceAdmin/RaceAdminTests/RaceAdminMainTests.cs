@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RaceAdmin;
+using System.Collections.Generic;
 
 namespace RaceAdminTests
 {
@@ -59,18 +60,24 @@ DriverInfo:
 
         private Mock<ISdkWrapper> mockWrapper;
         private Mock<ICautionHandler> mockCautionHandler;
+        private Dictionary<string, ICautionHandler> cautionHandlers;
+        private RaceAdminMain ram;
 
         [TestInitialize]
         public void Before()
         {
             mockWrapper = new Mock<ISdkWrapper>();
             mockCautionHandler = new Mock<ICautionHandler>();
+            cautionHandlers = new Dictionary<string, ICautionHandler>();
+            cautionHandlers.Add("test", mockCautionHandler.Object);
+
+            ram = new RaceAdminMain(mockWrapper.Object);
+            ram.SetTestCautionHandlers(cautionHandlers);
         }
 
         [TestMethod]
         public void TestOnSessionInfoUpdate_ReadsDriverInfo()
         {
-            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
 
             Assert.AreEqual(1, ram.Drivers.Count);
@@ -83,7 +90,6 @@ DriverInfo:
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewDrivers()
         {
-            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
             Assert.AreEqual(1, ram.Drivers.Count);
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 1.0));
@@ -93,8 +99,6 @@ DriverInfo:
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewIncidents()
         {
-            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
-
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 0.0));
             Assert.AreEqual(0, ram.TotalIncCount);
             Assert.AreEqual(0, ram.IncCountSinceCaution);
@@ -112,14 +116,13 @@ DriverInfo:
             mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionUniqueID")).Returns(new FakeTelemetryValue<int>(sessionId));
             mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionFlags")).Returns(new FakeTelemetryValue<int>(0));
 
-            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object);
             ram.OnTelemetryUpdated(null, null);
 
             Assert.AreEqual(sessionId, ram.LiveUniqueSessionID);
         }
 
         [TestMethod]
-        public void TestOnTelemetryUpdated_NotifiesCautionNeeded()
+        public void TestOnTelemetryUpdated_CautionHandlerInteraction()
         {
             mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionUniqueID")).Returns(new FakeTelemetryValue<int>(0));
             var sessionFlagsCalls = 0;
@@ -145,10 +148,7 @@ DriverInfo:
                     }
                 });
 
-            RaceAdminMain ram = new RaceAdminMain(mockWrapper.Object, mockCautionHandler.Object)
-            {
-                IncsRequiredForCaution = 5
-            };
+            ram.IncsRequiredForCaution = 5;
 
             // add drivers to the session, then send some incidents to trigger caution flag needed notification
             ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 1.0));

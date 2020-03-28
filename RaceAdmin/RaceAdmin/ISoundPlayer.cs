@@ -2,7 +2,7 @@
 {
     public interface ISoundPlayer
     {
-        void PlayLooping();
+        void Play();
         void Stop();
 
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Threading;
 
 namespace RaceAdmin
 {
@@ -7,8 +6,10 @@ namespace RaceAdmin
     public class AudioCautionHandler : ICautionHandler
     {
         private ISoundPlayer player;
+        private Timer timer;
 
-        public Panel CautionPanel { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Repeat { get; set; }
+        public uint Interval { get; set; }
 
         public AudioCautionHandler(ISoundPlayer player)
         {
@@ -17,12 +18,26 @@ namespace RaceAdmin
 
         public void CautionThresholdReached()
         {
-            player.PlayLooping();
+            var count = 0;
+            timer = new Timer(
+                callback: new TimerCallback((o) =>
+                {
+                    if (count++ < Repeat)
+                    {
+                        player.Play();
+                    }
+                }),
+                state: null,
+                dueTime: 0,
+                period: Interval);
         }
 
         public void YellowFlagThrown()
         {
-            player.Stop();
+            var handle = new ManualResetEvent(false);
+            timer.Dispose(handle);
+            handle.WaitOne();
+            handle.Dispose();
         }
 
         public void GreenFlagThrown()
