@@ -8,17 +8,26 @@ using System.Windows.Forms;
 
 namespace RaceAdmin
 {
+    using SessionFlags = iRacingSdkWrapper.Bitfields.SessionFlags;
+
+    internal enum CautionState
+    {
+        None,
+        ThresholdReached,
+        YellowFlagDeployed
+    }
+
     public partial class RaceAdminMain : Form
     {
-        /// <summary>
-        /// Counter used to animate CautionPanel.
-        /// </summary>
-        private int count = 0;
-
         /// <summary>
         /// Flag to indicate whether the incidents since last caution field has been reset to 0.
         /// </summary>
         private bool incsReset = false;
+
+        /// <summary>
+        /// Tracks the current caution state on track.
+        /// </summary>
+        private CautionState cautionState = CautionState.None;
 
         /// <summary>
         /// The total count of incidents since the current session started.
@@ -61,30 +70,48 @@ namespace RaceAdmin
         private List<Driver> drivers = new List<Driver>();
 
         /// <summary>
-        /// SdkWrapper object.
+        /// ISdkWrapper object.
         /// </summary>
-        private readonly SdkWrapper wrapper;
+        private ISdkWrapper wrapper;
+
+        /// <summary>
+        /// The ICautionHandler used to notify the user that a caution is advised.
+        /// </summary>
+        private ICautionHandler cautionHandler;
+
+        // these are added for testing only
+        public int LiveUniqueSessionID { get => liveUniqueSessionID; }
+        public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
+        public List<Driver> Drivers { get => drivers; }
+        public int TotalIncCount { get => totalIncCount; }
+        public int IncCountSinceCaution { get => incCountSinceCaution; }
 
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
         /// </summary>
-        public RaceAdminMain()
+        public RaceAdminMain(ISdkWrapper wrapper, ICautionHandler cautionHandler)
         {
+            this.wrapper = wrapper;
+            this.cautionHandler = cautionHandler;
+
             // Initialize WinForm
             InitializeComponent();
 
-            // Create instance of wrapper.
-            wrapper = new SdkWrapper();
-
             // Listen to events
-            wrapper.TelemetryUpdated += OnTelemetryUpdated;
-            wrapper.SessionInfoUpdated += OnSessionInfoUpdated;
+            wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
+            wrapper.AddSessionInfoUpdateHandler(OnSessionInfoUpdated);
 
             // Set telemetry update rate.
-            wrapper.TelemetryUpdateFrequency = 4;
+            wrapper.SetTelemetryUpdateFrequency(4); // Hz
 
             // Start the wrapper.
             wrapper.Start();
+
+            // TODO: this is horrible but I don't see a better solution yet; the
+            // issue is that the cautionHandler needs access to the CautionPanel
+            // in order to flash the yellow indicator, but the CautionHandler is
+            // a dependency of RaceAdminMain's OnTelemetryUpdated event handler
+            cautionHandler.CautionPanel = CautionPanel;
         }
 
         /// <summary>
@@ -95,7 +122,7 @@ namespace RaceAdmin
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">Session string changed event. Contains info from session string that can be queried.</param>
-        private void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
+        public void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             // Perform some initialization if this is the first time being called in this session...
             if (this.sessionInitializationComplete == false)
@@ -231,65 +258,54 @@ namespace RaceAdmin
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">Telemetry data changed event.</param>
-        private void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        public void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
             // Check for incident limit reached for caution.
             // Animate color changes on CautionPanel.
-            if((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
+            if ((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
             {
-                if (this.count % 2 == 0)
+                if (cautionState == CautionState.None)
                 {
-                    if (CautionPanel.BackColor == System.Drawing.Color.FromName(Properties.Resources.ColorName_Control))
-                    {
-                        CautionPanel.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_Gold);
-                    }
-                    else if (CautionPanel.BackColor == System.Drawing.Color.FromName(Properties.Resources.ColorName_Gold))
-                    {
-                        CautionPanel.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_Control);
-                    }
+                    cautionHandler.CautionThresholdReached();
+                    cautionState = CautionState.ThresholdReached;
                 }
-
-                if (this.count >= 3)
-                {
-                    this.count = 0;
-                }
-                else
-                {
-                    this.count++;
-                }
-            }
-            else
-            {
-                CautionPanel.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_Control);
             }
 
             // Update incident count fields.
             TotalIncidentCountNum.Text = this.totalIncCount.ToString();
             IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
-            
+
             // Update SessionUniqueID.
             var tempInt = wrapper.GetTelemetryValue<int>("SessionUniqueID");
-            if(tempInt.Value > this.liveUniqueSessionID)
+            if (tempInt.Value() > this.liveUniqueSessionID)
             {
                 this.sessionInitializationComplete = false;
-                this.liveUniqueSessionID = tempInt.Value;
+                this.liveUniqueSessionID = tempInt.Value();
             }
 
             // Check for change in flag state.
             tempInt = wrapper.GetTelemetryValue<int>("SessionFlags");
-            int flagField = tempInt.Value;
-            int greenFlag = 0x00000004;   // Bit flag defined as "green" in iRacing sdk.
-            int cautionFlag = 0x00004000; // Bit flag defined as "caution" in iRacing sdk.
-            if ((flagField & cautionFlag) != 0)
+            int flagField = tempInt.Value();
+            if ((flagField & (uint)SessionFlags.Caution) != 0)
             {
+                if (cautionState == CautionState.ThresholdReached)
+                {
+                    cautionHandler.YellowFlagThrown();
+                    cautionState = CautionState.YellowFlagDeployed;
+                }
                 this.incsReset = false;
             }
-            if((flagField & greenFlag) != 0 && (this.incsReset == false))
+            if ((flagField & (uint)SessionFlags.Green) != 0 && (this.incsReset == false))
             {
+                if (cautionState == CautionState.YellowFlagDeployed)
+                {
+                    cautionHandler.GreenFlagThrown();
+                    cautionState = CautionState.None;
+                }
                 this.incCountSinceCaution = 0;
                 this.incsReset = true;
             }
-            
+
             // To get telemetry values not defined in Nick's wrapper...
             //var fictionalObject = wrapper.GetTelemetryValue<int>("VariableName");
             //int fictionalValue = fictionalObject.Value;
@@ -315,7 +331,7 @@ namespace RaceAdmin
             this.incCountSinceCaution += delta;
             TotalIncidentCountNum.Text = this.totalIncCount.ToString();
             IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
-            if(delta == 4)
+            if (delta == 4)
             {
                 newRow.DefaultCellStyle.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_IndianRed);
             }
@@ -333,10 +349,10 @@ namespace RaceAdmin
             string fullName;
             int incidentCount;
             YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            while(carIdx <= this.numStarters + 1)
+            while (carIdx <= this.numStarters + 1)
             {
                 query.TryGetValue(out fullName);
-                if(fullName == null)
+                if (fullName == null)
                 {
                     carIdx++;
                     query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
@@ -397,7 +413,7 @@ namespace RaceAdmin
                 var cells = row.Cells.Cast<DataGridViewCell>();
                 csvString.AppendLine(string.Join(",", cells.Select(cell => "\"" + cell.Value + "\"").ToArray()));
             }
-            
+
             // Write to the csv file.
             File.WriteAllText(csvPath.ToString(), csvString.ToString());
         }
@@ -411,7 +427,7 @@ namespace RaceAdmin
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             wrapper.Stop();
-            if(ExportToCsvCheckBox.Checked == true)
+            if (ExportToCsvCheckBox.Checked == true)
             {
                 ExportIncidentTableToCsv();
             }
@@ -427,9 +443,9 @@ namespace RaceAdmin
         /// <param name="e">KeyEvent event.</param>
         private void IncsRequiredForCautionTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if(e.KeyData == Keys.Enter)
+            if (e.KeyData == Keys.Enter)
             {
-                if(System.Int32.TryParse(IncsRequiredForCautionTextBox.Text, out this.incsRequiredForCaution) == false)
+                if (System.Int32.TryParse(IncsRequiredForCautionTextBox.Text, out this.incsRequiredForCaution) == false)
                 {
                     MessageBox.Show(Properties.Resources.ErrorMessage_ValidNumberNotEntered);
                 }

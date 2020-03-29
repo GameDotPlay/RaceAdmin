@@ -1,6 +1,6 @@
 ﻿namespace RaceAdmin
 {
-    class Driver
+    public class Driver
     {
         private int carIdx;
         private string fullName;
