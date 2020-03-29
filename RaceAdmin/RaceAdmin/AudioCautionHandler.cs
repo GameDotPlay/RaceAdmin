@@ -39,7 +39,7 @@ namespace RaceAdmin
         {
             var count = 0;
             timer = new Timer(
-                callback: new TimerCallback((o) =>
+                callback: new TimerCallback(o =>
                 {
                     if (count++ < Repeat)
                     {
