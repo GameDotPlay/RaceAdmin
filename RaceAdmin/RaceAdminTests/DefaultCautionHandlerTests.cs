@@ -29,10 +29,9 @@ namespace RaceAdminTests
             {
                 BackColor = control
             };
-            handler = new DefaultCautionHandler
+            handler = new DefaultCautionHandler(panel)
             {
                 Interval = 2, // ms
-                CautionPanel = panel
             };
         }
 
