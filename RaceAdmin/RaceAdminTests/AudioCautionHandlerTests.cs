@@ -45,6 +45,7 @@ namespace RaceAdminTests
             player.Setup(p => p.Play())
                 .Callback(() => playLastCalled = DateTime.Now);
 
+            // start the sound playing and wait for it to play a few times
             handler.CautionThresholdReached();
             Thread.Sleep(soundInterval * 3);
 
