@@ -320,7 +320,7 @@ namespace RaceAdmin
         /// </summary>
         /// <param name="driver">Driver associated with the latest incident.</param>
         /// <param name="delta">The number of incident points gained by this driver on this occasion.</param>
-        private void LogNewIncident(Driver driver, int delta)
+        public void LogNewIncident(Driver driver, int delta)
         {
             StringBuilder sb = new StringBuilder();
             int rowId = IncidentsTableView.Rows.Add();
@@ -397,16 +397,19 @@ namespace RaceAdmin
         /// <param name="e">EventArgs event.</param>
         private void ExportButton_Click(object sender, EventArgs e)
         {
-            var saveFileDialog = new SaveFileDialog();
-            saveFileDialog.FileName = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".csv";
-            saveFileDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
-            saveFileDialog.FilterIndex = 1;
-            saveFileDialog.RestoreDirectory = true;
+            var saveFileDialog = new SaveFileDialog
+            {
+                Title = "Export...",
+                FileName = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".csv",
+                Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                Stream outputStream;
-                if ((outputStream = saveFileDialog.OpenFile()) != null)
+                Stream outputStream = saveFileDialog.OpenFile();
+                if (outputStream != null)
                 {
                     var outputWriter = new StreamWriter(outputStream);
                     ExportIncidentTableToCsv(outputWriter);
@@ -419,7 +422,7 @@ namespace RaceAdmin
         /// Exports the contents of the IncidentsTableView to the given writer in CSV format.
         /// </summary>
         /// <param name="writer">The TextWriter to which the contents should be written.</param>
-        private void ExportIncidentTableToCsv(TextWriter writer)
+        public void ExportIncidentTableToCsv(TextWriter writer)
         {
             // write the column headers
             var headers = IncidentsTableView.Columns.Cast<DataGridViewColumn>();
@@ -508,7 +511,7 @@ namespace RaceAdmin
 
         private int testCurrentLap = 1;
 
-        private void Test_AddIncidentRow_Click(object sender, EventArgs e)
+        private void Test_AddIncidentRow(object sender, EventArgs e)
         {
             testCurrentLap = MakeRandomLap();
 

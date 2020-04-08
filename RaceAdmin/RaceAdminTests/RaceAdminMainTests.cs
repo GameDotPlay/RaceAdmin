@@ -4,6 +4,8 @@ using Moq;
 using RaceAdmin;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace RaceAdminTests
@@ -140,6 +142,62 @@ DriverInfo:
                     x.Item1, x.Item2, x.Item3);
                 Assert.AreEqual(true, e.Handled);
             }
+        }
+
+        [TestMethod]
+        public void TestExportIncidentTableToCSV()
+        {
+            // first add a few rows of incident logs
+            var drivers = new Driver[]
+            {
+                new Driver() { FullName = "Clark Archer", CarNum = "29", OldIncs = 0, NewIncs = 2, CurrentLap = 1 },
+                new Driver() { FullName = "Erich Smith",  CarNum = "32", OldIncs = 0, NewIncs = 4, CurrentLap = 4 },
+                new Driver() { FullName = "Clark Archer", CarNum = "29", OldIncs = 2, NewIncs = 6, CurrentLap = 4 }
+            };
+            Array.ForEach(drivers, d => ram.LogNewIncident(d, d.NewIncs - d.OldIncs));
+
+            // set up a mock TextWriter to capture all arguments passed to the WriteLine() method
+            var lines = new List<String>();
+            var mockWriter = new Mock<TextWriter>();
+            mockWriter.Setup(w => w.WriteLine(Capture.In(lines)));
+
+            // run the export
+            ram.ExportIncidentTableToCsv(mockWriter.Object);
+
+            // now assemble the expected lines we want to see in the output CSV
+            var expected = new List<String>
+            {
+                "\"Car #\",\"Driver Name\",\"Inc.\",\"Total\",\"Driver Lap #\""
+            };
+            Array.ForEach(drivers, d => expected.Add(MakeDriverCSV(d)));
+
+            // verify that the expected values match what the export method actually wrote
+            Assert.IsTrue(expected.SequenceEqual(lines),
+                "CSV output did not match!\n\tExpected:\n{0}\n\tActual:\n{1}",
+                MakeLines(expected), MakeLines(lines));
+        }
+
+        private static string MakeLines(List<String> list)
+        {
+            return String.Join("\n", list.Select(s => "\t\t" + s).ToArray());
+        }
+
+        private static string MakeDriverCSV(Driver driver)
+        {
+            var fields = new String[] {
+                driver.CarNum,
+                driver.FullName,
+                MakeIncidents(driver),
+                driver.NewIncs.ToString(),
+                driver.CurrentLap.ToString() };
+
+            return String.Join(",", fields.Select(f => "\"" + f + "\"").ToArray());
+        }
+
+        private static string MakeIncidents(Driver driver)
+        {
+            var delta = driver.NewIncs - driver.OldIncs;
+            return delta.ToString() + "x";
         }
 
         [TestMethod]
