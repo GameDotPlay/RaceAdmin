@@ -2,7 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RaceAdmin;
+using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace RaceAdminTests
 {
@@ -73,6 +75,71 @@ DriverInfo:
 
             ram = new RaceAdminMain(mockWrapper.Object);
             ram.SetTestCautionHandlers(cautionHandlers);
+        }
+
+        [TestMethod]
+        public void TestIncidentTableView_SortCompare_Assumptions()
+        {
+            // check that a leading zero does not fail to parse or parse as octal
+            Assert.AreEqual(90, Int32.Parse("090"));
+            Assert.AreEqual(13, Int32.Parse("013"));
+        }
+
+        [TestMethod]
+        public void TestIncidentsTableView_SortCompare_IgnoresNonCarNumColumn()
+        {
+            // create a sort event for a column not named "CarNum"
+            var column = new DataGridViewColumn()
+            {
+                Name = "DriverName"
+            };
+            var e = new DataGridViewSortCompareEventArgs(column, null, null, 0, 0)
+            {
+                SortResult = 0,
+                Handled = false
+            };
+
+            ram.IncidentsTableView_SortCompare(null, e);
+
+            // event should not be handled
+            Assert.AreEqual(0, e.SortResult);
+            Assert.AreEqual(false, e.Handled);
+        }
+
+        [TestMethod]
+        public void TestIncidentsTableView_SortCompare_ComparesCarNumColumnValues()
+        {
+            // create a sort event for the "CarNum" column
+            var column = new DataGridViewColumn()
+            {
+                Name = "CarNum"
+            };
+
+            var data = new[] {
+                ("1", "2", -1),  // simple numeric less than
+                ("2", "1", 1),   // simple numeric greater than
+                ("3", "3", 0),   // simple numeric equal
+                ("10", "2", 1),  // verify sorting by numeric value
+                ("1", "01", -1), // two digit numbers with leading zeros are sorted after single digit numbers
+                ("044", "44", 1) // three digit numbers with leading zeros are sorted after two digit numbers
+            };
+
+            foreach (var x in data)
+            {
+                var e = new DataGridViewSortCompareEventArgs(column, x.Item1, x.Item2, 0, 0)
+                {
+                    SortResult = 0,
+                    Handled = false
+                };
+
+                ram.IncidentsTableView_SortCompare(null, e);
+
+                // event should be handled with valid sort result
+                Assert.IsTrue(x.Item3 == e.SortResult,
+                    "expected comparison between {0} and {1} to return {2}",
+                    x.Item1, x.Item2, x.Item3);
+                Assert.AreEqual(true, e.Handled);
+            }
         }
 
         [TestMethod]

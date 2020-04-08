@@ -475,20 +475,43 @@ namespace RaceAdmin
             }
         }
 
+        public void IncidentsTableView_SortCompare(object sender, DataGridViewSortCompareEventArgs e)
+        {
+            if ("CarNum".Equals(e.Column.Name))
+            {
+                var v1 = e.CellValue1.ToString();
+                var v2 = e.CellValue2.ToString();
+                var result = v1.Length - v2.Length;
+                if (result == 0)
+                {
+                    var num1 = Int32.Parse(v1);
+                    var num2 = Int32.Parse(v2);
+                    result = num1 - num2;
+                }
+                e.SortResult = result;
+                e.Handled = true;
+            }
+            else
+            {
+                e.Handled = false;
+            }
+        }
+
         // Code below this comment is used to generate test data or to simulate behavior 
         // for UI testing. To use, create buttons on the form and connect them to the various
         // event handler methods below.
 
         private int testCurrentLap = 1;
 
-        private void AddIncidentRow_Click(object sender, EventArgs e)
+        private void Test_AddIncidentRow_Click(object sender, EventArgs e)
         {
             testCurrentLap = MakeRandomLap();
 
             var rng = new Random();
             var newIncidents = (int)Math.Pow(2, rng.Next(3));
 
-            Driver driver = new Driver() {
+            Driver driver = new Driver()
+            {
                 CarIdx = 0,
                 FullName = MakeRandomName(),
                 CarNum = MakeRandomCarNumber(),
@@ -552,5 +575,10 @@ namespace RaceAdmin
             var rng = new Random();
             return testCurrentLap + rng.Next(2);
         }
+
+        // Code above this comment is used to generate test data or to simulate behavior 
+        // for UI testing. To use, create buttons on the form and connect them to the various
+        // event handler methods above.
+
     }
 }
