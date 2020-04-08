@@ -391,51 +391,56 @@ namespace RaceAdmin
         }
 
         /// <summary>
-        /// Exports the contents of the IncidentsTableView to a csv file.
+        /// Exports the incidents table to a CSV file when the Export... button is clicked.
         /// </summary>
-        private void ExportIncidentTableToCsv()
+        /// <param name="sender">Sender of the event.</param>
+        /// <param name="e">EventArgs event.</param>
+        private void ExportButton_Click(object sender, EventArgs e)
         {
-            // Check for csv folder, create if it doesn't exist.
-            StringBuilder csvPath = new StringBuilder();
-            csvPath.Append(Path.GetDirectoryName(Application.ExecutablePath));
-            csvPath.Append(@"\csv");
-            Directory.CreateDirectory(csvPath.ToString());
+            var saveFileDialog = new SaveFileDialog();
+            saveFileDialog.FileName = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".csv";
+            saveFileDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 1;
+            saveFileDialog.RestoreDirectory = true;
 
-            // Set path and filename for the csv file.
-            DateTime dateTime = DateTime.Now;
-            csvPath.Append(@"\");
-            csvPath.Append(dateTime.ToString("yyyy-MM-dd HH-mm-ss"));
-            csvPath.Append(@".csv");
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                Stream outputStream;
+                if ((outputStream = saveFileDialog.OpenFile()) != null)
+                {
+                    var outputWriter = new StreamWriter(outputStream);
+                    ExportIncidentTableToCsv(outputWriter);
+                    outputWriter.Close();
+                }
+            }
+        }
 
-            // Iterate through each row of the incident table and build a string to write to the csv file.
-            StringBuilder csvString = new StringBuilder();
+        /// <summary>
+        /// Exports the contents of the IncidentsTableView to the given writer in CSV format.
+        /// </summary>
+        /// <param name="writer">The TextWriter to which the contents should be written.</param>
+        private void ExportIncidentTableToCsv(TextWriter writer)
+        {
+            // write the column headers
             var headers = IncidentsTableView.Columns.Cast<DataGridViewColumn>();
-            csvString.AppendLine(string.Join(",", headers.Select(column => "\"" + column.HeaderText + "\"").ToArray()));
+            writer.WriteLine(string.Join(",", headers.Select(column => "\"" + column.HeaderText + "\"").ToArray()));
 
+            // iterate through each row of the incidents table and write
             foreach (DataGridViewRow row in IncidentsTableView.Rows)
             {
                 var cells = row.Cells.Cast<DataGridViewCell>();
-                csvString.AppendLine(string.Join(",", cells.Select(cell => "\"" + cell.Value + "\"").ToArray()));
+                writer.WriteLine(string.Join(",", cells.Select(cell => "\"" + cell.Value + "\"").ToArray()));
             }
-
-            // Write to the csv file.
-            File.WriteAllText(csvPath.ToString(), csvString.ToString());
         }
 
         /// <summary>
         /// Closes the current environment when the X button is clicked.
-        /// Checks if user wants to export the incident table to csv.
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">FormClosing event.</param>
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             wrapper.Stop();
-            if (ExportToCsvCheckBox.Checked == true)
-            {
-                ExportIncidentTableToCsv();
-            }
-
             Environment.Exit(0);
         }
 
