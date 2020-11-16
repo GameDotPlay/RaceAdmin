@@ -475,5 +475,110 @@ namespace RaceAdmin
             }
         }
 
+        public void IncidentsTableView_SortCompare(object sender, DataGridViewSortCompareEventArgs e)
+        {
+            if ("CarNum".Equals(e.Column.Name))
+            {
+                var v1 = e.CellValue1.ToString();
+                var v2 = e.CellValue2.ToString();
+                var result = v1.Length - v2.Length;
+                if (result == 0)
+                {
+                    var num1 = Int32.Parse(v1);
+                    var num2 = Int32.Parse(v2);
+                    result = num1 - num2;
+                }
+                e.SortResult = result;
+                e.Handled = true;
+            }
+            else
+            {
+                e.Handled = false;
+            }
+        }
+
+        // Code below this comment is used to generate test data or to simulate behavior 
+        // for UI testing. To use, create buttons on the form and connect them to the various
+        // event handler methods below.
+
+        private int testCurrentLap = 1;
+
+        private void Test_AddIncidentRow_Click(object sender, EventArgs e)
+        {
+            testCurrentLap = MakeRandomLap();
+
+            var rng = new Random();
+            var newIncidents = (int)Math.Pow(2, rng.Next(3));
+
+            Driver driver = new Driver()
+            {
+                CarIdx = 0,
+                FullName = MakeRandomName(),
+                CarNum = MakeRandomCarNumber(),
+                IRating = "",
+                OldIncs = 0,
+                NewIncs = newIncidents,
+                CurrentLap = testCurrentLap
+            };
+
+            LogNewIncident(driver, newIncidents);
+        }
+
+        private static string MakeRandomName()
+        {
+            var rng = new Random();
+            var names = rng.Next(2, 5);
+
+            var name = new StringBuilder();
+            for (var i = 0; i < names; i++)
+            {
+                var characters = rng.Next(8) + 3;
+                for (var j = 0; j < characters; j++)
+                {
+                    var character = (char)rng.Next('a', 'z');
+                    if (j == 0)
+                    {
+                        character = character.ToString().ToUpper()[0];
+                    }
+                    name.Append(character);
+                }
+                if (i < (names - 1))
+                {
+                    if (rng.NextDouble() < 0.05)
+                    {
+                        name.Append("-");
+                    }
+                    else
+                    {
+                        name.Append(" ");
+                    }
+                }
+            }
+            return name.ToString();
+        }
+
+        private string MakeRandomCarNumber()
+        {
+            var rng = new Random();
+            var digits = rng.Next(3) + 1;
+            var sb = new StringBuilder();
+            for (var i = 0; i < digits; i++)
+            {
+                var digit = rng.Next(10);
+                sb.Append(digit.ToString());
+            }
+            return sb.ToString();
+        }
+
+        private int MakeRandomLap()
+        {
+            var rng = new Random();
+            return testCurrentLap + rng.Next(2);
+        }
+
+        // Code above this comment is used to generate test data or to simulate behavior 
+        // for UI testing. To use, create buttons on the form and connect them to the various
+        // event handler methods above.
+
     }
 }

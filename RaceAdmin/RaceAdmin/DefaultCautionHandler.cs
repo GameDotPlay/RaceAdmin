@@ -49,7 +49,8 @@ namespace RaceAdmin
         {
             // start a timer to flash the caution panel
             timer = new System.Threading.Timer(
-                callback: new System.Threading.TimerCallback(o => {
+                callback: new System.Threading.TimerCallback(o =>
+                {
                     cautionPanel.BackColor = NextColor(cautionPanel.BackColor);
                 }),
                 state: null,
