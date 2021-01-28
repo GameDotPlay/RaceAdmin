@@ -1,5 +1,6 @@
-﻿using iRacingSdkWrapper;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using iRacingSdkWrapper;
 
 namespace RaceAdmin
 {
@@ -14,10 +15,9 @@ namespace RaceAdmin
 
         void SetTelemetryUpdateFrequency(int updateFrequency);
 
-        void Start();
+        void Start(bool record);
         void Stop();
 
         ITelemetryValue<T> GetTelemetryValue<T>(string name);
-
     }
 }

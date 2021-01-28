@@ -1,5 +1,8 @@
-﻿using iRacingSdkWrapper;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using iRacingSdkWrapper;
 
 namespace RaceAdmin
 {
@@ -10,19 +13,75 @@ namespace RaceAdmin
     public class SdkWrapperProxy : ISdkWrapper
     {
         private readonly SdkWrapper wrapper;
+        private bool record;
+
+        // TODO: these need to be lists so client code can add more than one of each type
+        private EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handleSessionInfoUpdate;
+        private EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handleTelemetryUpdate;
 
         public SdkWrapperProxy(SdkWrapper wrapper)
         {
             this.wrapper = wrapper;
+            this.record = false;
+
+            wrapper.TelemetryUpdated += OnTelemetryUpdate;
+            wrapper.SessionInfoUpdated += OnSessionInfoUpdate;
         }
+
         public void AddTelemetryUpdateHandler(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler)
         {
-            wrapper.TelemetryUpdated += handler;
+            this.handleTelemetryUpdate = handler;
+        }
+
+        private void OnTelemetryUpdate(Object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        {
+            if (record)
+            {
+                // TODO: consider implementing this...it's a bit complicated and not absolutely
+                // necessary for what is needed to be recorded in order to debug the incident
+                // counting bugs related to team driving
+            }
+
+            handleTelemetryUpdate?.Invoke(sender, e);
         }
 
         public void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler)
         {
-            wrapper.SessionInfoUpdated += handler;
+            this.handleSessionInfoUpdate = handler;
+        }
+
+        private void OnSessionInfoUpdate(Object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
+        {
+            if (record)
+            {
+                YamlQuery q = e.SessionInfo["WeekendInfo"]["SessionID"];
+                string sessionId = q.GetValue("nosession");
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                using (BinaryWriter w = AppendBinary(documentsPath + "\\session-" + sessionId + ".log"))
+                {
+                    w.Write(1); // session info update record identifer
+                    w.Write(e.UpdateTime);
+                    WriteUTF8(w, e.SessionInfo.Yaml);
+                }
+            }
+
+            handleSessionInfoUpdate?.Invoke(sender, e);
+        }
+
+        private void WriteUTF8(BinaryWriter w, string s)
+        {
+            WriteByteArray(w, Encoding.UTF8.GetBytes(s));
+        }
+
+        private void WriteByteArray(BinaryWriter w, byte[] bytes)
+        {
+            w.Write(bytes.Length);
+            w.Write(bytes);
+        }
+
+        private BinaryWriter AppendBinary(string path)
+        {
+            return new BinaryWriter(new FileStream(path, FileMode.Append, FileAccess.Write));
         }
 
         public void SetTelemetryUpdateFrequency(int updateFrequency)
@@ -30,8 +89,9 @@ namespace RaceAdmin
             wrapper.TelemetryUpdateFrequency = updateFrequency;
         }
 
-        public void Start()
+        public void Start(bool record)
         {
+            this.record = record;
             wrapper.Start();
         }
 
@@ -44,6 +104,5 @@ namespace RaceAdmin
         {
             return new TelemetryValueProxy<T>(wrapper.GetTelemetryValue<T>(name));
         }
-
     }
 }

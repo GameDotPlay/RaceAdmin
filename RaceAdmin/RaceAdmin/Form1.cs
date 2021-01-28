@@ -97,8 +97,10 @@ namespace RaceAdmin
             InitializeComponent();
 
             this.wrapper = wrapper;
-            this.cautionHandlers = new Dictionary<string, ICautionHandler>();
-            this.cautionHandlers.Add("default", new DefaultCautionHandler(this.CautionPanel));
+            this.cautionHandlers = new Dictionary<string, ICautionHandler>
+            {
+                { "default", new DefaultCautionHandler(this.CautionPanel) }
+            };
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -108,7 +110,8 @@ namespace RaceAdmin
             wrapper.SetTelemetryUpdateFrequency(4); // Hz
 
             // Start the wrapper.
-            wrapper.Start();
+            bool record = true;
+            wrapper.Start(record);
         }
 
         // used for testing only
@@ -280,17 +283,18 @@ namespace RaceAdmin
             IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
 
             // Update SessionUniqueID.
-            var tempInt = wrapper.GetTelemetryValue<int>("SessionUniqueID");
-            if (tempInt.Value() > this.liveUniqueSessionID)
+            // CONSIDER: is this actually necessary? The same info comes through the session
+            // updates (maybe) so this might be redundant.
+            var sessionUniqueID = e.TelemetryInfo.SessionUniqueID.Value;
+            if (sessionUniqueID != this.liveUniqueSessionID)
             {
+                this.liveUniqueSessionID = sessionUniqueID;
                 this.sessionInitializationComplete = false;
-                this.liveUniqueSessionID = tempInt.Value();
             }
 
             // Check for change in flag state.
-            tempInt = wrapper.GetTelemetryValue<int>("SessionFlags");
-            int flagField = tempInt.Value();
-            if ((flagField & (uint)SessionFlags.Caution) != 0)
+            var flags = e.TelemetryInfo.SessionFlags.Value;
+            if (flags.Contains(SessionFlags.Caution))
             {
                 if (cautionState == CautionState.ThresholdReached)
                 {
@@ -299,7 +303,7 @@ namespace RaceAdmin
                 }
                 this.incsReset = false;
             }
-            if ((flagField & (uint)SessionFlags.Green) != 0 && (this.incsReset == false))
+            if (flags.Contains(SessionFlags.Green) && (this.incsReset == false))
             {
                 if (cautionState == CautionState.YellowFlagDeployed)
                 {
@@ -322,6 +326,12 @@ namespace RaceAdmin
         /// <param name="delta">The number of incident points gained by this driver on this occasion.</param>
         public void LogNewIncident(Driver driver, int delta)
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => LogNewIncident(driver, delta)));
+                return;
+            }
+
             StringBuilder sb = new StringBuilder();
             int rowId = IncidentsTableView.Rows.Add();
             DataGridViewRow newRow = IncidentsTableView.Rows[rowId];
