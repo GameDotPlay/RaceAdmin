@@ -55,9 +55,8 @@ namespace RaceAdmin
             if (record)
             {
                 YamlQuery q = e.SessionInfo["WeekendInfo"]["SessionID"];
-                string sessionId = q.GetValue("nosession");
-                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                using (BinaryWriter w = AppendBinary(documentsPath + "\\session-" + sessionId + ".log"))
+                string sessionId = q.GetValue("default");
+                using (BinaryWriter w = AppendBinary(MakeSessionLogPath(sessionId)))
                 {
                     w.Write(1); // session info update record identifer
                     w.Write(e.UpdateTime);
@@ -82,6 +81,12 @@ namespace RaceAdmin
         private BinaryWriter AppendBinary(string path)
         {
             return new BinaryWriter(new FileStream(path, FileMode.Append, FileAccess.Write));
+        }
+
+        private string MakeSessionLogPath(string sessionId)
+        {
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            return documentsPath + "\\race-admin-session-" + sessionId + ".bin";
         }
 
         public void SetTelemetryUpdateFrequency(int updateFrequency)

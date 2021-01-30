@@ -22,7 +22,7 @@ namespace RaceAdmin.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -61,9 +61,19 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _2021_vApex_Flag_Logo4_RG_Black {
+            get {
+                object obj = ResourceManager.GetObject("2021 vApex Flag Logo4-RG-Black", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Control.
         /// </summary>
-        internal static string ColorName_Control {
+        public static string ColorName_Control {
             get {
                 return ResourceManager.GetString("ColorName_Control", resourceCulture);
             }
@@ -72,7 +82,7 @@ namespace RaceAdmin.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Gold.
         /// </summary>
-        internal static string ColorName_Gold {
+        public static string ColorName_Gold {
             get {
                 return ResourceManager.GetString("ColorName_Gold", resourceCulture);
             }

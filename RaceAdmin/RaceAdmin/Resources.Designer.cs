@@ -61,6 +61,16 @@ namespace RaceAdmin {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _2021_vApex_Flag_Logo4_RG_Black {
+            get {
+                object obj = ResourceManager.GetObject("2021 vApex Flag Logo4-RG-Black", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
         internal static System.IO.UnmanagedMemoryStream Caution {
