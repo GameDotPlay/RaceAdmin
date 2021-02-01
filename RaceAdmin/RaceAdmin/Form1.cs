@@ -10,6 +10,7 @@ using System.Data;
 using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace RaceAdmin
 {
@@ -24,6 +25,9 @@ namespace RaceAdmin
 
     public partial class RaceAdminMain : Form
     {
+        [DllImport("User32.dll")]
+        static extern int SetForegroundWindow(IntPtr point);
+
         /// <summary>
         /// Flag to indicate whether the incidents since last caution field has been reset to 0.
         /// </summary>
@@ -671,6 +675,19 @@ namespace RaceAdmin
         {
             var rng = new Random();
             return testCurrentLap + rng.Next(2);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Process p = Process.GetProcessesByName("iRacingSim64DX11").FirstOrDefault();
+            if (p != null)
+            {
+                IntPtr h = p.MainWindowHandle;
+                SetForegroundWindow(h);
+                SendKeys.SendWait("t");
+                Thread.Sleep(1000);
+                SendKeys.SendWait("!yellow{ENTER}");
+            }
         }
 
         // Code above this comment is used to generate test data or to simulate behavior 
