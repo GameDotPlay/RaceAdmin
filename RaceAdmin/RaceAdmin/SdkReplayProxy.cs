@@ -22,6 +22,11 @@ namespace RaceAdmin
             this.telemetryUpdateHandlers = new List<EventHandler<SdkWrapper.TelemetryUpdatedEventArgs>>();
         }
 
+        public bool IsLive()
+        {
+            return false;
+        }
+
         public void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler)
         {
             sessionInfoUpdateHandlers.Add(handler);
@@ -42,7 +47,7 @@ namespace RaceAdmin
             // ignored for now
         }
 
-        public void Start(bool record)
+        public void Start()
         {
             ReplayLoop loop = new ReplayLoop(reader, sessionInfoUpdateHandlers);
             Thread t = new Thread(new ThreadStart(loop.ThreadProc));
@@ -52,7 +57,7 @@ namespace RaceAdmin
 
         public void Stop()
         {
-            reader.Close(); // probably not threadsafe (well, not threadsafe)
+            reader.Close(); // probably not threadsafe (well, not threadsafe but program is closing)
         }
     }
 
@@ -69,18 +74,25 @@ namespace RaceAdmin
 
         public void ThreadProc()
         {
-            while (reader.BaseStream.Position != reader.BaseStream.Length)
+            try
             {
-                int recordType = reader.ReadInt32();
-                switch (recordType)
+                while (reader.BaseStream.Position != reader.BaseStream.Length)
                 {
-                    case 1:
-                        DoSessionInfoUpdate();
-                        break;
-                    default:
-                        break;
+                    int recordType = reader.ReadInt32();
+                    switch (recordType)
+                    {
+                        case 1:
+                            DoSessionInfoUpdate();
+                            break;
+                        default:
+                            break;
+                    }
+                    Thread.Sleep(50);
                 }
-                Thread.Sleep(50);
+                reader.Close();
+            } catch (ObjectDisposedException)
+            {
+                // just ignore; reader closed by parent thread or program closing anyway
             }
         }
 

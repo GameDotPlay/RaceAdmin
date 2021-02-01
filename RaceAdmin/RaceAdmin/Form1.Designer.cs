@@ -34,13 +34,10 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RaceAdminMain));
             this.IncidentsTableView = new System.Windows.Forms.DataGridView();
-            this.CarNum = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Incident = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Total = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DriverLapNum = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TotalIncidentCountLabel = new System.Windows.Forms.Label();
             this.TotalIncidentCountNum = new System.Windows.Forms.Label();
             this.IncidentsSinceCautionLabel = new System.Windows.Forms.Label();
@@ -51,8 +48,15 @@
             this.label4 = new System.Windows.Forms.Label();
             this.AudioNotificationCheckBox = new System.Windows.Forms.CheckBox();
             this.ExportButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.versionLabel = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CarNum = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Team = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Incident = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Total = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DriverLapNum = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.IncidentsTableView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -77,7 +81,9 @@
             this.IncidentsTableView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.IncidentsTableView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.IncidentsTableView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Time,
             this.CarNum,
+            this.Team,
             this.DriverName,
             this.Incident,
             this.Total,
@@ -105,94 +111,6 @@
             this.IncidentsTableView.TabIndex = 0;
             this.IncidentsTableView.TabStop = false;
             this.IncidentsTableView.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.IncidentsTableView_SortCompare);
-            // 
-            // CarNum
-            // 
-            this.CarNum.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ControlLight;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.CarNum.DefaultCellStyle = dataGridViewCellStyle2;
-            this.CarNum.DividerWidth = 1;
-            this.CarNum.HeaderText = "Car #";
-            this.CarNum.MinimumWidth = 75;
-            this.CarNum.Name = "CarNum";
-            this.CarNum.ReadOnly = true;
-            this.CarNum.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.CarNum.Width = 75;
-            // 
-            // DriverName
-            // 
-            this.DriverName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.ControlLight;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.DriverName.DefaultCellStyle = dataGridViewCellStyle3;
-            this.DriverName.DividerWidth = 1;
-            this.DriverName.HeaderText = "Driver Name";
-            this.DriverName.MinimumWidth = 250;
-            this.DriverName.Name = "DriverName";
-            this.DriverName.ReadOnly = true;
-            this.DriverName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // Incident
-            // 
-            this.Incident.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.ControlLight;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.Incident.DefaultCellStyle = dataGridViewCellStyle4;
-            this.Incident.DividerWidth = 1;
-            this.Incident.HeaderText = "Inc.";
-            this.Incident.MinimumWidth = 75;
-            this.Incident.Name = "Incident";
-            this.Incident.ReadOnly = true;
-            this.Incident.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Incident.Width = 75;
-            // 
-            // Total
-            // 
-            this.Total.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.ControlLight;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.Total.DefaultCellStyle = dataGridViewCellStyle5;
-            this.Total.DividerWidth = 1;
-            this.Total.HeaderText = "Total";
-            this.Total.MinimumWidth = 75;
-            this.Total.Name = "Total";
-            this.Total.ReadOnly = true;
-            this.Total.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Total.Width = 75;
-            // 
-            // DriverLapNum
-            // 
-            this.DriverLapNum.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.ControlLight;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.DriverLapNum.DefaultCellStyle = dataGridViewCellStyle6;
-            this.DriverLapNum.HeaderText = "Driver Lap #";
-            this.DriverLapNum.MinimumWidth = 110;
-            this.DriverLapNum.Name = "DriverLapNum";
-            this.DriverLapNum.ReadOnly = true;
-            this.DriverLapNum.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.DriverLapNum.Width = 110;
             // 
             // TotalIncidentCountLabel
             // 
@@ -314,15 +232,15 @@
             this.ExportButton.UseVisualStyleBackColor = true;
             this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
             // 
-            // label1
+            // versionLabel
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(117, 631);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(31, 13);
-            this.label1.TabIndex = 8;
-            this.label1.Text = "1.1.0";
+            this.versionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.versionLabel.AutoSize = true;
+            this.versionLabel.Location = new System.Drawing.Point(117, 631);
+            this.versionLabel.Name = "versionLabel";
+            this.versionLabel.Size = new System.Drawing.Size(37, 13);
+            this.versionLabel.TabIndex = 8;
+            this.versionLabel.Text = "v1.0.0";
             // 
             // pictureBox1
             // 
@@ -335,6 +253,124 @@
             this.pictureBox1.TabIndex = 9;
             this.pictureBox1.TabStop = false;
             // 
+            // Time
+            // 
+            this.Time.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ControlLight;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
+            this.Time.DefaultCellStyle = dataGridViewCellStyle2;
+            this.Time.DividerWidth = 1;
+            this.Time.HeaderText = "Time";
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
+            // 
+            // CarNum
+            // 
+            this.CarNum.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.ControlLight;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.CarNum.DefaultCellStyle = dataGridViewCellStyle3;
+            this.CarNum.DividerWidth = 1;
+            this.CarNum.HeaderText = "Car #";
+            this.CarNum.MinimumWidth = 75;
+            this.CarNum.Name = "CarNum";
+            this.CarNum.ReadOnly = true;
+            this.CarNum.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.CarNum.Width = 75;
+            // 
+            // Team
+            // 
+            this.Team.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.ControlLight;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
+            this.Team.DefaultCellStyle = dataGridViewCellStyle4;
+            this.Team.DividerWidth = 1;
+            this.Team.FillWeight = 50F;
+            this.Team.HeaderText = "Team";
+            this.Team.MinimumWidth = 250;
+            this.Team.Name = "Team";
+            this.Team.ReadOnly = true;
+            // 
+            // DriverName
+            // 
+            this.DriverName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.ControlLight;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.DriverName.DefaultCellStyle = dataGridViewCellStyle5;
+            this.DriverName.DividerWidth = 1;
+            this.DriverName.FillWeight = 50F;
+            this.DriverName.HeaderText = "Driver";
+            this.DriverName.MinimumWidth = 250;
+            this.DriverName.Name = "DriverName";
+            this.DriverName.ReadOnly = true;
+            this.DriverName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // Incident
+            // 
+            this.Incident.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.ControlLight;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.Incident.DefaultCellStyle = dataGridViewCellStyle6;
+            this.Incident.DividerWidth = 1;
+            this.Incident.HeaderText = "Inc.";
+            this.Incident.MinimumWidth = 75;
+            this.Incident.Name = "Incident";
+            this.Incident.ReadOnly = true;
+            this.Incident.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Incident.Width = 75;
+            // 
+            // Total
+            // 
+            this.Total.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.ControlLight;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.Total.DefaultCellStyle = dataGridViewCellStyle7;
+            this.Total.DividerWidth = 1;
+            this.Total.HeaderText = "Total";
+            this.Total.MinimumWidth = 75;
+            this.Total.Name = "Total";
+            this.Total.ReadOnly = true;
+            this.Total.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Total.Width = 75;
+            // 
+            // DriverLapNum
+            // 
+            this.DriverLapNum.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.ControlLight;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.DriverLapNum.DefaultCellStyle = dataGridViewCellStyle8;
+            this.DriverLapNum.HeaderText = "Car Lap #";
+            this.DriverLapNum.MinimumWidth = 110;
+            this.DriverLapNum.Name = "DriverLapNum";
+            this.DriverLapNum.ReadOnly = true;
+            this.DriverLapNum.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.DriverLapNum.Width = 110;
+            // 
             // RaceAdminMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -342,7 +378,7 @@
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(977, 661);
             this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.versionLabel);
             this.Controls.Add(this.ExportButton);
             this.Controls.Add(this.AudioNotificationCheckBox);
             this.Controls.Add(this.CautionPanel);
@@ -379,14 +415,16 @@
         private System.Windows.Forms.Panel CautionPanel;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox AudioNotificationCheckBox;
+        private System.Windows.Forms.Button ExportButton;
+        private System.Windows.Forms.Label versionLabel;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
         private System.Windows.Forms.DataGridViewTextBoxColumn CarNum;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Team;
         private System.Windows.Forms.DataGridViewTextBoxColumn DriverName;
         private System.Windows.Forms.DataGridViewTextBoxColumn Incident;
         private System.Windows.Forms.DataGridViewTextBoxColumn Total;
         private System.Windows.Forms.DataGridViewTextBoxColumn DriverLapNum;
-        private System.Windows.Forms.Button ExportButton;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 

@@ -13,19 +13,24 @@ namespace RaceAdmin
     public class SdkWrapperProxy : ISdkWrapper
     {
         private readonly SdkWrapper wrapper;
-        private bool record;
+        private readonly bool record;
 
         // TODO: these need to be lists so client code can add more than one of each type
         private EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handleSessionInfoUpdate;
         private EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handleTelemetryUpdate;
 
-        public SdkWrapperProxy(SdkWrapper wrapper)
+        public SdkWrapperProxy(SdkWrapper wrapper, bool record)
         {
             this.wrapper = wrapper;
-            this.record = false;
+            this.record = record;
 
             wrapper.TelemetryUpdated += OnTelemetryUpdate;
             wrapper.SessionInfoUpdated += OnSessionInfoUpdate;
+        }
+
+        public bool IsLive()
+        {
+            return true;
         }
 
         public void AddTelemetryUpdateHandler(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler)
@@ -37,9 +42,8 @@ namespace RaceAdmin
         {
             if (record)
             {
-                // TODO: consider implementing this...it's a bit complicated and not absolutely
-                // necessary for what is needed to be recorded in order to debug the incident
-                // counting bugs related to team driving
+                // TODO: this is needed in order to know which session (practice, qualify, race)
+                // as well as to detect any flags displayed (green, yellow, etc.)
             }
 
             handleTelemetryUpdate?.Invoke(sender, e);
@@ -94,9 +98,8 @@ namespace RaceAdmin
             wrapper.TelemetryUpdateFrequency = updateFrequency;
         }
 
-        public void Start(bool record)
+        public void Start()
         {
-            this.record = record;
             wrapper.Start();
         }
 

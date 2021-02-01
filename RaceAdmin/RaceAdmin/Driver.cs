@@ -34,10 +34,12 @@
 
         public int CarIdx { get; set; }
         public string FullName { get; set; }
+        public string TeamName { get; set; }
         public string CarNum { get; set; }
         public string IRating { get; set; }
         public int OldIncs { get; set; }
         public int NewIncs { get; set; }
+        public string TeamInc { get; set; }
         public int CurrentLap { get; set; }
     }
 }

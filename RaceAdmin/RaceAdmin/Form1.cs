@@ -6,6 +6,10 @@ using System.Linq;
 using System.Media;
 using System.Text;
 using System.Windows.Forms;
+using System.Data;
+using System.Threading;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace RaceAdmin
 {
@@ -40,6 +44,8 @@ namespace RaceAdmin
         /// </summary>
         private int incCountSinceCaution = 0;
 
+        private bool teamRacing;
+
         /// <summary>
         /// The maximum allowable number of drivers set for this session. Used to iterate through drivers in session string.
         /// </summary>
@@ -68,7 +74,7 @@ namespace RaceAdmin
         /// <summary>
         /// List of Driver objects used to store data about the current set of drivers in the session.
         /// </summary>
-        private List<Driver> drivers = new List<Driver>();
+        private Dictionary<string, Driver> drivers = new Dictionary<string, Driver>();
 
         /// <summary>
         /// ISdkWrapper object.
@@ -80,10 +86,12 @@ namespace RaceAdmin
         /// </summary>
         private Dictionary<string, ICautionHandler> cautionHandlers;
 
+        private double lastUpdateTime;
+
         // these are added for testing only
         public int LiveUniqueSessionID { get => liveUniqueSessionID; }
         public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
-        public List<Driver> Drivers { get => drivers; }
+        public Dictionary<string, Driver> Drivers { get => drivers; }
         public int TotalIncCount { get => totalIncCount; }
         public int IncCountSinceCaution { get => incCountSinceCaution; }
 
@@ -95,6 +103,9 @@ namespace RaceAdmin
         {
             // Initialize WinForm
             InitializeComponent();
+            
+            string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
+            this.versionLabel.Text = String.Format("v{0}", version);
 
             this.wrapper = wrapper;
             this.cautionHandlers = new Dictionary<string, ICautionHandler>
@@ -110,8 +121,7 @@ namespace RaceAdmin
             wrapper.SetTelemetryUpdateFrequency(4); // Hz
 
             // Start the wrapper.
-            bool record = true;
-            wrapper.Start(record);
+            wrapper.Start();
         }
 
         // used for testing only
@@ -119,7 +129,6 @@ namespace RaceAdmin
         {
             this.cautionHandlers = cautionHandlers;
         }
-
 
         /// <summary>
         /// Called when the session string has been updated by the simulator.
@@ -131,129 +140,123 @@ namespace RaceAdmin
         /// <param name="e">Session string changed event. Contains info from session string that can be queried.</param>
         public void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
-            // Perform some initialization if this is the first time being called in this session...
-            if (this.sessionInitializationComplete == false)
+            if (!wrapper.IsLive() && e.UpdateTime < lastUpdateTime)
             {
-                YamlQuery query;  // Yaml query object used to query data from the session string.
-                string temp;      // Temporary string used to get string version of data from query before parsing to a number.
+                // curretnly the wrapper does not record the data necessary to detect session 
+                // transitions so we need to fake it here
+                Console.WriteLine("advancing session");
+                liveSessionNum++;
+                sessionInitializationComplete = false;
+            }
+            lastUpdateTime = e.UpdateTime;
 
-                // Get max # of drivers set for this session...
-                query = e.SessionInfo["WeekendInfo"]["WeekendOptions"]["NumStarters"];
-                query.TryGetValue(out temp);
-                System.Int32.TryParse(temp, out this.numStarters);
-
-                drivers.Clear();
-                PopulateDriversList(drivers, e);
-                this.totalIncCount = 0;
-                this.incCountSinceCaution = 0;
-                IncidentsTableView.Rows.Clear();
-
+            // Perform some initialization if this is the first time being called in this session...
+            if (!this.sessionInitializationComplete)
+            {
+                InitializeSession(e);
                 this.sessionInitializationComplete = true;
             }
-            else if (this.sessionInitializationComplete == true)
+
+            AddNewDrivers(e);
+            UpdateIncidentCounts(e);
+            UpdateDriverLapCounts(e);
+        }
+
+        private void InitializeSession(SdkWrapper.SessionInfoUpdatedEventArgs e)
+        {
+            if (InvokeRequired)
             {
-                int carIdx = 0;     // Used as iterator to iterate through driver ID #'s in session string.
-                int numDrivers = 0; // Counter for number of drivers in the current session.
-                YamlQuery query;    // Yaml query object used to query data from the session string.
-                string temp;        // Temporary string used to get string version of data from query before parsing to a number.
-                string name;        // Temporary string used to compare a new name from query with current list of drivers in List<drivers>.
+                Invoke(new Action(() => InitializeSession(e)));
+                return;
+            }
 
-                // Check for new drivers that have entered since session started...
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                while (carIdx <= this.numStarters + 1)
+            YamlQuery query = e.SessionInfo["WeekendInfo"]["TeamRacing"];
+            query.TryGetValue(out string temp);
+            System.Int32.TryParse(temp, out int tempInt);
+            teamRacing = tempInt > 0;
+            var teamColName = RaceAdmin.Properties.Resources.TableColumn_Team;
+            if (!teamRacing && IncidentsTableView.Columns.Contains(teamColName))
+            {
+                IncidentsTableView.Columns.Remove(IncidentsTableView.Columns[teamColName]);
+            }
+
+            // Get max # of drivers set for this session...
+            query = e.SessionInfo["WeekendInfo"]["WeekendOptions"]["NumStarters"];
+            query.TryGetValue(out temp);
+            System.Int32.TryParse(temp, out this.numStarters);
+
+            this.totalIncCount = 0;
+            this.incCountSinceCaution = 0;
+            ClearIncidents();
+        }
+
+        private void UpdateIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
+        {
+            int carIdx = 0;
+            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+            while (query.TryGetValue(out string name))
+            {
+                if (name == null || name == "Pace Car")
                 {
-                    query.TryGetValue(out temp);
-                    if (temp == null)
-                    {
-                        carIdx++;
-                        query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                        continue;
-                    }
-                    else if (temp == "Pace Car")
-                    {
-                        carIdx++;
-                        query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                        continue;
-                    }
-                    else
-                    {
-                        carIdx++;
-                        numDrivers++;
-                        query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                    }
-                }
-
-                if (drivers.Count != numDrivers)
-                {
-                    drivers.Clear();
-                    PopulateDriversList(drivers, e);
-                }
-
-                // Every time session info updates check all drivers in List<drivers> for changes in incidents...
-                carIdx = 0;
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                while (carIdx <= this.numStarters + 1)
-                {
-                    query.TryGetValue(out name);
-                    if (name == null) // Someone who clicked join but never actually launched the simulator.
-                    {
-                        carIdx++;
-                        query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                        continue;
-                    }
-                    if (name == "Pace Car") // We don't care about the pace car.
-                    {
-                        carIdx++;
-                        query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                        continue;
-                    }
-                    foreach (var driver in drivers)
-                    {
-                        if (carIdx == driver.CarIdx)
-                        {
-                            string s_newIncs;
-                            int i_newIncs;
-                            query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"];
-                            query.TryGetValue(out s_newIncs);
-                            System.Int32.TryParse(s_newIncs, out i_newIncs);
-                            driver.NewIncs = i_newIncs;
-                            if ((driver.NewIncs - driver.OldIncs) != 0)
-                            {
-                                LogNewIncident(driver, (driver.NewIncs - driver.OldIncs));
-                                driver.OldIncs = driver.NewIncs;
-                            }
-                            break;
-                        }
-                    }
-
                     carIdx++;
                     query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+                    continue;
                 }
 
-                // Update current lap number for all drivers...
-                int i = 1;
-                string s_lapsComplete;
-                string s_carIdx;
-                carIdx = 0;
-                int i_lapsComplete;
-                query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.liveSessionNum]["ResultsPositions"]["Position", i]["CarIdx"];
-                while (query.TryGetValue(out s_carIdx))
+                if (!drivers.TryGetValue(name, out Driver driver))
                 {
-                    System.Int32.TryParse(s_carIdx, out carIdx);
-                    foreach (var driver in drivers)
-                    {
-                        if (carIdx == driver.CarIdx)
-                        {
-                            query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.liveSessionNum]["ResultsPositions"]["Position", i]["LapsComplete"];
-                            query.TryGetValue(out s_lapsComplete);
-                            System.Int32.TryParse(s_lapsComplete, out i_lapsComplete);
-                            driver.CurrentLap = i_lapsComplete + 1;
-                        }
-                    }
-
-                    i++;
-                    query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.liveSessionNum]["ResultsPositions"]["Position", i]["CarIdx"];
+                    carIdx++;
+                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+                    Console.WriteLine("ERROR: driver {0} not found in session driver list", name);
+                    continue;
                 }
+
+                if (teamRacing)
+                {
+                    driver.TeamInc = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value;
+                }
+
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"];
+                query.TryGetValue(out string s_newIncs);
+                System.Int32.TryParse(s_newIncs, out int i_newIncs);
+
+                // delta can be negative if a driver or the person running the RaceAdmin program 
+                // disconnects and then reconnects; overall the negative rows and then the positive
+                // rows added back total up to the same amount, so we can just ignore these. The negative
+                // rows cause confusion and make the incident count fluctuate unnaturally.
+                var delta = i_newIncs - driver.OldIncs;
+                if (delta > 0)
+                {
+                    driver.NewIncs = i_newIncs;
+                    LogNewIncident(e.SessionInfo.UpdateTime, driver, delta);
+                    driver.OldIncs = driver.NewIncs;
+                }
+
+                carIdx++;
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+            }
+        }
+
+        private void UpdateDriverLapCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
+        {
+            int i = 1;
+            YamlQuery query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.liveSessionNum]["ResultsPositions"]["Position", i]["CarIdx"];
+            while (query.TryGetValue(out string s_carIdx))
+            {
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", s_carIdx]["UserName"];
+                if (query.TryGetValue(out string userName))
+                {
+                    if (drivers.TryGetValue(userName, out Driver driver))
+                    {
+                        query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.liveSessionNum]["ResultsPositions"]["Position", i]["LapsComplete"];
+                        query.TryGetValue(out string s_lapsComplete);
+                        System.Int32.TryParse(s_lapsComplete, out int i_lapsComplete);
+                        driver.CurrentLap = i_lapsComplete + 1;
+                    }
+                }
+
+                i++;
+                query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.liveSessionNum]["ResultsPositions"]["Position", i]["CarIdx"];
             }
         }
 
@@ -283,8 +286,6 @@ namespace RaceAdmin
             IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
 
             // Update SessionUniqueID.
-            // CONSIDER: is this actually necessary? The same info comes through the session
-            // updates (maybe) so this might be redundant.
             var sessionUniqueID = e.TelemetryInfo.SessionUniqueID.Value;
             if (sessionUniqueID != this.liveUniqueSessionID)
             {
@@ -318,28 +319,58 @@ namespace RaceAdmin
             //var fictionalObject = wrapper.GetTelemetryValue<int>("VariableName");
             //int fictionalValue = fictionalObject.Value;
         }
+        private void ClearIncidents()
+        {
+            if(InvokeRequired)
+            {
+                Invoke(new Action(() => ClearIncidents()));
+                return;
+            }
+
+            IncidentsTableView.Rows.Clear();
+            foreach(var driver in drivers.Values)
+            {
+                driver.NewIncs = 0;
+                driver.OldIncs = 0;
+            }
+        }
 
         /// <summary>
         /// Inserts new row in incident log.
         /// </summary>
         /// <param name="driver">Driver associated with the latest incident.</param>
         /// <param name="delta">The number of incident points gained by this driver on this occasion.</param>
-        public void LogNewIncident(Driver driver, int delta)
+        public void LogNewIncident(double timestamp, Driver driver, int delta)
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => LogNewIncident(driver, delta)));
+                Invoke(new Action(() => LogNewIncident(timestamp, driver, delta)));
                 return;
             }
 
             StringBuilder sb = new StringBuilder();
             int rowId = IncidentsTableView.Rows.Add();
             DataGridViewRow newRow = IncidentsTableView.Rows[rowId];
+            newRow.Cells[Properties.Resources.TableColumn_Time].Value = MakeTimeString(timestamp);
             newRow.Cells[Properties.Resources.TableColumn_CarNum].Value = driver.CarNum;
+            if (teamRacing)
+            {
+                newRow.Cells[Properties.Resources.TableColumn_Team].Value = driver.TeamName;
+            }
             newRow.Cells[Properties.Resources.TableColumn_DriverName].Value = driver.FullName;
             sb.Append(delta + "x");
             newRow.Cells[Properties.Resources.TableColumn_Incident].Value = sb.ToString();
-            newRow.Cells[Properties.Resources.TableColumn_Total].Value = driver.NewIncs.ToString();
+            String total;
+            if (teamRacing)
+            {
+                // iracing-style team incidents
+                total = String.Format("{0},{1}", driver.TeamInc, driver.NewIncs);
+            }
+            else
+            {
+                total = driver.NewIncs.ToString();
+            }
+            newRow.Cells[Properties.Resources.TableColumn_Total].Value = total;
             newRow.Cells[Properties.Resources.TableColumn_DriverLapNum].Value = driver.CurrentLap;
             this.totalIncCount += delta;
             this.incCountSinceCaution += delta;
@@ -352,52 +383,48 @@ namespace RaceAdmin
             IncidentsTableView.FirstDisplayedScrollingRowIndex = IncidentsTableView.RowCount - 1;
         }
 
+        private string MakeTimeString(double time)
+        {
+            return TimeSpan.FromSeconds(time).ToString(@"hh\:mm\:ss");
+        }
+
         /// <summary>
         /// Populates a List<T> of drivers in the current session. 
         /// </summary>
-        /// <param name="drivers">List of Driver objects.</param>
         /// <param name="e">Session string changed event. Object that conatains info from session string that can be queried.</param>
-        private void PopulateDriversList(List<Driver> drivers, SdkWrapper.SessionInfoUpdatedEventArgs e)
+        private void AddNewDrivers(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             int carIdx = 0;
-            string fullName;
-            int incidentCount;
             YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            while (carIdx <= this.numStarters + 1)
+            while (query.TryGetValue(out string fullName))
             {
-                query.TryGetValue(out fullName);
-                if (fullName == null)
+                if (fullName != null)
                 {
+                    if (!drivers.ContainsKey(fullName))
+                    {
+                        var driver = new Driver
+                        {
+                            CarIdx = carIdx,
+                            FullName = fullName,
+                            TeamName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamName"].Value,
+                            CarNum = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarNumber"].Value,
+                            IRating = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["IRating"].Value,
+                            OldIncs = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"].Value)
+                        };
+
+                        Console.WriteLine("adding driver {0}", fullName);
+                        drivers.Add(fullName, driver);
+                    }
+
                     carIdx++;
                     query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                    continue;
                 }
-                if (fullName == "Pace Car")
-                {
-                    carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                    continue;
-                }
-
-                Driver driver = new Driver();
-
-                driver.FullName = fullName;
-                driver.CarIdx = carIdx;
-
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarNumber"];
-                driver.CarNum = query.Value;
-
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["IRating"];
-                driver.IRating = query.Value;
-
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"];
-                System.Int32.TryParse(query.Value, out incidentCount);
-                driver.OldIncs = incidentCount;
-
-                drivers.Add(driver);
-                carIdx++;
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
             }
+        }
+
+        private int SafeInt(string s)
+        {
+            return System.Int32.TryParse(s, out int x) ? x: 0;
         }
 
         /// <summary>
@@ -407,25 +434,32 @@ namespace RaceAdmin
         /// <param name="e">EventArgs event.</param>
         private void ExportButton_Click(object sender, EventArgs e)
         {
-            var saveFileDialog = new SaveFileDialog
+            Thread t = new Thread((ThreadStart)(() =>
             {
-                Title = "Export...",
-                FileName = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".csv",
-                Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
-                FilterIndex = 1,
-                RestoreDirectory = true
-            };
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                Stream outputStream = saveFileDialog.OpenFile();
-                if (outputStream != null)
+                var saveFileDialog = new SaveFileDialog
                 {
-                    var outputWriter = new StreamWriter(outputStream);
-                    ExportIncidentTableToCsv(outputWriter);
-                    outputWriter.Close();
+                    Title = "Export...",
+                    FileName = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".csv",
+                    Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
+                    FilterIndex = 1,
+                    RestoreDirectory = true
+                };
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    Stream outputStream = saveFileDialog.OpenFile();
+                    if (outputStream != null)
+                    {
+                        var outputWriter = new StreamWriter(outputStream);
+                        ExportIncidentTableToCsv(outputWriter);
+                        outputWriter.Close();
+                    }
                 }
-            }
+            }));
+
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            t.Join();
         }
 
         /// <summary>
@@ -539,7 +573,7 @@ namespace RaceAdmin
                 CurrentLap = testCurrentLap
             };
 
-            LogNewIncident(driver, newIncidents);
+            LogNewIncident(0.0, driver, newIncidents);
         }
 
         private static string MakeRandomName()
