@@ -57,7 +57,12 @@
             this.Incident = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Total = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DriverLapNum = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ObscurePanel1 = new System.Windows.Forms.Panel();
+            this.ObscurePanel2 = new System.Windows.Forms.Panel();
+            this.sessionLabel = new System.Windows.Forms.Label();
+            this.hideIncidentsCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.IncidentsTableView)).BeginInit();
+            this.CautionPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -189,6 +194,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CautionPanel.BackColor = System.Drawing.SystemColors.Control;
             this.CautionPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.CautionPanel.Controls.Add(this.sessionLabel);
             this.CautionPanel.Location = new System.Drawing.Point(12, 12);
             this.CautionPanel.MinimumSize = new System.Drawing.Size(568, 273);
             this.CautionPanel.Name = "CautionPanel";
@@ -212,7 +218,7 @@
             this.AudioNotificationCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.AudioNotificationCheckBox.AutoSize = true;
             this.AudioNotificationCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
-            this.AudioNotificationCheckBox.Location = new System.Drawing.Point(739, 628);
+            this.AudioNotificationCheckBox.Location = new System.Drawing.Point(729, 613);
             this.AudioNotificationCheckBox.Name = "AudioNotificationCheckBox";
             this.AudioNotificationCheckBox.Size = new System.Drawing.Size(151, 20);
             this.AudioNotificationCheckBox.TabIndex = 6;
@@ -371,12 +377,59 @@
             this.DriverLapNum.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.DriverLapNum.Width = 110;
             // 
+            // ObscurePanel1
+            // 
+            this.ObscurePanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ObscurePanel1.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.ObscurePanel1.CausesValidation = false;
+            this.ObscurePanel1.Enabled = false;
+            this.ObscurePanel1.Location = new System.Drawing.Point(610, 13);
+            this.ObscurePanel1.Name = "ObscurePanel1";
+            this.ObscurePanel1.Size = new System.Drawing.Size(355, 301);
+            this.ObscurePanel1.TabIndex = 10;
+            this.ObscurePanel1.Visible = false;
+            // 
+            // ObscurePanel2
+            // 
+            this.ObscurePanel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ObscurePanel2.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.ObscurePanel2.Location = new System.Drawing.Point(12, 291);
+            this.ObscurePanel2.Name = "ObscurePanel2";
+            this.ObscurePanel2.Size = new System.Drawing.Size(591, 329);
+            this.ObscurePanel2.TabIndex = 11;
+            this.ObscurePanel2.Visible = false;
+            // 
+            // sessionLabel
+            // 
+            this.sessionLabel.AutoSize = true;
+            this.sessionLabel.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.sessionLabel.Location = new System.Drawing.Point(3, 3);
+            this.sessionLabel.Name = "sessionLabel";
+            this.sessionLabel.Size = new System.Drawing.Size(88, 18);
+            this.sessionLabel.TabIndex = 0;
+            this.sessionLabel.Text = "PRACTICE";
+            // 
+            // hideIncidentsCheckBox
+            // 
+            this.hideIncidentsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.hideIncidentsCheckBox.AutoSize = true;
+            this.hideIncidentsCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.hideIncidentsCheckBox.Location = new System.Drawing.Point(729, 631);
+            this.hideIncidentsCheckBox.Name = "hideIncidentsCheckBox";
+            this.hideIncidentsCheckBox.Size = new System.Drawing.Size(177, 20);
+            this.hideIncidentsCheckBox.TabIndex = 12;
+            this.hideIncidentsCheckBox.Text = "Hide incidents during race";
+            this.hideIncidentsCheckBox.UseVisualStyleBackColor = true;
+            // 
             // RaceAdminMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(977, 661);
+            this.Controls.Add(this.hideIncidentsCheckBox);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.versionLabel);
             this.Controls.Add(this.ExportButton);
@@ -390,6 +443,8 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.IncidentsTableView);
+            this.Controls.Add(this.ObscurePanel1);
+            this.Controls.Add(this.ObscurePanel2);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(993, 700);
@@ -397,6 +452,8 @@
             this.Text = "Race Administrator";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.IncidentsTableView)).EndInit();
+            this.CautionPanel.ResumeLayout(false);
+            this.CautionPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -425,6 +482,10 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Incident;
         private System.Windows.Forms.DataGridViewTextBoxColumn Total;
         private System.Windows.Forms.DataGridViewTextBoxColumn DriverLapNum;
+        private System.Windows.Forms.Panel ObscurePanel1;
+        private System.Windows.Forms.Panel ObscurePanel2;
+        private System.Windows.Forms.Label sessionLabel;
+        private System.Windows.Forms.CheckBox hideIncidentsCheckBox;
     }
 }
 

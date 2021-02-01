@@ -87,6 +87,7 @@ namespace RaceAdmin
         private Dictionary<string, ICautionHandler> cautionHandlers;
 
         private double lastUpdateTime;
+        private bool raceSession;
 
         // these are added for testing only
         public int LiveUniqueSessionID { get => liveUniqueSessionID; }
@@ -142,9 +143,8 @@ namespace RaceAdmin
         {
             if (!wrapper.IsLive() && e.UpdateTime < lastUpdateTime)
             {
-                // curretnly the wrapper does not record the data necessary to detect session 
+                // currently the wrapper does not record the data necessary to detect session 
                 // transitions so we need to fake it here
-                Console.WriteLine("advancing session");
                 liveSessionNum++;
                 sessionInitializationComplete = false;
             }
@@ -160,6 +160,12 @@ namespace RaceAdmin
             AddNewDrivers(e);
             UpdateIncidentCounts(e);
             UpdateDriverLapCounts(e);
+
+            var sessionComplete = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", liveSessionNum]["ResultsOfficial"].Value;
+            if (raceSession && sessionComplete == "1")
+            {
+                ShowIncidents();
+            }
         }
 
         private void InitializeSession(SdkWrapper.SessionInfoUpdatedEventArgs e)
@@ -169,6 +175,23 @@ namespace RaceAdmin
                 Invoke(new Action(() => InitializeSession(e)));
                 return;
             }
+
+            var sessionType = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", liveSessionNum]["SessionType"].Value;
+            var sessionName = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", liveSessionNum]["SessionName"].Value;
+            sessionLabel.Text = sessionName;
+            if (sessionType == "Race")
+            {
+                if (hideIncidentsCheckBox.Checked)
+                {
+                    ObscureIncidents();
+                }
+                raceSession = true;
+            }
+            else
+            {
+                raceSession = false;
+            }
+            Console.WriteLine("initializing session {0} ({1})", sessionName, sessionType);
 
             YamlQuery query = e.SessionInfo["WeekendInfo"]["TeamRacing"];
             query.TryGetValue(out string temp);
@@ -188,6 +211,28 @@ namespace RaceAdmin
             this.totalIncCount = 0;
             this.incCountSinceCaution = 0;
             ClearIncidents();
+        }
+
+        private void ObscureIncidents()
+        {
+            ObscurePanel1.Visible = true;
+            ObscurePanel1.BringToFront();
+            ObscurePanel2.Visible = true;
+            ObscurePanel2.BringToFront();
+        }
+
+        private void ShowIncidents()
+        {
+            if(InvokeRequired)
+            {
+                Invoke(new Action(() => ShowIncidents()));
+                return;
+            }
+
+            ObscurePanel1.Visible = false;
+            ObscurePanel1.SendToBack();
+            ObscurePanel2.Visible = false;
+            ObscurePanel2.SendToBack();
         }
 
         private void UpdateIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
