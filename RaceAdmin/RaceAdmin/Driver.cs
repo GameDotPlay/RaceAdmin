@@ -39,7 +39,7 @@
         public string IRating { get; set; }
         public int OldIncs { get; set; }
         public int NewIncs { get; set; }
-        public string TeamInc { get; set; }
+        public string TeamIncs { get; set; }
         public int CurrentLap { get; set; }
     }
 }

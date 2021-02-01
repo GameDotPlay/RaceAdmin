@@ -262,7 +262,7 @@ namespace RaceAdmin
 
                 if (teamRacing)
                 {
-                    driver.TeamInc = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value;
+                    driver.TeamIncs = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value;
                 }
 
                 query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"];
@@ -381,6 +381,7 @@ namespace RaceAdmin
             {
                 driver.NewIncs = 0;
                 driver.OldIncs = 0;
+                driver.TeamIncs = 0;
             }
         }
 
@@ -413,7 +414,7 @@ namespace RaceAdmin
             if (teamRacing)
             {
                 // iracing-style team incidents
-                total = String.Format("{0},{1}", driver.TeamInc, driver.NewIncs);
+                total = String.Format("{0},{1}", driver.TeamIncs, driver.NewIncs);
             }
             else
             {
