@@ -178,6 +178,7 @@
     <Compile Include="TelemetryInfoProxy.cs" />
     <Compile Include="TelemetryUpdatedEventProxy.cs" />
     <Compile Include="TelemetryValueProxy.cs" />
+    <Compile Include="ThrowCautionHandler.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

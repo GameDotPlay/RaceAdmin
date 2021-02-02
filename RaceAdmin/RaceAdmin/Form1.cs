@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -25,9 +24,6 @@ namespace RaceAdmin
 
     public partial class RaceAdminMain : Form
     {
-        [DllImport("User32.dll")]
-        static extern int SetForegroundWindow(IntPtr point);
-
         /// <summary>
         /// Flag to indicate whether the incidents since last caution field has been reset to 0.
         /// </summary>
@@ -605,6 +601,14 @@ namespace RaceAdmin
 
         private void AutoThrowCaution_CheckedChanged(object sender, EventArgs e)
         {
+            if (autoThrowCaution.Checked)
+            {
+                cautionHandlers.Add("throw", new ThrowCautionHandler());
+            }
+            else
+            {
+                cautionHandlers.Remove("throw");
+            }
             Properties.Settings.Default.autoThrowCaution = autoThrowCaution.Checked;
             Properties.Settings.Default.Save();
         }
