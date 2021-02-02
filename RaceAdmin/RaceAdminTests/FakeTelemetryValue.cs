@@ -4,16 +4,13 @@ namespace RaceAdminTests
 {
     internal class FakeTelemetryValue<T> : ITelemetryValue<T>
     {
-        private T value;
+        private readonly T value;
 
         public FakeTelemetryValue(T value)
         {
             this.value = value;
         }
 
-        public T Value()
-        {
-            return value;
-        }
+        public T Value { get => value; }
     }
 }

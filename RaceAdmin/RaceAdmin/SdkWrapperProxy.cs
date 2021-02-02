@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using iRacingSdkWrapper;
+using System;
 using System.IO;
 using System.Text;
-using iRacingSdkWrapper;
 
 namespace RaceAdmin
 {
@@ -17,7 +16,7 @@ namespace RaceAdmin
 
         // TODO: these need to be lists so client code can add more than one of each type
         private EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handleSessionInfoUpdate;
-        private EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handleTelemetryUpdate;
+        private EventHandler<ITelemetryUpdatedEvent> handleTelemetryUpdate;
 
         public SdkWrapperProxy(SdkWrapper wrapper, bool record)
         {
@@ -33,7 +32,7 @@ namespace RaceAdmin
             return true;
         }
 
-        public void AddTelemetryUpdateHandler(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler)
+        public void AddTelemetryUpdateHandler(EventHandler<ITelemetryUpdatedEvent> handler)
         {
             this.handleTelemetryUpdate = handler;
         }
@@ -46,7 +45,7 @@ namespace RaceAdmin
                 // as well as to detect any flags displayed (green, yellow, etc.)
             }
 
-            handleTelemetryUpdate?.Invoke(sender, e);
+            handleTelemetryUpdate?.Invoke(sender, new TelemetryUpdatedEventProxy(new TelemetryInfoProxy(e.TelemetryInfo)));
         }
 
         public void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler)
@@ -112,5 +111,6 @@ namespace RaceAdmin
         {
             return new TelemetryValueProxy<T>(wrapper.GetTelemetryValue<T>(name));
         }
+
     }
 }

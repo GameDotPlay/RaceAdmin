@@ -2,6 +2,6 @@
 {
     public interface ITelemetryValue<T>
     {
-        T Value();
+        T Value { get; }
     }
 }

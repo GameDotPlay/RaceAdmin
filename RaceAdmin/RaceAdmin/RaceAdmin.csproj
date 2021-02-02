@@ -159,6 +159,8 @@
     <Compile Include="ICautionHandler.cs" />
     <Compile Include="ISdkWrapper.cs" />
     <Compile Include="ISoundPlayer.cs" />
+    <Compile Include="ITelemetryInfo.cs" />
+    <Compile Include="ITelemetryUpdatedEvent.cs" />
     <Compile Include="ITelemetryValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -170,6 +172,8 @@
     <Compile Include="SdkReplayProxy.cs" />
     <Compile Include="SdkWrapperProxy.cs" />
     <Compile Include="SoundPlayerProxy.cs" />
+    <Compile Include="TelemetryInfoProxy.cs" />
+    <Compile Include="TelemetryUpdatedEventProxy.cs" />
     <Compile Include="TelemetryValueProxy.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

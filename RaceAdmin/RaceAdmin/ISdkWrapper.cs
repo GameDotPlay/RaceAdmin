@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using iRacingSdkWrapper;
+﻿using iRacingSdkWrapper;
+using System;
 
 namespace RaceAdmin
 {
@@ -11,7 +10,7 @@ namespace RaceAdmin
     {
         void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler);
 
-        void AddTelemetryUpdateHandler(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler);
+        void AddTelemetryUpdateHandler(EventHandler<ITelemetryUpdatedEvent> handler);
 
         void SetTelemetryUpdateFrequency(int updateFrequency);
 

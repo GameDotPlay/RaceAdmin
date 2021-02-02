@@ -1,16 +1,16 @@
 ﻿using iRacingSdkWrapper;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Media;
-using System.Text;
-using System.Windows.Forms;
-using System.Data;
-using System.Threading;
 using System.Reflection;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace RaceAdmin
 {
@@ -108,7 +108,7 @@ namespace RaceAdmin
         {
             // Initialize WinForm
             InitializeComponent();
-            
+
             string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
             this.versionLabel.Text = String.Format("v{0}", version);
 
@@ -185,7 +185,7 @@ namespace RaceAdmin
             sessionLabel.Text = sessionName;
             if (sessionType == "Race")
             {
-                if (hideIncidentsCheckBox.Checked)
+                if (hideIncidents.Checked)
                 {
                     ObscureIncidents();
                 }
@@ -202,9 +202,9 @@ namespace RaceAdmin
             System.Int32.TryParse(temp, out int tempInt);
             teamRacing = tempInt > 0;
             var teamColName = RaceAdmin.Properties.Resources.TableColumn_Team;
-            if (!teamRacing && IncidentsTableView.Columns.Contains(teamColName))
+            if (!teamRacing && incidentsTableView.Columns.Contains(teamColName))
             {
-                IncidentsTableView.Columns.Remove(IncidentsTableView.Columns[teamColName]);
+                incidentsTableView.Columns.Remove(incidentsTableView.Columns[teamColName]);
             }
 
             // Get max # of drivers set for this session...
@@ -227,7 +227,7 @@ namespace RaceAdmin
 
         private void ShowIncidents()
         {
-            if(InvokeRequired)
+            if (InvokeRequired)
             {
                 Invoke(new Action(() => ShowIncidents()));
                 return;
@@ -317,7 +317,7 @@ namespace RaceAdmin
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">Telemetry data changed event.</param>
-        public void OnTelemetryUpdated(object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        public void OnTelemetryUpdated(object sender, ITelemetryUpdatedEvent e)
         {
             // Check for incident limit reached for caution.
             // Animate color changes on CautionPanel.
@@ -370,18 +370,18 @@ namespace RaceAdmin
         }
         private void ClearIncidents()
         {
-            if(InvokeRequired)
+            if (InvokeRequired)
             {
                 Invoke(new Action(() => ClearIncidents()));
                 return;
             }
 
-            IncidentsTableView.Rows.Clear();
-            foreach(var driver in drivers.Values)
+            incidentsTableView.Rows.Clear();
+            foreach (var driver in drivers.Values)
             {
                 driver.NewIncs = 0;
                 driver.OldIncs = 0;
-                driver.TeamIncs = 0;
+                driver.TeamIncs = "";
             }
         }
 
@@ -399,8 +399,8 @@ namespace RaceAdmin
             }
 
             StringBuilder sb = new StringBuilder();
-            int rowId = IncidentsTableView.Rows.Add();
-            DataGridViewRow newRow = IncidentsTableView.Rows[rowId];
+            int rowId = incidentsTableView.Rows.Add();
+            DataGridViewRow newRow = incidentsTableView.Rows[rowId];
             newRow.Cells[Properties.Resources.TableColumn_Time].Value = MakeTimeString(timestamp);
             newRow.Cells[Properties.Resources.TableColumn_CarNum].Value = driver.CarNum;
             if (teamRacing)
@@ -430,10 +430,10 @@ namespace RaceAdmin
             {
                 newRow.DefaultCellStyle.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_IndianRed);
             }
-            IncidentsTableView.FirstDisplayedScrollingRowIndex = IncidentsTableView.RowCount - 1;
+            incidentsTableView.FirstDisplayedScrollingRowIndex = incidentsTableView.RowCount - 1;
         }
 
-        private string MakeTimeString(double time)
+        public static string MakeTimeString(double time)
         {
             return TimeSpan.FromSeconds(time).ToString(@"hh\:mm\:ss");
         }
@@ -474,7 +474,7 @@ namespace RaceAdmin
 
         private int SafeInt(string s)
         {
-            return System.Int32.TryParse(s, out int x) ? x: 0;
+            return System.Int32.TryParse(s, out int x) ? x : 0;
         }
 
         /// <summary>
@@ -519,11 +519,11 @@ namespace RaceAdmin
         public void ExportIncidentTableToCsv(TextWriter writer)
         {
             // write the column headers
-            var headers = IncidentsTableView.Columns.Cast<DataGridViewColumn>();
+            var headers = incidentsTableView.Columns.Cast<DataGridViewColumn>();
             writer.WriteLine(string.Join(",", headers.Select(column => "\"" + column.HeaderText + "\"").ToArray()));
 
             // iterate through each row of the incidents table and write
-            foreach (DataGridViewRow row in IncidentsTableView.Rows)
+            foreach (DataGridViewRow row in incidentsTableView.Rows)
             {
                 var cells = row.Cells.Cast<DataGridViewCell>();
                 writer.WriteLine(string.Join(",", cells.Select(cell => "\"" + cell.Value + "\"").ToArray()));
@@ -535,41 +535,31 @@ namespace RaceAdmin
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">FormClosing event.</param>
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void RaceAdminMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             wrapper.Stop();
             Environment.Exit(0);
         }
 
-        /// <summary>
-        /// KeyUp event for IncsRequiredForCautionTextBox.
-        /// Captures an "Enter" key pressed event to get new IncsRequiredForCaution value from user.
-        /// </summary>
-        /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">KeyEvent event.</param>
-        private void IncsRequiredForCautionTextBox_KeyUp(object sender, KeyEventArgs e)
+        private void IncidentsRequired_ValueChanged(object sender, EventArgs e)
         {
-            if (e.KeyData == Keys.Enter)
-            {
-                if (System.Int32.TryParse(IncsRequiredForCautionTextBox.Text, out this.incsRequiredForCaution) == false)
-                {
-                    MessageBox.Show(Properties.Resources.ErrorMessage_ValidNumberNotEntered);
-                }
-            }
+            incsRequiredForCaution = (int)incidentsRequired.Value;
         }
 
-        private void AudioNotificationCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void AudioNotification_CheckedChanged(object sender, EventArgs e)
         {
-            if (AudioNotificationCheckBox.Checked)
+            if (audioNotification.Checked)
             {
-                var player = new AudioCautionHandler(
-                    new SoundPlayerProxy(new SoundPlayer(RaceAdmin.Resources.Caution)))
+                var player = new SoundPlayer(RaceAdmin.Resources.Caution);
+                player.Play();
+
+                var handler = new AudioCautionHandler(new SoundPlayerProxy(player))
                 {
                     Repeat = 5, // times
                     Interval = 1000 // ms
                 };
 
-                cautionHandlers.Add("audio", player);
+                cautionHandlers.Add("audio", handler);
             }
             else
             {
@@ -676,19 +666,6 @@ namespace RaceAdmin
         {
             var rng = new Random();
             return testCurrentLap + rng.Next(2);
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Process p = Process.GetProcessesByName("iRacingSim64DX11").FirstOrDefault();
-            if (p != null)
-            {
-                IntPtr h = p.MainWindowHandle;
-                SetForegroundWindow(h);
-                SendKeys.SendWait("t");
-                Thread.Sleep(1000);
-                SendKeys.SendWait("!yellow{ENTER}");
-            }
         }
 
         // Code above this comment is used to generate test data or to simulate behavior 

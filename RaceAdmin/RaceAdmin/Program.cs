@@ -1,8 +1,8 @@
 ﻿using iRacingSdkWrapper;
 using System;
-using System.IO;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 using System.Windows.Forms;
 
 namespace RaceAdmin
@@ -31,7 +31,8 @@ namespace RaceAdmin
             });
 
             command.Handler = CommandHandler.Create(
-                (bool record, string playback) => {
+                (bool record, string playback) =>
+                {
                     ISdkWrapper wrapperProxy;
 
                     if (playback != null && playback.Length > 0)

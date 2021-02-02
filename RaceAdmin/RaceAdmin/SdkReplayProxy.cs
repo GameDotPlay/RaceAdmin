@@ -1,11 +1,8 @@
 ﻿using iRacingSdkWrapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace RaceAdmin
 {
@@ -13,13 +10,13 @@ namespace RaceAdmin
     {
         private BinaryReader reader;
         private List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers;
-        private List<EventHandler<SdkWrapper.TelemetryUpdatedEventArgs>> telemetryUpdateHandlers;
+        private List<EventHandler<ITelemetryUpdatedEvent>> telemetryUpdateHandlers;
 
         public SdkReplayProxy(BinaryReader reader)
         {
             this.reader = reader;
             this.sessionInfoUpdateHandlers = new List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>>();
-            this.telemetryUpdateHandlers = new List<EventHandler<SdkWrapper.TelemetryUpdatedEventArgs>>();
+            this.telemetryUpdateHandlers = new List<EventHandler<ITelemetryUpdatedEvent>>();
         }
 
         public bool IsLive()
@@ -32,7 +29,7 @@ namespace RaceAdmin
             sessionInfoUpdateHandlers.Add(handler);
         }
 
-        public void AddTelemetryUpdateHandler(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler)
+        public void AddTelemetryUpdateHandler(EventHandler<ITelemetryUpdatedEvent> handler)
         {
             telemetryUpdateHandlers.Add(handler);
         }
@@ -90,7 +87,8 @@ namespace RaceAdmin
                     Thread.Sleep(50);
                 }
                 reader.Close();
-            } catch (ObjectDisposedException)
+            }
+            catch (ObjectDisposedException)
             {
                 // just ignore; reader closed by parent thread or program closing anyway
             }
@@ -101,7 +99,7 @@ namespace RaceAdmin
             var timestamp = reader.ReadDouble();
             var yaml = ReadUTF8(reader);
             var args = new SdkWrapper.SessionInfoUpdatedEventArgs(yaml, timestamp);
-            foreach(var handler in sessionInfoUpdateHandlers)
+            foreach (var handler in sessionInfoUpdateHandlers)
             {
                 handler.Invoke(this, args);
             }
