@@ -106,7 +106,8 @@ namespace RaceAdmin
                                 currentSession++;
                             }
                             lastUpdateTime = e.UpdateTime;
-                            SendFakeTelemetryUpdate(currentSession);
+                            // uncomment below line if playing back old file without telemetry updates
+                            // SendFakeTelemetryUpdate(currentSession);
                             break;
                         case 2: // TelemetryUpdated
                             DoTelemetryUpdate(sendEvents);
@@ -116,7 +117,7 @@ namespace RaceAdmin
                     }
                     if (sendEvents)
                     {
-                        Thread.Sleep(50);
+                        Thread.Sleep(10);
                     }
                 }
                 reader.Close();

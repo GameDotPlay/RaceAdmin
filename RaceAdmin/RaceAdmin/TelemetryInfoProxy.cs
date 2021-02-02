@@ -19,5 +19,9 @@ namespace RaceAdmin
         public ITelemetryValue<int> SessionNum { get => new TelemetryValueProxy<int>(telemetryInfo.SessionNum); }
         public ITelemetryValue<int> SessionUniqueID { get => new TelemetryValueProxy<int>(telemetryInfo.SessionUniqueID); }
         public ITelemetryValue<double> SessionTimeRemain { get => new TelemetryValueProxy<double>(telemetryInfo.SessionTimeRemain); }
+
+        // NOTE: To get telemetry values not defined in Nick's wrapper...
+        //    var fictionalObject = wrapper.GetTelemetryValue<int>("VariableName");
+        //    int fictionalValue = fictionalObject.Value;
     }
 }
