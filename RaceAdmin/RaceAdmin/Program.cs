@@ -17,8 +17,18 @@ namespace RaceAdmin
         {
             var command = new RootCommand
             {
-                new Option(new[] { "--record", "-r" }, "Record session updates and telemetry."),
-                new Option(new[] { "--playback", "-p" }, "Play back events from specified session log.") { Argument = new Argument<string>() }
+                // TODO: these should really be subcommands
+                new Option(
+                    aliases: new[] { "--record", "-r" },
+                    description: "Record session updates and telemetry."),
+                new Option(
+                    aliases: new[] { "--playback", "-p" },
+                    description: "Play back events from specified session log.")
+                        { Argument = new Argument<string>() },
+                new Option(
+                    aliases: new[] { "--session", "-s" },
+                    description: "Play back only events from the indexed session within the session log.")
+                        { Argument = new Argument<int>(getDefaultValue: () => -1) }
             };
 
             command.AddValidator(r =>
@@ -31,7 +41,7 @@ namespace RaceAdmin
             });
 
             command.Handler = CommandHandler.Create(
-                (bool record, string playback) =>
+                (bool record, string playback, int session) =>
                 {
                     ISdkWrapper wrapperProxy;
 
@@ -40,7 +50,7 @@ namespace RaceAdmin
                         // replay mode; for now assume just a filename and look for file in documents folder
                         string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                         BinaryReader reader = new BinaryReader(File.Open(documentsPath + "\\" + playback, FileMode.Open));
-                        wrapperProxy = new SdkReplayProxy(reader);
+                        wrapperProxy = new SdkReplayProxy(reader, session);
                     }
                     else
                     {

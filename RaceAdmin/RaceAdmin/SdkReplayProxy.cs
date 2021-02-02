@@ -1,4 +1,5 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.Bitfields;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,15 +9,17 @@ namespace RaceAdmin
 {
     class SdkReplayProxy : ISdkWrapper
     {
-        private BinaryReader reader;
-        private List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers;
-        private List<EventHandler<ITelemetryUpdatedEvent>> telemetryUpdateHandlers;
+        private readonly BinaryReader reader;
+        private readonly int session;
+        private readonly List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers;
+        private readonly List<EventHandler<ITelemetryUpdatedEvent>> telemetryUpdateHandlers;
 
-        public SdkReplayProxy(BinaryReader reader)
+        public SdkReplayProxy(BinaryReader reader, int session)
         {
             this.reader = reader;
-            this.sessionInfoUpdateHandlers = new List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>>();
-            this.telemetryUpdateHandlers = new List<EventHandler<ITelemetryUpdatedEvent>>();
+            this.session = session;
+            sessionInfoUpdateHandlers = new List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>>();
+            telemetryUpdateHandlers = new List<EventHandler<ITelemetryUpdatedEvent>>();
         }
 
         public bool IsLive()
@@ -46,9 +49,12 @@ namespace RaceAdmin
 
         public void Start()
         {
-            ReplayLoop loop = new ReplayLoop(reader, sessionInfoUpdateHandlers);
-            Thread t = new Thread(new ThreadStart(loop.ThreadProc));
-            t.IsBackground = true;
+            ReplayLoop loop = new ReplayLoop(reader, session, sessionInfoUpdateHandlers, telemetryUpdateHandlers);
+            Thread t = new Thread(new ThreadStart(loop.Run))
+            {
+                Name = "ReplayLoop",
+                IsBackground = true
+            };
             t.Start();
         }
 
@@ -60,31 +66,51 @@ namespace RaceAdmin
 
     public class ReplayLoop
     {
-        private BinaryReader reader;
-        private List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers;
+        private readonly BinaryReader reader;
+        private readonly int session;
+        private readonly List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers;
+        private readonly List<EventHandler<ITelemetryUpdatedEvent>> telemetryUpdateHandlers;
 
-        public ReplayLoop(BinaryReader reader, List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers)
+        public ReplayLoop(BinaryReader reader, int session, List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers, List<EventHandler<ITelemetryUpdatedEvent>> telemetryUpdateHandlers)
         {
             this.reader = reader;
+            this.session = session;
             this.sessionInfoUpdateHandlers = sessionInfoUpdateHandlers;
+            this.telemetryUpdateHandlers = telemetryUpdateHandlers;
         }
 
-        public void ThreadProc()
+        public void Run()
         {
             try
             {
+                var lastUpdateTime = 0.0;
+                var currentSession = 0;
                 while (reader.BaseStream.Position != reader.BaseStream.Length)
                 {
+                    var sendEvents = session == -1 || session == currentSession;
+
                     int recordType = reader.ReadInt32();
                     switch (recordType)
                     {
                         case 1:
-                            DoSessionInfoUpdate();
+                            var e = DoSessionInfoUpdate(sendEvents);
+                            if (e.UpdateTime < lastUpdateTime)
+                            {
+                                // this is needed because we do not currently record/playback 
+                                // the telemetry updates which are the only way that the client
+                                // can detect session transitions
+                                currentSession++;
+                                SendFakeTelemetryUpdate(currentSession);
+                            }
+                            lastUpdateTime = e.UpdateTime;
                             break;
                         default:
                             break;
                     }
-                    Thread.Sleep(50);
+                    if (sendEvents)
+                    {
+                        Thread.Sleep(50);
+                    }
                 }
                 reader.Close();
             }
@@ -94,15 +120,29 @@ namespace RaceAdmin
             }
         }
 
-        private void DoSessionInfoUpdate()
+        private void SendFakeTelemetryUpdate(int currentSession)
+        {
+            var args = new FakeTelemetryUpdatedEvent(new FakeTelemetryInfo()
+            {
+                SessionFlags = new FakeTelemetryValue<SessionFlag>(new SessionFlag(0)),
+                SessionNum = new FakeTelemetryValue<int>(currentSession),
+                SessionUniqueID = new FakeTelemetryValue<int>(currentSession),
+            });
+            telemetryUpdateHandlers.ForEach(h => h.Invoke(this, args));
+        }
+
+        private SdkWrapper.SessionInfoUpdatedEventArgs DoSessionInfoUpdate(bool sendEvents)
         {
             var timestamp = reader.ReadDouble();
             var yaml = ReadUTF8(reader);
             var args = new SdkWrapper.SessionInfoUpdatedEventArgs(yaml, timestamp);
-            foreach (var handler in sessionInfoUpdateHandlers)
+
+            if (sendEvents)
             {
-                handler.Invoke(this, args);
+                sessionInfoUpdateHandlers.ForEach(h => h.Invoke(this, args));
             }
+
+            return args;
         }
 
         private string ReadUTF8(BinaryReader reader)

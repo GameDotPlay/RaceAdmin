@@ -1,8 +1,6 @@
-﻿using RaceAdmin;
-
-namespace RaceAdminTests
+﻿namespace RaceAdmin
 {
-    internal class FakeTelemetryValue<T> : ITelemetryValue<T>
+    public class FakeTelemetryValue<T> : ITelemetryValue<T>
     {
         private readonly T value;
 
@@ -13,4 +11,5 @@ namespace RaceAdminTests
 
         public T Value { get => value; }
     }
+
 }

@@ -270,9 +270,11 @@ SessionInfo:
         [TestMethod]
         public void TestOnTelemetryUpdated_ReadsSessionId()
         {
+            var sessionNum = 0;
             var sessionId = 1;
 
             mockTelemetryInfo.Setup(e => e.SessionFlags).Returns(new FakeTelemetryValue<SessionFlag>(new SessionFlag(0)));
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(sessionNum));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(sessionId));
             mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
 
@@ -285,6 +287,7 @@ SessionInfo:
         public void TestOnTelemetryUpdated_CautionHandlerInteraction()
         {
             var sessionFlagsCalls = 0;
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(0));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(0));
             mockTelemetryInfo.Setup(e => e.SessionFlags)
                 .Callback(() => sessionFlagsCalls++)

@@ -90,7 +90,6 @@ namespace RaceAdmin
         /// </summary>
         private Dictionary<string, ICautionHandler> cautionHandlers;
 
-        private double lastUpdateTime;
         private bool raceSession;
 
         // these are added for testing only
@@ -145,20 +144,11 @@ namespace RaceAdmin
         /// <param name="e">Session string changed event. Contains info from session string that can be queried.</param>
         public void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
-            if (!wrapper.IsLive() && e.UpdateTime < lastUpdateTime)
-            {
-                // currently the wrapper does not record the data necessary to detect session 
-                // transitions so we need to fake it here
-                liveSessionNum++;
-                sessionInitializationComplete = false;
-            }
-            lastUpdateTime = e.UpdateTime;
-
             // Perform some initialization if this is the first time being called in this session...
             if (!this.sessionInitializationComplete)
             {
                 InitializeSession(e);
-                this.sessionInitializationComplete = true;
+                sessionInitializationComplete = true;
             }
 
             AddNewDrivers(e);
@@ -334,11 +324,20 @@ namespace RaceAdmin
             TotalIncidentCountNum.Text = this.totalIncCount.ToString();
             IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
 
-            // Update SessionUniqueID.
+            // Update Session Identifiers
+            // NOTE: Current thinking is that the SessionUniqueID changes even between 
+            //       pracice, qualifying, and race during one iRacing session, which does seem
+            //       to be the case though it is not exactly clear what the values might be. 
+            //       The SessionNum value (I think) iterates from 0, 1, 2, etc. and is an 
+            //       index into the SessionInfo:Sessions data in the SessionInfoUpdate YAML.
+            //       It is not clear that we need both and once we have full telemetry recording
+            //       implemented this may become more clear and allow simplification of the code.
             var sessionUniqueID = e.TelemetryInfo.SessionUniqueID.Value;
-            if (sessionUniqueID != this.liveUniqueSessionID)
+            var sessionNum = e.TelemetryInfo.SessionNum.Value;
+            if (sessionUniqueID != this.liveUniqueSessionID || sessionNum != liveSessionNum)
             {
                 this.liveUniqueSessionID = sessionUniqueID;
+                this.liveSessionNum = sessionNum;
                 this.sessionInitializationComplete = false;
             }
 

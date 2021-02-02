@@ -92,7 +92,6 @@
   <ItemGroup>
     <Compile Include="AudioCautionHandlerTests.cs" />
     <Compile Include="DefaultCautionHandlerTests.cs" />
-    <Compile Include="FakeTelemetryValue.cs" />
     <Compile Include="RaceAdminMainTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
