@@ -92,17 +92,24 @@ namespace RaceAdmin
                     int recordType = reader.ReadInt32();
                     switch (recordType)
                     {
-                        case 1:
+                        case 1: // SessionInfoUpdated
                             var e = DoSessionInfoUpdate(sendEvents);
+                            // TODO: get rid of this once we have some live race data with the
+                            // telemetry updates recorded. The currentSession will still need
+                            // to be tracked but it can be read directly from the telemetry
+                            // updates rather than guessed by the code below
+                            // this is needed because we do not currently record/playback 
+                            // the telemetry updates which are the only way that the client
+                            // can detect session transitions
                             if (e.UpdateTime < lastUpdateTime)
                             {
-                                // this is needed because we do not currently record/playback 
-                                // the telemetry updates which are the only way that the client
-                                // can detect session transitions
                                 currentSession++;
-                                SendFakeTelemetryUpdate(currentSession);
                             }
                             lastUpdateTime = e.UpdateTime;
+                            SendFakeTelemetryUpdate(currentSession);
+                            break;
+                        case 2: // TelemetryUpdated
+                            DoTelemetryUpdate(sendEvents);
                             break;
                         default:
                             break;
@@ -114,9 +121,10 @@ namespace RaceAdmin
                 }
                 reader.Close();
             }
-            catch (ObjectDisposedException)
+            catch (Exception e) when (e is ObjectDisposedException || e is NullReferenceException)
             {
                 // just ignore; reader closed by parent thread or program closing anyway
+                // plus this replay proxy is development scaffolding not intended for end users
             }
         }
 
@@ -140,6 +148,25 @@ namespace RaceAdmin
             if (sendEvents)
             {
                 sessionInfoUpdateHandlers.ForEach(h => h.Invoke(this, args));
+            }
+
+            return args;
+        }
+
+        private ITelemetryUpdatedEvent DoTelemetryUpdate(bool sendEvents)
+        {
+            var args = new FakeTelemetryUpdatedEvent(new FakeTelemetryInfo()
+            {
+                SessionFlags = new FakeTelemetryValue<SessionFlag>(new SessionFlag((int)reader.ReadUInt32())),
+                SessionNum = new FakeTelemetryValue<int>(reader.ReadInt32()),
+                SessionUniqueID = new FakeTelemetryValue<int>(reader.ReadInt32()),
+                SessionTimeRemain = new FakeTelemetryValue<double>(reader.ReadDouble()),
+                SessionLapsRemain = new FakeTelemetryValue<int>(reader.ReadInt32())
+            });
+
+            if (sendEvents)
+            {
+                telemetryUpdateHandlers.ForEach(h => h.Invoke(this, args));
             }
 
             return args;

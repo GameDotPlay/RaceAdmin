@@ -13,6 +13,7 @@ namespace RaceAdmin
     {
         private readonly SdkWrapper wrapper;
         private readonly bool record;
+        private string sessionLogPath;
 
         // TODO: these need to be lists so client code can add more than one of each type
         private EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handleSessionInfoUpdate;
@@ -39,13 +40,33 @@ namespace RaceAdmin
 
         private void OnTelemetryUpdate(Object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
-            if (record)
+            // there is apparently nothing in the telemetry data to tell us the session identifier
+            // (meaning the session id that would be displayed in iRacing results); the session 
+            // identifers in the telemetry seem be as follows:
+            //   SessionNum      --> an index into the Sessions in the SessionInfo
+            //   SessionUniqueId --> I've only seen the number 1 so far in an official practice
+            // this means we can't know the sessionLogPath until it has been calculated by the
+            // first session info update so can log no telemetry updates until that occurs; in
+            // practice this seems to be fine
+            if (record && sessionLogPath != null)
             {
-                // TODO: this is needed in order to know which session (practice, qualify, race)
-                // as well as to detect any flags displayed (green, yellow, etc.)
+                // NOTE: we only record fields which we've exposed in ITelemetryInfo for two reasons.
+                // First, there is no way to simply get a copy of the whole binary record from iRSDKSharp,
+                // so we'd have to loop across all the fields by name and read each one (we do a subset of
+                // this of course in the solution below, but only on a smallish number of fields).
+                // A second reason is simply to keep our session log file as small as possible.
+                using (BinaryWriter w = AppendBinary(sessionLogPath))
+                {
+                    w.Write(2); // telemetry update record identifier
+                    w.Write(e.TelemetryInfo.SessionFlags.Value.Value);
+                    w.Write(e.TelemetryInfo.SessionNum.Value);
+                    w.Write(e.TelemetryInfo.SessionUniqueID.Value);
+                    w.Write(e.TelemetryInfo.SessionTimeRemain.Value);
+                    w.Write(wrapper.GetTelemetryValue<int>("SessionLapsRemain").Value);
+                }
             }
 
-            handleTelemetryUpdate?.Invoke(sender, new TelemetryUpdatedEventProxy(new TelemetryInfoProxy(e.TelemetryInfo)));
+            handleTelemetryUpdate?.Invoke(sender, new TelemetryUpdatedEventProxy(new TelemetryInfoProxy(wrapper, e.TelemetryInfo)));
         }
 
         public void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler)
@@ -57,9 +78,13 @@ namespace RaceAdmin
         {
             if (record)
             {
-                YamlQuery q = e.SessionInfo["WeekendInfo"]["SessionID"];
-                string sessionId = q.GetValue("default");
-                using (BinaryWriter w = AppendBinary(MakeSessionLogPath(sessionId)))
+                if (sessionLogPath == null)
+                {
+                    YamlQuery q = e.SessionInfo["WeekendInfo"]["SessionID"];
+                    string sessionId = q.GetValue("default");
+                    sessionLogPath = MakeSessionLogPath(sessionId);
+                }
+                using (BinaryWriter w = AppendBinary(sessionLogPath))
                 {
                     w.Write(1); // session info update record identifer
                     w.Write(e.UpdateTime);

@@ -73,7 +73,7 @@ namespace RaceAdmin
         /// <summary>
         /// The current unique session ID number obtained from the live telemetry.
         /// </summary>
-        private int liveUniqueSessionID = 0;
+        private int liveUniqueSessionID = 1;
 
         /// <summary>
         /// List of Driver objects used to store data about the current set of drivers in the session.
@@ -323,12 +323,23 @@ namespace RaceAdmin
         /// <param name="e">Telemetry data changed event.</param>
         public void OnTelemetryUpdated(object sender, ITelemetryUpdatedEvent e)
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => OnTelemetryUpdated(sender, e)));
+                return;
+            }
+
             // Check for incident limit reached for caution.
             // Animate color changes on CautionPanel.
-            if ((this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
+            // Only throw cautions during race sessions.
+            if (raceSession && (this.incCountSinceCaution >= this.incsRequiredForCaution) && (this.incsRequiredForCaution != 0))
             {
                 if (cautionState == CautionState.None)
                 {
+                    // tag the incident row which triggered the caution with a yellow background in the table
+                    incidentsTableView.Rows[incidentsTableView.Rows.Count - 1].DefaultCellStyle.BackColor =
+                        System.Drawing.Color.FromName(Properties.Resources.ColorName_Gold);
+
                     cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
                     cautionState = CautionState.ThresholdReached;
                 }
@@ -346,8 +357,10 @@ namespace RaceAdmin
             //       index into the SessionInfo:Sessions data in the SessionInfoUpdate YAML.
             //       It is not clear that we need both and once we have full telemetry recording
             //       implemented this may become more clear and allow simplification of the code.
+            // ALSO: See comments in the SdkWrapperProxy in the telemetry update recording section
             var sessionUniqueID = e.TelemetryInfo.SessionUniqueID.Value;
             var sessionNum = e.TelemetryInfo.SessionNum.Value;
+
             if (sessionUniqueID != this.liveUniqueSessionID || sessionNum != liveSessionNum)
             {
                 this.liveUniqueSessionID = sessionUniqueID;

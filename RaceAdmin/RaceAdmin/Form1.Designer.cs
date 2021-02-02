@@ -317,9 +317,9 @@
             this.sessionLabel.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.sessionLabel.Location = new System.Drawing.Point(3, 3);
             this.sessionLabel.Name = "sessionLabel";
-            this.sessionLabel.Size = new System.Drawing.Size(88, 18);
+            this.sessionLabel.Size = new System.Drawing.Size(105, 18);
             this.sessionLabel.TabIndex = 0;
-            this.sessionLabel.Text = "PRACTICE";
+            this.sessionLabel.Text = "NO SESSION";
             // 
             // label4
             // 

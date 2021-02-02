@@ -341,5 +341,11 @@ SessionInfo:
             // as before we want the caution handler to be notified the green flag has been thrown exactly once
             mockCautionHandler.Verify(handler => handler.GreenFlagThrown(), Times.Once());
         }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastMinutes()
+        {
+            ram.IncsRequiredForCaution = 5;
+        }
     }
 }
