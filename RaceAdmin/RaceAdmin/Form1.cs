@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -132,6 +133,29 @@ namespace RaceAdmin
 
         private void RaceAdminMain_Load(object sender, EventArgs e)
         {
+            // location && size
+            var location = new Point(Properties.Settings.Default.x, Properties.Settings.Default.y);
+            Screen screen = Screen.FromPoint(location);
+            if (location.X < screen.Bounds.X)
+            {
+                location.X = screen.Bounds.X;
+            }
+            else if (location.X > screen.Bounds.X + screen.Bounds.Width - 50)
+            {
+                location.X = screen.Bounds.X + screen.Bounds.Width - 400;
+            }
+            if (location.Y < screen.Bounds.Y)
+            {
+                location.Y = screen.Bounds.Y;
+            }
+            else if (location.Y > screen.Bounds.Y + screen.Bounds.Height - 50)
+            {
+                location.Y = screen.Bounds.Y + screen.Bounds.Height - 400;
+            }
+
+            this.Location = location;
+            this.Size = new Size(Properties.Settings.Default.width, Properties.Settings.Default.height);
+
             // full course yellow settings
             incidentsRequired.Value = Properties.Settings.Default.incidentsRequired;
             audioNotification.Checked = Properties.Settings.Default.audioNotification;
@@ -143,6 +167,33 @@ namespace RaceAdmin
             hideIncidents.Checked = Properties.Settings.Default.hideIncidents;
         }
 
+        private void RaceAdminMain_ResizeEnd(object sender, EventArgs e)
+        {
+            if (Size.Width >= MinimumSize.Width && Size.Height >= MinimumSize.Height)
+            {
+                Properties.Settings.Default.width = Size.Width;
+                Properties.Settings.Default.height = Size.Height;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        /// <summary>
+        /// Closes the current environment when the X button is clicked.
+        /// </summary>
+        /// <param name="sender">Sender of the event.</param>
+        /// <param name="e">FormClosing event.</param>
+        private void RaceAdminMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Location.X >= 0 && Location.Y >= 0)
+            {
+                Properties.Settings.Default.x = Location.X;
+                Properties.Settings.Default.y = Location.Y;
+                Properties.Settings.Default.Save();
+            }
+
+            wrapper.Stop();
+            Environment.Exit(0);
+        }
 
         /// <summary>
         /// Called when the session string has been updated by the simulator.
@@ -552,17 +603,6 @@ namespace RaceAdmin
             }
         }
 
-        /// <summary>
-        /// Closes the current environment when the X button is clicked.
-        /// </summary>
-        /// <param name="sender">Sender of the event.</param>
-        /// <param name="e">FormClosing event.</param>
-        private void RaceAdminMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            wrapper.Stop();
-            Environment.Exit(0);
-        }
-
         private void HideIncidents_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.hideIncidents = hideIncidents.Checked;
@@ -729,6 +769,5 @@ namespace RaceAdmin
         // Code above this comment is used to generate test data or to simulate behavior 
         // for UI testing. To use, create buttons on the form and connect them to the various
         // event handler methods above.
-
     }
 }

@@ -605,6 +605,7 @@
             this.Text = "Race Administrator";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.RaceAdminMain_FormClosing);
             this.Load += new System.EventHandler(this.RaceAdminMain_Load);
+            this.ResizeEnd += new System.EventHandler(this.RaceAdminMain_ResizeEnd);
             ((System.ComponentModel.ISupportInitialize)(this.incidentsTableView)).EndInit();
             this.CautionPanel.ResumeLayout(false);
             this.CautionPanel.PerformLayout();
