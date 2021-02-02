@@ -134,6 +134,20 @@ namespace RaceAdmin
             this.cautionHandlers = cautionHandlers;
         }
 
+        private void RaceAdminMain_Load(object sender, EventArgs e)
+        {
+            // full course yellow settings
+            incidentsRequired.Value = Properties.Settings.Default.incidentsRequired;
+            audioNotification.Checked = Properties.Settings.Default.audioNotification;
+            autoThrowCaution.Checked = Properties.Settings.Default.autoThrowCaution;
+            lastLaps.Value = Properties.Settings.Default.lastLaps;
+            lastMinutes.Value = Properties.Settings.Default.lastMinutes;
+
+            // general settings
+            hideIncidents.Checked = Properties.Settings.Default.hideIncidents;
+        }
+
+
         /// <summary>
         /// Called when the session string has been updated by the simulator.
         /// Checks for new drivers that have entered the session and populates/updates list of drivers.
@@ -540,9 +554,18 @@ namespace RaceAdmin
             Environment.Exit(0);
         }
 
+        private void HideIncidents_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.hideIncidents = hideIncidents.Checked;
+            Properties.Settings.Default.Save();
+        }
+
         private void IncidentsRequired_ValueChanged(object sender, EventArgs e)
         {
             incsRequiredForCaution = (int)incidentsRequired.Value;
+
+            Properties.Settings.Default.incidentsRequired = incsRequiredForCaution;
+            Properties.Settings.Default.Save();
         }
 
         private void AudioNotification_CheckedChanged(object sender, EventArgs e)
@@ -550,8 +573,6 @@ namespace RaceAdmin
             if (audioNotification.Checked)
             {
                 var player = new SoundPlayer(RaceAdmin.Resources.Caution);
-                player.Play();
-
                 var handler = new AudioCautionHandler(new SoundPlayerProxy(player))
                 {
                     Repeat = 5, // times
@@ -564,6 +585,27 @@ namespace RaceAdmin
             {
                 cautionHandlers.Remove("audio");
             }
+
+            Properties.Settings.Default.audioNotification = audioNotification.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void AutoThrowCaution_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.autoThrowCaution = autoThrowCaution.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void LastLaps_ValueChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.lastLaps = (int)lastLaps.Value;
+            Properties.Settings.Default.Save();
+        }
+
+        private void LastMinutes_ValueChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.lastMinutes = (int)lastMinutes.Value;
+            Properties.Settings.Default.Save();
         }
 
         public void IncidentsTableView_SortCompare(object sender, DataGridViewSortCompareEventArgs e)

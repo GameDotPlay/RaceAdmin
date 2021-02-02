@@ -22,5 +22,77 @@ namespace RaceAdmin.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool hideIncidents {
+            get {
+                return ((bool)(this["hideIncidents"]));
+            }
+            set {
+                this["hideIncidents"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool audioNotification {
+            get {
+                return ((bool)(this["audioNotification"]));
+            }
+            set {
+                this["audioNotification"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int incidentsRequired {
+            get {
+                return ((int)(this["incidentsRequired"]));
+            }
+            set {
+                this["incidentsRequired"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool autoThrowCaution {
+            get {
+                return ((bool)(this["autoThrowCaution"]));
+            }
+            set {
+                this["autoThrowCaution"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int lastLaps {
+            get {
+                return ((int)(this["lastLaps"]));
+            }
+            set {
+                this["lastLaps"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public int lastMinutes {
+            get {
+                return ((int)(this["lastMinutes"]));
+            }
+            set {
+                this["lastMinutes"] = value;
+            }
+        }
     }
 }

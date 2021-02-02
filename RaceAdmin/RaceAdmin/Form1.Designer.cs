@@ -59,12 +59,12 @@
             this.ObscurePanel1 = new System.Windows.Forms.Panel();
             this.ObscurePanel2 = new System.Windows.Forms.Panel();
             this.hideIncidents = new System.Windows.Forms.CheckBox();
-            this.autoThrowCautionCheckBox = new System.Windows.Forms.CheckBox();
+            this.autoThrowCaution = new System.Windows.Forms.CheckBox();
             this.applyButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.incidentsRequired = new System.Windows.Forms.NumericUpDown();
-            this.duringLastMinutesTextBox = new System.Windows.Forms.NumericUpDown();
-            this.duringLastLapsTextBox = new System.Windows.Forms.NumericUpDown();
+            this.lastMinutes = new System.Windows.Forms.NumericUpDown();
+            this.lastLaps = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -76,8 +76,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.incidentsRequired)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.duringLastMinutesTextBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.duringLastLapsTextBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lastMinutes)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lastLaps)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -414,18 +414,20 @@
             this.hideIncidents.TabIndex = 0;
             this.hideIncidents.Text = "Hide incidents during race";
             this.hideIncidents.UseVisualStyleBackColor = true;
+            this.hideIncidents.CheckedChanged += new System.EventHandler(this.HideIncidents_CheckedChanged);
             // 
-            // autoThrowCautionCheckBox
+            // autoThrowCaution
             // 
-            this.autoThrowCautionCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.autoThrowCautionCheckBox.AutoSize = true;
-            this.autoThrowCautionCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
-            this.autoThrowCautionCheckBox.Location = new System.Drawing.Point(13, 77);
-            this.autoThrowCautionCheckBox.Name = "autoThrowCautionCheckBox";
-            this.autoThrowCautionCheckBox.Size = new System.Drawing.Size(249, 20);
-            this.autoThrowCautionCheckBox.TabIndex = 3;
-            this.autoThrowCautionCheckBox.Text = "Throw caution flag automatically (beta)";
-            this.autoThrowCautionCheckBox.UseVisualStyleBackColor = true;
+            this.autoThrowCaution.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.autoThrowCaution.AutoSize = true;
+            this.autoThrowCaution.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.autoThrowCaution.Location = new System.Drawing.Point(13, 77);
+            this.autoThrowCaution.Name = "autoThrowCaution";
+            this.autoThrowCaution.Size = new System.Drawing.Size(249, 20);
+            this.autoThrowCaution.TabIndex = 3;
+            this.autoThrowCaution.Text = "Throw caution flag automatically (beta)";
+            this.autoThrowCaution.UseVisualStyleBackColor = true;
+            this.autoThrowCaution.CheckedChanged += new System.EventHandler(this.AutoThrowCaution_CheckedChanged);
             // 
             // applyButton
             // 
@@ -442,9 +444,9 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.incidentsRequired);
-            this.groupBox1.Controls.Add(this.autoThrowCautionCheckBox);
-            this.groupBox1.Controls.Add(this.duringLastMinutesTextBox);
-            this.groupBox1.Controls.Add(this.duringLastLapsTextBox);
+            this.groupBox1.Controls.Add(this.autoThrowCaution);
+            this.groupBox1.Controls.Add(this.lastMinutes);
+            this.groupBox1.Controls.Add(this.lastLaps);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label3);
@@ -475,42 +477,44 @@
             this.incidentsRequired.TabIndex = 0;
             this.incidentsRequired.ValueChanged += new System.EventHandler(this.IncidentsRequired_ValueChanged);
             // 
-            // duringLastMinutesTextBox
+            // lastMinutes
             // 
-            this.duringLastMinutesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.duringLastMinutesTextBox.Font = new System.Drawing.Font("Arial", 9.75F);
-            this.duringLastMinutesTextBox.Location = new System.Drawing.Point(95, 165);
-            this.duringLastMinutesTextBox.Maximum = new decimal(new int[] {
+            this.lastMinutes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lastMinutes.Font = new System.Drawing.Font("Arial", 9.75F);
+            this.lastMinutes.Location = new System.Drawing.Point(95, 165);
+            this.lastMinutes.Maximum = new decimal(new int[] {
             9999,
             0,
             0,
             0});
-            this.duringLastMinutesTextBox.Name = "duringLastMinutesTextBox";
-            this.duringLastMinutesTextBox.Size = new System.Drawing.Size(48, 22);
-            this.duringLastMinutesTextBox.TabIndex = 9;
-            this.duringLastMinutesTextBox.Value = new decimal(new int[] {
+            this.lastMinutes.Name = "lastMinutes";
+            this.lastMinutes.Size = new System.Drawing.Size(48, 22);
+            this.lastMinutes.TabIndex = 9;
+            this.lastMinutes.Value = new decimal(new int[] {
             15,
             0,
             0,
             0});
+            this.lastMinutes.ValueChanged += new System.EventHandler(this.LastMinutes_ValueChanged);
             // 
-            // duringLastLapsTextBox
+            // lastLaps
             // 
-            this.duringLastLapsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.duringLastLapsTextBox.Location = new System.Drawing.Point(95, 139);
-            this.duringLastLapsTextBox.Maximum = new decimal(new int[] {
+            this.lastLaps.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lastLaps.Location = new System.Drawing.Point(95, 139);
+            this.lastLaps.Maximum = new decimal(new int[] {
             9999,
             0,
             0,
             0});
-            this.duringLastLapsTextBox.Name = "duringLastLapsTextBox";
-            this.duringLastLapsTextBox.Size = new System.Drawing.Size(48, 22);
-            this.duringLastLapsTextBox.TabIndex = 6;
-            this.duringLastLapsTextBox.Value = new decimal(new int[] {
+            this.lastLaps.Name = "lastLaps";
+            this.lastLaps.Size = new System.Drawing.Size(48, 22);
+            this.lastLaps.TabIndex = 6;
+            this.lastLaps.Value = new decimal(new int[] {
             5,
             0,
             0,
             0});
+            this.lastLaps.ValueChanged += new System.EventHandler(this.LastLaps_ValueChanged);
             // 
             // label5
             // 
@@ -600,6 +604,7 @@
             this.Name = "RaceAdminMain";
             this.Text = "Race Administrator";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.RaceAdminMain_FormClosing);
+            this.Load += new System.EventHandler(this.RaceAdminMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.incidentsTableView)).EndInit();
             this.CautionPanel.ResumeLayout(false);
             this.CautionPanel.PerformLayout();
@@ -607,8 +612,8 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.incidentsRequired)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.duringLastMinutesTextBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.duringLastLapsTextBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lastMinutes)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lastLaps)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
@@ -640,7 +645,7 @@
         private System.Windows.Forms.Panel ObscurePanel2;
         private System.Windows.Forms.Label sessionLabel;
         private System.Windows.Forms.CheckBox hideIncidents;
-        private System.Windows.Forms.CheckBox autoThrowCautionCheckBox;
+        private System.Windows.Forms.CheckBox autoThrowCaution;
         private System.Windows.Forms.Button applyButton;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label1;
@@ -648,9 +653,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.NumericUpDown duringLastMinutesTextBox;
+        private System.Windows.Forms.NumericUpDown lastMinutes;
         private System.Windows.Forms.NumericUpDown incidentsRequired;
-        private System.Windows.Forms.NumericUpDown duringLastLapsTextBox;
+        private System.Windows.Forms.NumericUpDown lastLaps;
         private System.Windows.Forms.GroupBox groupBox2;
     }
 }
