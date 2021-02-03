@@ -16,7 +16,10 @@ namespace RaceAdminTests
     [TestClass]
     public class RaceAdminMainTests
     {
-        private const string sessionInfoUpdate1 = @"
+        const int TimedRaceLapRemainDefault = -1; // TODO: determine correct observed value from iRacing
+        const double LapRaceTimeRemainDefault = 604800.0; // observed value from iRacing
+
+        private const string SessionInfoUpdate1 = @"
 WeekendInfo:
     WeekendOptions:
         NumStarters: 1
@@ -35,7 +38,7 @@ SessionInfo:
           SessionName: RACE
           ResultsOfficial: 0
 ";
-        private const string sessionInfoUpdate2 = @"
+        private const string SessionInfoUpdate2 = @"
 WeekendInfo:
     WeekendOptions:
         NumStarters: 2
@@ -60,7 +63,7 @@ SessionInfo:
           SessionName: RACE
           ResultsOfficial: 0
 ";
-        private const string sessionInfoUpdate3 = @"
+        private const string SessionInfoUpdate3 = @"
 WeekendInfo:
     WeekendOptions:
         NumStarters: 2
@@ -96,13 +99,14 @@ SessionInfo:
         public void Before()
         {
             mockWrapper = new Mock<ISdkWrapper>();
-
             mockEvent = new Mock<ITelemetryUpdatedEvent>();
             mockTelemetryInfo = new Mock<ITelemetryInfo>();
-
             mockCautionHandler = new Mock<ICautionHandler>();
-            cautionHandlers = new Dictionary<string, ICautionHandler>();
-            cautionHandlers.Add("test", mockCautionHandler.Object);
+
+            cautionHandlers = new Dictionary<string, ICautionHandler>
+            {
+                { "test", mockCautionHandler.Object }
+            };
 
             ram = new RaceAdminMain(mockWrapper.Object);
             ram.SetTestCautionHandlers(cautionHandlers);
@@ -236,7 +240,7 @@ SessionInfo:
         [TestMethod]
         public void TestOnSessionInfoUpdate_ReadsDriverInfo()
         {
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate1, 0.0));
 
             Assert.AreEqual(1, ram.Drivers.Values.Count);
             var driver = ram.Drivers["Clark Archer"];
@@ -249,20 +253,20 @@ SessionInfo:
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewDrivers()
         {
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate1, 0.0));
             Assert.AreEqual(1, ram.Drivers.Count);
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 1.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate2, 1.0));
             Assert.AreEqual(2, ram.Drivers.Count);
         }
 
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewIncidents()
         {
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 0.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate2, 0.0));
             Assert.AreEqual(0, ram.TotalIncCount);
             Assert.AreEqual(0, ram.IncCountSinceCaution);
 
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate3, 2.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate3, 2.0));
             Assert.AreEqual(6, ram.TotalIncCount);
             Assert.AreEqual(6, ram.IncCountSinceCaution);
         }
@@ -280,7 +284,7 @@ SessionInfo:
 
             ram.OnTelemetryUpdated(null, mockEvent.Object);
 
-            Assert.AreEqual(sessionId, ram.LiveUniqueSessionID);
+            Assert.AreEqual(sessionId, ram.SessionUniqueID);
         }
 
         [TestMethod]
@@ -289,6 +293,8 @@ SessionInfo:
             var sessionFlagsCalls = 0;
             mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(0));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(0));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(99));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
             mockTelemetryInfo.Setup(e => e.SessionFlags)
                 .Callback(() => sessionFlagsCalls++)
                 .Returns(() =>
@@ -315,8 +321,8 @@ SessionInfo:
             ram.IncsRequiredForCaution = 5;
 
             // add drivers to the session, then send some incidents to trigger caution flag needed notification
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 1.0));
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate3, 2.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate2, 1.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate3, 2.0));
 
             // on the first two calls to OnTelemetryUpdated, the mock wrapper will detect that a caution is needed
             // and has not yet been thrown
@@ -343,9 +349,33 @@ SessionInfo:
         }
 
         [TestMethod]
-        public void TestOnTelemetryUpdated_NoCautionsDuringLastMinutes()
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXLaps_XLapsToGo()
         {
+            // no incidents last 5 laps; note that since the iRacing telemetry contains
+            // the number of complete laps left for the leader, when the leader comes to 
+            // the line, the reported number of laps left will not count the lap the leader
+            // is currently on. So, as the leader comes to the line with 5 laps to go, as
+            // soon as the car crosses the finish line, iRacing will report 4 laps to go.
+            const int IncidentLapCutoff = 5;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(IncidentLapCutoff - 1));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
             ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            // verify that the caution handlers were not triggered even though
+            // the incident count equals the required incidents since the incident
+            // threshold was exceeded during the last 5 laps of the race
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace RaceAdmin
     /// <summary>
     /// Tracks the current state of the caution handling system.
     /// </summary>
-    internal enum CautionState
+    public enum CautionState
     {
         /// <summary>
         /// Initial state.
@@ -42,6 +42,9 @@ namespace RaceAdmin
 
     public partial class RaceAdminMain : Form
     {
+        public const int DefaultSessionNum = 0;
+        public const int DefaultSessionUniqueID = 1;
+
         /// <summary>
         /// Flag to indicate whether the incidents since last caution field has been reset to 0.
         /// TODO: This seems to be made obsolete by the introduction of CautionState but need to 
@@ -73,12 +76,6 @@ namespace RaceAdmin
         private bool teamRacing;
 
         /// <summary>
-        /// The maximum allowable number of drivers set for this session. 
-        /// May be used to iterate through drivers in session string.
-        /// </summary>
-        private int numStarters = 0;
-
-        /// <summary>
         /// Flag to indicate whether the initialization for the current session has occured.
         /// Updated during telemetry updates when a change in SessionUniqueID or SessionNum
         /// is detected. Typically both values change simultaneously.
@@ -97,7 +94,7 @@ namespace RaceAdmin
         /// listed in the SessionInfo.Sessions section of the SessionInfoUpdate YAML.
         /// Updated during telemetry updates.
         /// </summary>
-        private int sessionNum = 0;
+        private int sessionNum = DefaultSessionNum;
 
         /// <summary>
         /// The current unique session ID number obtained from the live telemetry.
@@ -106,7 +103,7 @@ namespace RaceAdmin
         /// the race meeting (practice, qualify, race).
         /// Updated during telemetry updates.
         /// </summary>
-        private int sessionUniqueID = 1;
+        private int sessionUniqueID = DefaultSessionUniqueID;
 
         /// <summary>
         /// Number of laps remaining in the race. Only valid in races with race length
@@ -116,6 +113,7 @@ namespace RaceAdmin
         /// Note that this is the number of full laps left to be completed by the leader,
         /// so when the leader takes the white flag this value will decrement to zero.
         /// Updated during telemetry updates.
+        /// TODO: determine what this telemetry value contains during timed races
         /// </summary>
         private int sessionLapsRemain = int.MaxValue;
 
@@ -161,12 +159,14 @@ namespace RaceAdmin
         private bool raceSession;
 
         // these are added for testing only
-        public int LiveUniqueSessionID { get => sessionUniqueID; }
         public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
-        public Dictionary<string, Driver> Drivers { get => drivers; }
+        public int SessionUniqueID { get => sessionUniqueID; }
         public int TotalIncCount { get => totalIncCount; }
-        public int IncCountSinceCaution { get => incCountSinceCaution; }
-
+        public int IncCountSinceCaution { get => incCountSinceCaution; set => incCountSinceCaution = value; }
+        public int LastLaps { set => lastLaps.Value = value; }
+        public bool RaceSession { set => raceSession = value; }
+        public CautionState CautionState { get => cautionState; }
+        public Dictionary<string, Driver> Drivers { get => drivers; }
 
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
@@ -291,6 +291,7 @@ namespace RaceAdmin
             if (raceSession && resultsOfficial == "1")
             {
                 ShowIncidents();
+                raceSession = false;
             }
         }
 
@@ -328,11 +329,6 @@ namespace RaceAdmin
             {
                 incidentsTableView.Columns.Remove(incidentsTableView.Columns[teamColName]);
             }
-
-            // Get max # of drivers set for this session...
-            query = e.SessionInfo["WeekendInfo"]["WeekendOptions"]["NumStarters"];
-            query.TryGetValue(out temp);
-            System.Int32.TryParse(temp, out this.numStarters);
 
             this.totalIncCount = 0;
             this.incCountSinceCaution = 0;
@@ -468,8 +464,8 @@ namespace RaceAdmin
             //       to index into the SessionInfo Sessions list. The purpose of SessionUniqueID
             //       remains unclear but it seems likely we don't need it.
             // ALSO: See comments in the SdkWrapperProxy in the telemetry update recording section
-            var sessionUniqueID = e.TelemetryInfo.SessionUniqueID.Value;
-            var sessionNum = e.TelemetryInfo.SessionNum.Value;
+            var sessionUniqueID = SafeInt(e.TelemetryInfo.SessionUniqueID);
+            var sessionNum = SafeInt(e.TelemetryInfo.SessionNum);
             var sessionLapsRemain = SafeInt(e.TelemetryInfo.SessionLapsRemain);
             var sessionTimeRemain = SafeDouble(e.TelemetryInfo.SessionTimeRemain);
             var sessionFlags = SafeSessionFlag(e.TelemetryInfo.SessionFlags);
@@ -502,22 +498,44 @@ namespace RaceAdmin
 
         private void CheckIncidentLimit()
         {
-            // Check for incident limit reached for caution (during race sessions).
-            if (raceSession
-                && incsRequiredForCaution != 0
-                && incCountSinceCaution >= incsRequiredForCaution
-                && cautionState == CautionState.None)
+            if (!raceSession)
+            {
+                // only trigger cautions during races
+                return;
+            }
+
+            if (incsRequiredForCaution == 0 || incCountSinceCaution < incsRequiredForCaution)
+            {
+                // app not configured to trigger caution or not enough incidents to trigger caution
+                return;
+            }
+
+            if (cautionState != CautionState.None)
+            {
+                // already triggered a caution; nothing to do
+                return;
+            }
+
+            if (sessionLapsRemain < 0 || sessionLapsRemain < lastLaps.Value)
+            {
+                // no cautions during configured number of last laps of the race if the race
+                // distance is measured in laps
+                return;
+            }
+
+            // TODO: find a better way to do this (table contains no rows during unit testing)
+            if (incidentsTableView.Rows.Count > 0)
             {
                 // tag the incident row which triggered the caution with a yellow background in the table
-                incidentsTableView.Rows[incidentsTableView.Rows.Count - 1].DefaultCellStyle.BackColor =
-                    System.Drawing.Color.FromName(Properties.Resources.ColorName_Gold);
-
-                // notify caution handlers
-                cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
-
-                // move to next state in caution handling cycle
-                cautionState = CautionState.ThresholdReached;
+                var lastRow = incidentsTableView.Rows[incidentsTableView.Rows.Count - 1];
+                lastRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Resources.ColorName_Gold);
             }
+
+            // notify caution handlers
+            cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
+
+            // move to next state in caution handling cycle
+            cautionState = CautionState.ThresholdReached;
         }
 
         private void UpdateIncidentCountDisplay()
