@@ -16,7 +16,7 @@ namespace RaceAdminTests
     [TestClass]
     public class RaceAdminMainTests
     {
-        const int TimedRaceLapRemainDefault = -1; // TODO: determine correct observed value from iRacing
+        const int TimedRaceLapRemainDefault = 32767; // observed value from iRacing
         const double LapRaceTimeRemainDefault = 604800.0; // observed value from iRacing
 
         private const string SessionInfoUpdate1 = @"
@@ -357,6 +357,7 @@ SessionInfo:
             // is currently on. So, as the leader comes to the line with 5 laps to go, as
             // soon as the car crosses the finish line, iRacing will report 4 laps to go.
             const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
 
             mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
@@ -368,6 +369,7 @@ SessionInfo:
             ram.IncsRequiredForCaution = 5;
             ram.IncCountSinceCaution = 5;
             ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
 
             ram.OnTelemetryUpdated(this, mockEvent.Object);
 
@@ -377,5 +379,96 @@ SessionInfo:
             mockCautionHandler.VerifyNoOtherCalls();
             Assert.IsTrue(ram.CautionState == CautionState.None);
         }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXLaps_LessThanXLapsToGo()
+        {
+            // no incidents last 5 laps; note that since the iRacing telemetry contains
+            // the number of complete laps left for the leader, when the leader comes to 
+            // the line, the reported number of laps left will not count the lap the leader
+            // is currently on. So, as the leader comes to the line with 5 laps to go, as
+            // soon as the car crosses the finish line, iRacing will report 4 laps to go.
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(IncidentLapCutoff - 2));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            // verify that the caution handlers were not triggered even though
+            // the incident count equals the required incidents since the incident
+            // threshold was exceeded during the last 5 laps of the race
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
+        }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXMinutes_XMinutesToGo()
+        {
+            // no incidents last 15 minutes
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+            const double FifteenMinutesInSeconds = 60 * 15.0;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(TimedRaceLapRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(FifteenMinutesInSeconds));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            // verify that the caution handlers were not triggered even though
+            // the incident count equals the required incidents since the incident
+            // threshold was exceeded during the last 5 laps of the race
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
+        }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXMinutes_LessThanXMinutesToGo()
+        {
+            // no incidents last 15 minutes
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+            const double FifteenMinutesInSeconds = 60 * 15.0;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(TimedRaceLapRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(FifteenMinutesInSeconds - 1.0));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            // verify that the caution handlers were not triggered even though
+            // the incident count equals the required incidents since the incident
+            // threshold was exceeded during the last 5 laps of the race
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
+        }
+
     }
 }

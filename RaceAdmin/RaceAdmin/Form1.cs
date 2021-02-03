@@ -164,6 +164,7 @@ namespace RaceAdmin
         public int TotalIncCount { get => totalIncCount; }
         public int IncCountSinceCaution { get => incCountSinceCaution; set => incCountSinceCaution = value; }
         public int LastLaps { set => lastLaps.Value = value; }
+        public int LastMinutes { set => lastMinutes.Value = value; }
         public bool RaceSession { set => raceSession = value; }
         public CautionState CautionState { get => cautionState; }
         public Dictionary<string, Driver> Drivers { get => drivers; }
@@ -516,10 +517,16 @@ namespace RaceAdmin
                 return;
             }
 
-            if (sessionLapsRemain < 0 || sessionLapsRemain < lastLaps.Value)
+            if (sessionLapsRemain <= lastLaps.Value - 1)
             {
                 // no cautions during configured number of last laps of the race if the race
                 // distance is measured in laps
+                return;
+            }
+
+            if (sessionTimeRemain <= (double)lastMinutes.Value * 60.0)
+            {
+                // no cautions during configured last minutes of the race for timed races
                 return;
             }
 

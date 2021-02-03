@@ -562,9 +562,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(14, 117);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(138, 16);
+            this.label1.Size = new System.Drawing.Size(81, 16);
             this.label1.TabIndex = 4;
-            this.label1.Text = "Do not throw cautions:";
+            this.label1.Text = "No cautions:";
             // 
             // groupBox2
             // 
