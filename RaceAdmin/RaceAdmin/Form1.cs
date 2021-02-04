@@ -293,6 +293,7 @@ namespace RaceAdmin
             {
                 ShowIncidents();
                 raceSession = false;
+                Console.WriteLine("race complete");
             }
         }
 
@@ -505,6 +506,12 @@ namespace RaceAdmin
                 return;
             }
 
+            if (sessionFlags.Contains(SessionFlags.Checkered))
+            {
+                // don't trigger cautions after the checkered flag is out
+                return;
+            }
+
             if (incsRequiredForCaution == 0 || incCountSinceCaution < incsRequiredForCaution)
             {
                 // app not configured to trigger caution or not enough incidents to trigger caution
@@ -529,6 +536,8 @@ namespace RaceAdmin
                 // no cautions during configured last minutes of the race for timed races
                 return;
             }
+
+            Console.WriteLine("caution conditions met; notifying caution handlers");
 
             // TODO: find a better way to do this (table contains no rows during unit testing)
             if (incidentsTableView.Rows.Count > 0)
@@ -648,6 +657,8 @@ namespace RaceAdmin
                 newRow.DefaultCellStyle.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_IndianRed);
             }
             incidentsTableView.FirstDisplayedScrollingRowIndex = incidentsTableView.RowCount - 1;
+
+            Console.WriteLine("{0}; driver = {1}", newRow.Cells[Properties.Resources.TableColumn_Incident].Value, driver.FullName);
         }
 
         public static string MakeTimeString(double time)
