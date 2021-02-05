@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("RaceAdmin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A tool for tracking incidents and assisting with full course cautions on iRacing")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("vApex Racing Group")]
 [assembly: AssemblyProduct("RaceAdmin")]
