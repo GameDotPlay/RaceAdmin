@@ -53,7 +53,7 @@ how it reacts in this case.
 * No cautions during last laps - don't recommend or throw cautions during the last number of laps specified; set to zero to allow cautions up until the checkered flag
 * No cautions during last minutes - don't recommend or throw cautions during the last number of minutes specified; set to zero to allow cautions up until the checkered flag
 
-The app can only honor the last laps and last minutes settings when iRacing is reporting laps remaining and/or time remaining via telemetry. If a laps is configured as a race to a set number of laps, then the time remaining is not reported by iRacing unless iRacing detects that the session time will expire before the race completes. Similarly when a race is configured as a timed race only, iRacing does not report the number of laps remaining.
+The app can only honor the last laps and last minutes settings when iRacing is reporting laps remaining and/or time remaining via telemetry. If a race is configured as a race to a set number of laps, then the time remaining is not reported by iRacing unless iRacing detects that the session time will expire before the race completes. Similarly when a race is configured as a timed race only, iRacing does not report the number of laps remaining.
 
 ### General
 General settings which don't fall into other categories.
