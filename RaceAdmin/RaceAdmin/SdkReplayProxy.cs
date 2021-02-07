@@ -22,11 +22,6 @@ namespace RaceAdmin
             telemetryUpdateHandlers = new List<EventHandler<ITelemetryUpdatedEvent>>();
         }
 
-        public bool IsLive()
-        {
-            return false;
-        }
-
         public void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler)
         {
             sessionInfoUpdateHandlers.Add(handler);

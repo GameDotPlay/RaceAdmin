@@ -1,6 +1,6 @@
 ﻿namespace RaceAdmin
 {
-    class FakeTelemetryUpdatedEvent : ITelemetryUpdatedEvent
+    public class FakeTelemetryUpdatedEvent : ITelemetryUpdatedEvent
     {
         private readonly ITelemetryInfo telemetryInfo;
         public FakeTelemetryUpdatedEvent(ITelemetryInfo telemetryInfo)

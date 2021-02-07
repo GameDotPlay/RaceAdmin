@@ -1,5 +1,6 @@
 ﻿using iRacingSdkWrapper;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -15,9 +16,8 @@ namespace RaceAdmin
         private readonly bool record;
         private string sessionLogPath;
 
-        // TODO: these need to be lists so client code can add more than one of each type
-        private EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handleSessionInfoUpdate;
-        private EventHandler<ITelemetryUpdatedEvent> handleTelemetryUpdate;
+        private List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>> sessionInfoUpdateHandlers;
+        private List<EventHandler<ITelemetryUpdatedEvent>> telemetryUpdateHandlers;
 
         public SdkWrapperProxy(SdkWrapper wrapper, bool record)
         {
@@ -26,19 +26,17 @@ namespace RaceAdmin
 
             wrapper.TelemetryUpdated += OnTelemetryUpdate;
             wrapper.SessionInfoUpdated += OnSessionInfoUpdate;
-        }
 
-        public bool IsLive()
-        {
-            return true;
+            sessionInfoUpdateHandlers = new List<EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs>>();
+            telemetryUpdateHandlers = new List<EventHandler<ITelemetryUpdatedEvent>>();
         }
 
         public void AddTelemetryUpdateHandler(EventHandler<ITelemetryUpdatedEvent> handler)
         {
-            this.handleTelemetryUpdate = handler;
+            telemetryUpdateHandlers.Add(handler);
         }
 
-        private void OnTelemetryUpdate(Object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
+        public void OnTelemetryUpdate(Object sender, SdkWrapper.TelemetryUpdatedEventArgs e)
         {
             // there is apparently nothing in the telemetry data to tell us the session identifier
             // (meaning the session id that would be displayed in iRacing results); the session 
@@ -66,15 +64,17 @@ namespace RaceAdmin
                 }
             }
 
-            handleTelemetryUpdate?.Invoke(sender, new TelemetryUpdatedEventProxy(new TelemetryInfoProxy(wrapper, e.TelemetryInfo)));
+            telemetryUpdateHandlers.ForEach(
+                h => h.Invoke(sender, new TelemetryUpdatedEventProxy(
+                    new TelemetryInfoProxy(wrapper, e.TelemetryInfo))));
         }
 
         public void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler)
         {
-            this.handleSessionInfoUpdate = handler;
+            sessionInfoUpdateHandlers.Add(handler);
         }
 
-        private void OnSessionInfoUpdate(Object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
+        public void OnSessionInfoUpdate(Object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             if (record)
             {
@@ -92,7 +92,7 @@ namespace RaceAdmin
                 }
             }
 
-            handleSessionInfoUpdate?.Invoke(sender, e);
+            sessionInfoUpdateHandlers.ForEach(h => h.Invoke(sender, e));
         }
 
         private void WriteUTF8(BinaryWriter w, string s)

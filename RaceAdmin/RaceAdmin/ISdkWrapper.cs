@@ -15,8 +15,9 @@ namespace RaceAdmin
         void SetTelemetryUpdateFrequency(int updateFrequency);
 
         void Start();
+
         void Stop();
-        bool IsLive();
+
         ITelemetryValue<T> GetTelemetryValue<T>(string name);
     }
 }
