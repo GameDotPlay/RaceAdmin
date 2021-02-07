@@ -46,13 +46,6 @@ namespace RaceAdmin
         public const int DefaultSessionUniqueID = 1;
 
         /// <summary>
-        /// Flag to indicate whether the incidents since last caution field has been reset to 0.
-        /// TODO: This seems to be made obsolete by the introduction of CautionState but need to 
-        /// write some unit tests before deleting it.
-        /// </summary>
-        private bool incsReset = false;
-
-        /// <summary>
         /// Tracks the current caution state on track.
         /// </summary>
         private CautionState cautionState = CautionState.None;
@@ -563,34 +556,23 @@ namespace RaceAdmin
         private void CheckFlagStateChanges(ITelemetryUpdatedEvent e)
         {
             // has caution flag been deployed?
-            if (sessionFlags.Contains(SessionFlags.Caution))
+            if (sessionFlags.Contains(SessionFlags.Caution) && cautionState == CautionState.ThresholdReached)
             {
-                if (cautionState == CautionState.ThresholdReached)
-                {
-                    // notify caution handlers than the yellow flag has been thrown
-                    // and move to next state in caution handling cycle
-                    cautionHandlers.Values.ToList().ForEach(h => h.YellowFlagThrown());
-                    cautionState = CautionState.YellowFlagDeployed;
-                }
-
-                // get ready to reset the incident when the race goes green
-                incsReset = false;
+                // notify caution handlers than the yellow flag has been thrown
+                // and move to next state in caution handling cycle
+                cautionHandlers.Values.ToList().ForEach(h => h.YellowFlagThrown());
+                cautionState = CautionState.YellowFlagDeployed;
             }
 
             // has green flag been thrown?
-            if (sessionFlags.Contains(SessionFlags.Green) && incsReset == false)
+            if (sessionFlags.Contains(SessionFlags.Green) && cautionState == CautionState.YellowFlagDeployed)
             {
-                if (cautionState == CautionState.YellowFlagDeployed)
-                {
-                    // notify caution handlers than the race has resumed and move back
-                    // to initial state in caution handling cycle
-                    cautionHandlers.Values.ToList().ForEach(h => h.GreenFlagThrown());
-                    cautionState = CautionState.None;
-                }
-
+                // notify caution handlers than the race has resumed and move back
+                // to initial state in caution handling cycle
+                cautionHandlers.Values.ToList().ForEach(h => h.GreenFlagThrown());
+                cautionState = CautionState.None;
                 // reset incident count
                 incCountSinceCaution = 0;
-                incsReset = true;
             }
         }
 
