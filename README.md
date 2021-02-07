@@ -6,6 +6,10 @@ A tool for tracking iRacing incidents and recommending/throwing full course caut
 * You must be a session admin in order for this tool to function as intended since incidents for all
 cars are only reported at the end of a race to non-admins.
 
+## Overview
+
+![race admin screenshot](/images/race-admin.png)
+
 ### Session/Caution Indicator Panel
 This panel displays the name of the current session and will flash yellow when the caution conditions
 have been met. Once the caution flag has been thrown in will remain solid yellow until the race resumes
