@@ -112,8 +112,8 @@ namespace RaceAdmin
         /// this value decrements each time the leader crosses the start/finish line.
         /// Note that this is the number of full laps left to be completed by the leader,
         /// so when the leader takes the white flag this value will decrement to zero.
+        /// For timed races this value appears to generally be set to 32767 (2^15 - 1).
         /// Updated during telemetry updates.
-        /// TODO: determine what this telemetry value contains during timed races
         /// </summary>
         private int sessionLapsRemain = int.MaxValue;
 
