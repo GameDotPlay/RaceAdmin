@@ -131,6 +131,8 @@ namespace RaceAdmin
                 SessionFlags = new FakeTelemetryValue<SessionFlag>(new SessionFlag(0)),
                 SessionNum = new FakeTelemetryValue<int>(currentSession),
                 SessionUniqueID = new FakeTelemetryValue<int>(currentSession),
+                SessionLapsRemain = new FakeTelemetryValue<int>(Constants.TimedRaceLapRemainDefault),
+                SessionTimeRemain = new FakeTelemetryValue<double>(Constants.LapRaceTimeRemainDefault)
             });
             telemetryUpdateHandlers.ForEach(h => h.Invoke(this, args));
         }

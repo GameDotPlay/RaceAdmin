@@ -95,7 +95,7 @@
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.incidentsTableView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
@@ -121,7 +121,6 @@
             this.incidentsTableView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.incidentsTableView.RowTemplate.ReadOnly = true;
             this.incidentsTableView.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.incidentsTableView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.incidentsTableView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.incidentsTableView.ShowCellErrors = false;
             this.incidentsTableView.ShowCellToolTips = false;

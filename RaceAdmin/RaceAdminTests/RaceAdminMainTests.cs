@@ -16,9 +16,6 @@ namespace RaceAdminTests
     [TestClass]
     public class RaceAdminMainTests
     {
-        const int TimedRaceLapRemainDefault = 32767; // observed value from iRacing
-        const double LapRaceTimeRemainDefault = 604800.0; // observed value from iRacing
-
         private const string SessionInfoUpdate1 = @"
 WeekendInfo:
     WeekendOptions:
@@ -294,7 +291,7 @@ SessionInfo:
             mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(0));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(0));
             mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(99));
-            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(Constants.LapRaceTimeRemainDefault));
             mockTelemetryInfo.Setup(e => e.SessionFlags)
                 .Callback(() => sessionFlagsCalls++)
                 .Returns(() =>
@@ -362,7 +359,7 @@ SessionInfo:
             mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
             mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(IncidentLapCutoff - 1));
-            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(Constants.LapRaceTimeRemainDefault));
             mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
 
             ram.RaceSession = true;
@@ -389,7 +386,7 @@ SessionInfo:
             mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
             mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(IncidentLapCutoff - 2));
-            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(Constants.LapRaceTimeRemainDefault));
             mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
 
             ram.RaceSession = true;
@@ -414,7 +411,7 @@ SessionInfo:
 
             mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
-            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(TimedRaceLapRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(Constants.TimedRaceLapRemainDefault));
             mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(FifteenMinutesInSeconds));
             mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
 
@@ -442,7 +439,7 @@ SessionInfo:
 
             mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
             mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
-            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(TimedRaceLapRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(Constants.TimedRaceLapRemainDefault));
             mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(FifteenMinutesInSeconds - 1.0));
             mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
 

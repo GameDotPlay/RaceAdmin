@@ -15,57 +15,56 @@ namespace RaceAdmin
         [STAThread]
         static int Main(string[] args)
         {
-            var command = new RootCommand
-            {
-                // TODO: these should really be subcommands
-                new Option(
-                    aliases: new[] { "--record", "-r" },
-                    description: "Record session updates and telemetry."),
-                new Option(
-                    aliases: new[] { "--playback", "-p" },
-                    description: "Play back events from specified session log.")
-                        { Argument = new Argument<string>() },
-                new Option(
-                    aliases: new[] { "--session", "-s" },
-                    description: "Play back only events from the indexed session within the session log.")
-                        { Argument = new Argument<int>(getDefaultValue: () => -1) }
-            };
+            var command = new RootCommand();
 
-            command.AddValidator(r =>
-            {
-                if (r.Children.Contains("--record") && r.Children.Contains("--playback"))
+            Command record = new Command(
+                name: "record",
+                description: "Record session updates and telemetry.");
+            record.Handler = CommandHandler.Create(() => {
+                    Run(new SdkWrapperProxy(new SdkWrapper(), record: true));
+                });
+            command.AddCommand(record);
+
+            Command playback = new Command(
+                name: "playback",
+                description: "Play back only events from the indexed session within the session log.")
                 {
-                    return "Options '--record' and '--playback' cannot be used together.";
-                }
-                return null;
-            });
-
-            command.Handler = CommandHandler.Create(
-                (bool record, string playback, int session) =>
+                    new Option(
+                        aliases: new[] { "--session", "-s" },
+                        description: "Play back only events from the indexed session within the session log.")
+                        {
+                            Argument = new Argument<int>(getDefaultValue: () => -1)
+                        }
+                };
+            playback.AddArgument(new Argument<string>(
+                name: "logfile",
+                description: "The RaceAdmin session log file to play back."));
+            playback.Handler = CommandHandler.Create((string logfile, int session) =>
                 {
-                    ISdkWrapper wrapperProxy;
+                    // for now assume just a filename and look for file in documents folder
+                    string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    BinaryReader reader = new BinaryReader(File.Open(documentsPath + "\\" + logfile, FileMode.Open));
+                    Run(new SdkReplayProxy(reader, session));
+                });
+            command.AddCommand(playback);
 
-                    if (playback != null && playback.Length > 0)
-                    {
-                        // replay mode; for now assume just a filename and look for file in documents folder
-                        string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                        BinaryReader reader = new BinaryReader(File.Open(documentsPath + "\\" + playback, FileMode.Open));
-                        wrapperProxy = new SdkReplayProxy(reader, session);
-                    }
-                    else
-                    {
-                        wrapperProxy = new SdkWrapperProxy(new SdkWrapper(), record);
-                    }
-
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-
-                    RaceAdminMain form = new RaceAdminMain(wrapperProxy);
-                    Application.Run(form);
-                    wrapperProxy.Stop();
+            command.Handler = CommandHandler.Create(() =>
+                {
+                    Run(new SdkWrapperProxy(new SdkWrapper(), record: false));
                 });
 
             return command.Invoke(args);
         }
+
+        private static void Run(ISdkWrapper wrapper)
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            RaceAdminMain form = new RaceAdminMain(wrapper);
+            Application.Run(form);
+            wrapper.Stop();
+        }
     }
+
 }

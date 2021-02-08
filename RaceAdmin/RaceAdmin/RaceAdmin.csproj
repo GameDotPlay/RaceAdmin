@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioCautionHandler.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="DateUtil.cs" />
     <Compile Include="DefaultCautionHandler.cs" />
     <Compile Include="Driver.cs" />
