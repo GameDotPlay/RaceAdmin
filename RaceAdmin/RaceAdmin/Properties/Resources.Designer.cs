@@ -19,7 +19,7 @@ namespace RaceAdmin.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -57,6 +57,16 @@ namespace RaceAdmin.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _2021_vApex_Flag_Logo4_RG_Black {
+            get {
+                object obj = ResourceManager.GetObject("2021 vApex Flag Logo4-RG-Black", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -129,6 +139,24 @@ namespace RaceAdmin.Properties {
         internal static string TableColumn_Incident {
             get {
                 return ResourceManager.GetString("TableColumn_Incident", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Team.
+        /// </summary>
+        internal static string TableColumn_Team {
+            get {
+                return ResourceManager.GetString("TableColumn_Team", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time.
+        /// </summary>
+        internal static string TableColumn_Time {
+            get {
+                return ResourceManager.GetString("TableColumn_Time", resourceCulture);
             }
         }
         

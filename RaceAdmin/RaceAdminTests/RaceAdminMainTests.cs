@@ -1,4 +1,5 @@
 ﻿using iRacingSdkWrapper;
+using iRacingSdkWrapper.Bitfields;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RaceAdmin;
@@ -15,7 +16,10 @@ namespace RaceAdminTests
     [TestClass]
     public class RaceAdminMainTests
     {
-        private const string sessionInfoUpdate1 = @"
+        const int TimedRaceLapRemainDefault = 32767; // observed value from iRacing
+        const double LapRaceTimeRemainDefault = 604800.0; // observed value from iRacing
+
+        private const string SessionInfoUpdate1 = @"
 WeekendInfo:
     WeekendOptions:
         NumStarters: 1
@@ -23,11 +27,18 @@ DriverInfo:
     Drivers:
         - CarIdx: 0
           UserName: Clark Archer
+          TeamName: vApex Racing Group
           CarNumber: 29
           IRating: 3692
           CurDriverIncidentCount: 0
+SessionInfo:
+    Sessions:
+        - SessionNum: 0
+          SessionType: Race
+          SessionName: RACE
+          ResultsOfficial: 0
 ";
-        private const string sessionInfoUpdate2 = @"
+        private const string SessionInfoUpdate2 = @"
 WeekendInfo:
     WeekendOptions:
         NumStarters: 2
@@ -35,16 +46,24 @@ DriverInfo:
     Drivers:
         - CarIdx: 0
           UserName: Clark Archer
+          TeamName: vApex Racing Group
           CarNumber: 29
           IRating: 3692
           CurDriverIncidentCount: 0
         - CarIdx: 1
           UserName: Erich Smith
+          TeamName: vApex Racing Group
           CarNumber: 32
           IRating: 3073
           CurDriverIncidentCount: 0
+SessionInfo:
+    Sessions:
+        - SessionNum: 0
+          SessionType: Race
+          SessionName: RACE
+          ResultsOfficial: 0
 ";
-        private const string sessionInfoUpdate3 = @"
+        private const string SessionInfoUpdate3 = @"
 WeekendInfo:
     WeekendOptions:
         NumStarters: 2
@@ -60,10 +79,19 @@ DriverInfo:
           CarNumber: 32
           IRating: 3073
           CurDriverIncidentCount: 2
+SessionInfo:
+    Sessions:
+        - SessionNum: 0
+          SessionType: Race
+          SessionName: RACE
+          ResultsOfficial: 0
 ";
 
         private Mock<ISdkWrapper> mockWrapper;
+        private Mock<ITelemetryUpdatedEvent> mockEvent;
+        private Mock<ITelemetryInfo> mockTelemetryInfo;
         private Mock<ICautionHandler> mockCautionHandler;
+
         private Dictionary<string, ICautionHandler> cautionHandlers;
         private RaceAdminMain ram;
 
@@ -71,9 +99,14 @@ DriverInfo:
         public void Before()
         {
             mockWrapper = new Mock<ISdkWrapper>();
+            mockEvent = new Mock<ITelemetryUpdatedEvent>();
+            mockTelemetryInfo = new Mock<ITelemetryInfo>();
             mockCautionHandler = new Mock<ICautionHandler>();
-            cautionHandlers = new Dictionary<string, ICautionHandler>();
-            cautionHandlers.Add("test", mockCautionHandler.Object);
+
+            cautionHandlers = new Dictionary<string, ICautionHandler>
+            {
+                { "test", mockCautionHandler.Object }
+            };
 
             ram = new RaceAdminMain(mockWrapper.Object);
             ram.SetTestCautionHandlers(cautionHandlers);
@@ -154,7 +187,8 @@ DriverInfo:
                 new Driver() { FullName = "Erich Smith",  CarNum = "32", OldIncs = 0, NewIncs = 4, CurrentLap = 4 },
                 new Driver() { FullName = "Clark Archer", CarNum = "29", OldIncs = 2, NewIncs = 6, CurrentLap = 4 }
             };
-            Array.ForEach(drivers, d => ram.LogNewIncident(d, d.NewIncs - d.OldIncs));
+            int timestamp = 0;
+            Array.ForEach(drivers, d => ram.LogNewIncident(++timestamp, d, d.NewIncs - d.OldIncs));
 
             // set up a mock TextWriter to capture all arguments passed to the WriteLine() method
             var lines = new List<String>();
@@ -167,9 +201,10 @@ DriverInfo:
             // now assemble the expected lines we want to see in the output CSV
             var expected = new List<String>
             {
-                "\"Car #\",\"Driver Name\",\"Inc.\",\"Total\",\"Driver Lap #\""
+                "\"Time\",\"Car #\",\"Team\",\"Driver\",\"Inc.\",\"Total\",\"Car Lap #\""
             };
-            Array.ForEach(drivers, d => expected.Add(MakeDriverCSV(d)));
+            timestamp = 0;
+            Array.ForEach(drivers, d => expected.Add(MakeDriverCSV(++timestamp, d)));
 
             // verify that the expected values match what the export method actually wrote
             Assert.IsTrue(expected.SequenceEqual(lines),
@@ -182,10 +217,12 @@ DriverInfo:
             return String.Join("\n", list.Select(s => "\t\t" + s).ToArray());
         }
 
-        private static string MakeDriverCSV(Driver driver)
+        private static string MakeDriverCSV(double timestamp, Driver driver)
         {
             var fields = new String[] {
+                RaceAdminMain.MakeTimeString(timestamp),
                 driver.CarNum,
+                driver.TeamName,
                 driver.FullName,
                 MakeIncidents(driver),
                 driver.NewIncs.ToString(),
@@ -203,32 +240,33 @@ DriverInfo:
         [TestMethod]
         public void TestOnSessionInfoUpdate_ReadsDriverInfo()
         {
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate1, 0.0));
 
-            Assert.AreEqual(1, ram.Drivers.Count);
-            Assert.AreEqual("Clark Archer", ram.Drivers[0].FullName);
-            Assert.AreEqual("29", ram.Drivers[0].CarNum);
-            Assert.AreEqual("3692", ram.Drivers[0].IRating);
-            Assert.AreEqual(0, ram.Drivers[0].OldIncs);
+            Assert.AreEqual(1, ram.Drivers.Values.Count);
+            var driver = ram.Drivers["Clark Archer"];
+            Assert.AreEqual("Clark Archer", driver.FullName);
+            Assert.AreEqual("29", driver.CarNum);
+            Assert.AreEqual("3692", driver.IRating);
+            Assert.AreEqual(0, driver.OldIncs);
         }
 
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewDrivers()
         {
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate1, 0.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate1, 0.0));
             Assert.AreEqual(1, ram.Drivers.Count);
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 1.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate2, 1.0));
             Assert.AreEqual(2, ram.Drivers.Count);
         }
 
         [TestMethod]
         public void TestOnSessionInfoUpdated_DetectsNewIncidents()
         {
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 0.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate2, 0.0));
             Assert.AreEqual(0, ram.TotalIncCount);
             Assert.AreEqual(0, ram.IncCountSinceCaution);
 
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate3, 2.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate3, 2.0));
             Assert.AreEqual(6, ram.TotalIncCount);
             Assert.AreEqual(6, ram.IncCountSinceCaution);
         }
@@ -236,71 +274,213 @@ DriverInfo:
         [TestMethod]
         public void TestOnTelemetryUpdated_ReadsSessionId()
         {
+            var sessionNum = 0;
             var sessionId = 1;
 
-            mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionUniqueID")).Returns(new FakeTelemetryValue<int>(sessionId));
-            mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionFlags")).Returns(new FakeTelemetryValue<int>(0));
+            mockTelemetryInfo.Setup(e => e.SessionFlags).Returns(new FakeTelemetryValue<SessionFlag>(new SessionFlag(0)));
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(sessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(sessionId));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
 
-            ram.OnTelemetryUpdated(null, null);
+            ram.OnTelemetryUpdated(null, mockEvent.Object);
 
-            Assert.AreEqual(sessionId, ram.LiveUniqueSessionID);
+            Assert.AreEqual(sessionId, ram.SessionUniqueID);
         }
 
         [TestMethod]
         public void TestOnTelemetryUpdated_CautionHandlerInteraction()
         {
-            mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionUniqueID")).Returns(new FakeTelemetryValue<int>(0));
             var sessionFlagsCalls = 0;
-            mockWrapper.Setup(wrapper => wrapper.GetTelemetryValue<int>("SessionFlags"))
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(0));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(0));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(99));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionFlags)
                 .Callback(() => sessionFlagsCalls++)
                 .Returns(() =>
                 {
                     if (sessionFlagsCalls < 3)
                     {
-                        return new FakeTelemetryValue<int>(0);
+                        return new FakeTelemetryValue<SessionFlag>(new SessionFlag(0));
                     }
                     else if (sessionFlagsCalls < 5)
                     {
-                        return new FakeTelemetryValue<int>((int)SessionFlags.Caution);
+                        return new FakeTelemetryValue<SessionFlag>(new SessionFlag((int)SessionFlags.Caution));
                     }
                     else if (sessionFlagsCalls < 7)
                     {
-                        return new FakeTelemetryValue<int>((int)SessionFlags.Green);
+                        return new FakeTelemetryValue<SessionFlag>(new SessionFlag((int)SessionFlags.Green));
                     }
                     else
                     {
-                        return new FakeTelemetryValue<int>(0);
+                        return new FakeTelemetryValue<SessionFlag>(new SessionFlag(0));
                     }
                 });
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
 
             ram.IncsRequiredForCaution = 5;
 
             // add drivers to the session, then send some incidents to trigger caution flag needed notification
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate2, 1.0));
-            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(sessionInfoUpdate3, 2.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate2, 1.0));
+            ram.OnSessionInfoUpdated(null, new SdkWrapper.SessionInfoUpdatedEventArgs(SessionInfoUpdate3, 2.0));
 
             // on the first two calls to OnTelemetryUpdated, the mock wrapper will detect that a caution is needed
             // and has not yet been thrown
-            ram.OnTelemetryUpdated(null, null);
-            ram.OnTelemetryUpdated(null, null);
+            ram.OnTelemetryUpdated(null, mockEvent.Object);
+            ram.OnTelemetryUpdated(null, mockEvent.Object);
 
             // but we want to notify the caution handler only once
             mockCautionHandler.Verify(handler => handler.CautionThresholdReached(), Times.Once());
 
             // on the second and third calls, the mock wrapper will return SessionFlags indicating a caution has been thrown
-            ram.OnTelemetryUpdated(null, null);
-            ram.OnTelemetryUpdated(null, null);
+            ram.OnTelemetryUpdated(null, mockEvent.Object);
+            ram.OnTelemetryUpdated(null, mockEvent.Object);
 
             // and again we only want to notify the caution handler once
             mockCautionHandler.Verify(handler => handler.YellowFlagThrown(), Times.Once());
 
             // finally we are ready to get back to green flag racing, so the mock wrapper will return SessionFlags
             // indicating that the green flag has been thrown
-            ram.OnTelemetryUpdated(null, null);
-            ram.OnTelemetryUpdated(null, null);
+            ram.OnTelemetryUpdated(null, mockEvent.Object);
+            ram.OnTelemetryUpdated(null, mockEvent.Object);
 
             // as before we want the caution handler to be notified the green flag has been thrown exactly once
             mockCautionHandler.Verify(handler => handler.GreenFlagThrown(), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXLaps_XLapsToGo()
+        {
+            // no incidents last 5 laps; note that since the iRacing telemetry contains
+            // the number of complete laps left for the leader, when the leader comes to 
+            // the line, the reported number of laps left will not count the lap the leader
+            // is currently on. So, as the leader comes to the line with 5 laps to go, as
+            // soon as the car crosses the finish line, iRacing will report 4 laps to go.
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(IncidentLapCutoff - 1));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            // verify that the caution handlers were not triggered even though
+            // the incident count equals the required incidents since the incident
+            // threshold was exceeded during the last 5 laps of the race
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
+        }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXLaps_LessThanXLapsToGo()
+        {
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(IncidentLapCutoff - 2));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(LapRaceTimeRemainDefault));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
+        }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXMinutes_XMinutesToGo()
+        {
+            // no incidents last 15 minutes
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+            const double FifteenMinutesInSeconds = 60 * 15.0;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(TimedRaceLapRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(FifteenMinutesInSeconds));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            // verify that the caution handlers were not triggered even though
+            // the incident count equals the required incidents since the incident
+            // threshold was exceeded during the last 15 minutes of the race
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
+        }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsDuringLastXMinutes_LessThanXMinutesToGo()
+        {
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+            const double FifteenMinutesInSeconds = 60 * 15.0;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(TimedRaceLapRemainDefault));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(FifteenMinutesInSeconds - 1.0));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 5;
+            ram.IncCountSinceCaution = 5;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
+        }
+
+        [TestMethod]
+        public void TestOnTelemetryUpdated_NoCautionsAfterCheckeredFlag()
+        {
+            const int IncidentLapCutoff = 5;
+            const int IncidentMinuteCutoff = 15;
+
+            mockTelemetryInfo.Setup(e => e.SessionNum).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionNum));
+            mockTelemetryInfo.Setup(e => e.SessionUniqueID).Returns(new FakeTelemetryValue<int>(RaceAdminMain.DefaultSessionUniqueID));
+            mockTelemetryInfo.Setup(e => e.SessionLapsRemain).Returns(new FakeTelemetryValue<int>(IncidentLapCutoff + 1));
+            mockTelemetryInfo.Setup(e => e.SessionTimeRemain).Returns(new FakeTelemetryValue<double>(IncidentMinuteCutoff * 60.0 + 1));
+            mockTelemetryInfo.Setup(e => e.SessionFlags).Returns(new FakeTelemetryValue<SessionFlag>(new SessionFlag((int)SessionFlags.Checkered)));
+            mockEvent.Setup(e => e.TelemetryInfo).Returns(mockTelemetryInfo.Object);
+
+            ram.RaceSession = true;
+            ram.IncsRequiredForCaution = 1;
+            ram.IncCountSinceCaution = 2;
+            ram.LastLaps = IncidentLapCutoff;
+            ram.LastMinutes = IncidentMinuteCutoff;
+
+            ram.OnTelemetryUpdated(this, mockEvent.Object);
+
+            mockCautionHandler.VerifyNoOtherCalls();
+            Assert.IsTrue(ram.CautionState == CautionState.None);
         }
     }
 }

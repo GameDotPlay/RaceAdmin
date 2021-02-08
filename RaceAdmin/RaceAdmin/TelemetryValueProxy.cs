@@ -11,6 +11,6 @@ namespace RaceAdmin
             this.telemetryValue = telemetryValue;
         }
 
-        public T Value() => telemetryValue.Value;
+        public T Value { get => telemetryValue.Value; }
     }
 }

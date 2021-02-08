@@ -10,14 +10,14 @@ namespace RaceAdmin
     {
         void AddSessionInfoUpdateHandler(EventHandler<SdkWrapper.SessionInfoUpdatedEventArgs> handler);
 
-        void AddTelemetryUpdateHandler(EventHandler<SdkWrapper.TelemetryUpdatedEventArgs> handler);
+        void AddTelemetryUpdateHandler(EventHandler<ITelemetryUpdatedEvent> handler);
 
         void SetTelemetryUpdateFrequency(int updateFrequency);
 
         void Start();
+
         void Stop();
 
         ITelemetryValue<T> GetTelemetryValue<T>(string name);
-
     }
 }
