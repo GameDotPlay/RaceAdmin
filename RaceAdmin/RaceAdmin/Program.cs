@@ -3,18 +3,28 @@ using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace RaceAdmin
 {
     static class Program
     {
+        [DllImport("kernel32.dll")]
+        static extern bool AttachConsole(int dwProcessId);
+        private const int AttachParentProcess = -1;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static int Main(string[] args)
         {
+            if (args.Length > 0)
+            {
+                AttachConsole(AttachParentProcess);
+            }
+
             var command = new RootCommand
             {
                 Handler = CommandHandler.Create(() =>
@@ -22,7 +32,6 @@ namespace RaceAdmin
                     Run(new SdkWrapperProxy(new SdkWrapper(), record: false));
                 })
             };
-
 
             Command record = new Command(
                 name: "record",
