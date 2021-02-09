@@ -59,3 +59,27 @@ The app can only honor the last laps and last minutes settings when iRacing is r
 General settings which don't fall into other categories.
 
 * Hide incidents during race - obscures the incidents table, total incidents and incidents since last caution data during a race so that it will not distract a driver who is also using the app to assist with cautions.
+
+
+## Command Line Options
+
+While RaceAdmin normally runs as a simple form and processes live session and telemetry updates from iRacing, it also offers the ability to record and playback session data. This is a recent addition and is not fully mature. It's intended purpose is to allow users to record the session/telemetry data so that it can be used to debug program issues or to aid in new feature development. 
+
+Available command line options:
+```
+RaceAdmin [options] [command]
+
+Options:
+  --version         Show version information
+  -?, -h, --help    Show help and usage information
+
+Commands:
+  record                Record session updates and telemetry.
+  playback <logfile>    Play back only events from the indexed session within the session log.
+```
+The output session log file is written into the current user's documents folder. The session log filename when recording will be `race-admin-session-<iRacingSessionID>.bin`. When using the playback command, the full path to the session log should not be specified, only the filename itself.
+  
+### Developer Notes
+First, only telemetry fields currently used in this codebase are recorded. While this is mainly to keep the output file size to a minimum, it is also a consequence of the libraries used to read the iRacing telemetry updates. The exact fields captured are those exposed as properties by `ITelemetryInfo`. The initial set of fields captured are: `SessionFlags`, `SessionLapsRemain`, `SessionNum`, `SessionTimeRemain` and `SessionUniqueID`. A second difference is that the playback speed is much higher than the capture data rate. 
+
+Additionally there are several interfaces and fakes introduced to facilitate unit test construction. While this goal is achieved, it does add more boilerplate and complication to the normal use case code. This layer may be encapsulated outside of the RaceAdmin codebase itself in the future.
