@@ -15,43 +15,48 @@ namespace RaceAdmin
         [STAThread]
         static int Main(string[] args)
         {
-            var command = new RootCommand();
+            var command = new RootCommand
+            {
+                Handler = CommandHandler.Create(() =>
+                {
+                    Run(new SdkWrapperProxy(new SdkWrapper(), record: false));
+                })
+            };
+
 
             Command record = new Command(
                 name: "record",
-                description: "Record session updates and telemetry.");
-            record.Handler = CommandHandler.Create(() => {
+                description: "Record session updates and telemetry.")
+            {
+                Handler = CommandHandler.Create(() =>
+                {
                     Run(new SdkWrapperProxy(new SdkWrapper(), record: true));
-                });
+                })
+            };
             command.AddCommand(record);
 
             Command playback = new Command(
                 name: "playback",
                 description: "Play back only events from the indexed session within the session log.")
+            {
+                new Argument<string>(
+                    name: "logfile",
+                    description: "The RaceAdmin session log file to play back."),
+                new Option(
+                    aliases: new[] { "--session", "-s" },
+                    description: "Play back only events from the indexed session within the session log.")
                 {
-                    new Option(
-                        aliases: new[] { "--session", "-s" },
-                        description: "Play back only events from the indexed session within the session log.")
-                        {
-                            Argument = new Argument<int>(getDefaultValue: () => -1)
-                        }
-                };
-            playback.AddArgument(new Argument<string>(
-                name: "logfile",
-                description: "The RaceAdmin session log file to play back."));
+                    Argument = new Argument<int>(getDefaultValue: () => -1)
+                }
+            };
             playback.Handler = CommandHandler.Create((string logfile, int session) =>
-                {
-                    // for now assume just a filename and look for file in documents folder
-                    string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    BinaryReader reader = new BinaryReader(File.Open(documentsPath + "\\" + logfile, FileMode.Open));
-                    Run(new SdkReplayProxy(reader, session));
-                });
+            {
+                // for now assume just a filename and look for file in documents folder
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                BinaryReader reader = new BinaryReader(File.Open(documentsPath + "\\" + logfile, FileMode.Open));
+                Run(new SdkReplayProxy(reader, session));
+            });
             command.AddCommand(playback);
-
-            command.Handler = CommandHandler.Create(() =>
-                {
-                    Run(new SdkWrapperProxy(new SdkWrapper(), record: false));
-                });
 
             return command.Invoke(args);
         }
