@@ -134,6 +134,13 @@ namespace RaceAdmin
         private Dictionary<string, Driver> drivers = new Dictionary<string, Driver>();
 
         /// <summary>
+        /// Car dictionary keyed by carId. Used to store data about
+        /// all cars in the race meeting. Cars are never removed once added.
+        /// The pace car may also be contained in this dictionary.
+        /// </summary>
+        private Dictionary<int, Car> cars = new Dictionary<int, Car>();
+
+        /// <summary>
         /// ISdkWrapper object.
         /// </summary>
         private ISdkWrapper wrapper;
@@ -222,11 +229,18 @@ namespace RaceAdmin
             Size = new Size(Properties.Settings.Default.width, Properties.Settings.Default.height);
 
             // full course yellow settings
+            detectTowForCautionCheckBox.Checked = Properties.Settings.Default.detectTowForCaution;
+            useTotalIncidentsForCautionCheckBox.Checked = Properties.Settings.Default.useTotalIncidentsForCaution;
             incidentsRequired.Value = Properties.Settings.Default.incidentsRequired;
             audioNotification.Checked = Properties.Settings.Default.audioNotification;
             autoThrowCaution.Checked = Properties.Settings.Default.autoThrowCaution;
             lastLaps.Value = Properties.Settings.Default.lastLaps;
             lastMinutes.Value = Properties.Settings.Default.lastMinutes;
+            if (!useTotalIncidentsForCautionCheckBox.Checked)
+            {
+                incidentsRequired.Visible = false;
+                incidentsRequiredForCautionLabel.Visible = false;
+            }
 
             // general settings
             hideIncidents.Checked = Properties.Settings.Default.hideIncidents;
@@ -277,9 +291,11 @@ namespace RaceAdmin
                 sessionInitializationComplete = true;
             }
 
-            AddNewDrivers(e);
-            UpdateIncidentCounts(e);
+            AddNewCarsAndDrivers(e);
+            UpdateDriverIncidentCounts(e);
             UpdateDriverLapCounts(e);
+
+            UpdateCarTeamIncidentCounts(e);
 
             var resultsOfficial = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", sessionNum]["ResultsOfficial"].Value;
             if (raceSession && resultsOfficial == "1")
@@ -358,7 +374,7 @@ namespace RaceAdmin
             ObscurePanel2.SendToBack();
         }
 
-        private void UpdateIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
+        private void UpdateDriverIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             int carIdx = 0;
             YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
@@ -428,6 +444,34 @@ namespace RaceAdmin
             }
         }
 
+        private void UpdateCarTeamIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
+		{
+            int carIdx = 0;
+            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+            while (query.TryGetValue(out string name))
+            {
+                if (name == null || name == "Pace Car")
+                {
+                    carIdx++;
+                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+                    continue;
+                }
+
+                if (!cars.TryGetValue(carIdx, out Car car))
+                {
+                    carIdx++;
+                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+                    Console.WriteLine("ERROR: car {0} not found in session driver list", carIdx);
+                    continue;
+                }
+
+                car.TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value);
+
+                carIdx++;
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+            }
+        }
+
         /// <summary>
         /// Called every time the live telemetry gets updates. Currently configured to 4 times per second by setting wrapper.TelemetryUpdateFrequency. No need to update this 60 times per second.
         /// Used as a known clock tick for animating color changes on CautionPanel after Incs required for caution value is reached.
@@ -486,10 +530,25 @@ namespace RaceAdmin
                 sessionInitializationComplete = false;
             }
 
+            UpdateLiveCarInfo(e);
+
             CheckIncidentLimit();
             UpdateIncidentCountDisplay();
             CheckFlagStateChanges(e);
         }
+
+        private void UpdateLiveCarInfo(ITelemetryUpdatedEvent e)
+		{
+            foreach(KeyValuePair<int, Car> car in cars)
+			{
+                car.Value.PercentAroundTrack = SafeFloat(e.TelemetryInfo.PercentAroundTrack);
+                car.Value.BetweenPitCones = SafeBoolToInt(e.TelemetryInfo.BetweenPitCones);
+                car.Value.CurrentLap = SafeInt(e.TelemetryInfo.CurrentLap);
+                car.Value.LapsCompleted = SafeInt(e.TelemetryInfo.LapsCompleted);
+                car.Value.OverallPositionInRace = SafeInt(e.TelemetryInfo.OverallPositionInRace);
+                car.Value.ClassPositionInRace = SafeInt(e.TelemetryInfo.ClassPositionInRace);
+            }
+		}
 
         private void CheckIncidentLimit()
         {
@@ -649,10 +708,11 @@ namespace RaceAdmin
         }
 
         /// <summary>
-        /// Populates a List<T> of drivers in the current session. 
+        /// Populates a Dictionary<name, Driver> of drivers in the current session.
+        /// Populates a Dictionary<CarIdx, Car> of cars in the current session.
         /// </summary>
         /// <param name="e">Session string changed event. Object that conatains info from session string that can be queried.</param>
-        private void AddNewDrivers(SdkWrapper.SessionInfoUpdatedEventArgs e)
+        private void AddNewCarsAndDrivers(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             int carIdx = 0;
             YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
@@ -672,8 +732,65 @@ namespace RaceAdmin
                             OldIncs = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"].Value)
                         };
 
-                        Console.WriteLine("adding driver {0}", fullName);
+                        Console.WriteLine("Adding driver {0}", fullName);
                         drivers.Add(fullName, driver);
+                    }
+
+                    if (!cars.ContainsKey(carIdx))
+                    {
+                        var car = new Car
+                        {
+                            CarIdx = carIdx,
+                            CurrentDriver = fullName,
+                            TeamName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamName"].Value,
+                            TeamID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamID"].Value,
+                            TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value),
+                            CarNumber = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarNumber"].Value,
+                            CarClassID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassID"].Value,
+                            CarScreenName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarScreenName"].Value,
+                            CarClassShortName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassShortName"].Value,
+                        };
+
+                        Console.WriteLine("Adding car {0}", carIdx);
+                        cars.Add(carIdx, car);
+                    }
+
+                    carIdx++;
+                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Started making this as separate from AddNewDrivers but 80% of it is the same so I added the important bits to AddNewDrivers() and renamed the method.
+        /// Might be better in the future to keep these separate so I'll keep this method here for now, but it is not used.
+        /// </summary>
+        /// <param name="e">Session string changed event. Object that conatains info from session string that can be queried.</param>
+        private void AddNewCars(SdkWrapper.SessionInfoUpdatedEventArgs e)
+		{
+            int carIdx = 0;
+            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+            while (query.TryGetValue(out string fullName))
+            {
+                if (fullName != null)
+                {
+                    if (!cars.ContainsKey(carIdx))
+                    {
+                        var car = new Car
+                        {
+                            CarIdx = carIdx,
+                            CurrentDriver = fullName,
+                            TeamName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamName"].Value,
+                            TeamID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamID"].Value,
+                            TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value),
+                            CarNumber = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarNumber"].Value,
+                            CarClassID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassID"].Value,
+                            CarScreenName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarScreenName"].Value,
+                            CarClassShortName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassShortName"].Value,
+                        };
+
+                        Console.WriteLine("Adding car {0}", carIdx);
+                        cars.Add(carIdx, car);
                     }
 
                     carIdx++;
@@ -692,6 +809,11 @@ namespace RaceAdmin
             return v != null ? v.Value : 0.0;
         }
 
+        private float SafeFloat(ITelemetryValue<float> v)
+        {
+            return v != null ? v.Value : 0.0f;
+        }
+
         private SessionFlag SafeSessionFlag(ITelemetryValue<SessionFlag> v)
         {
             return v != null ? v.Value : new SessionFlag(0);
@@ -700,6 +822,29 @@ namespace RaceAdmin
         private int SafeInt(string s)
         {
             return System.Int32.TryParse(s, out int x) ? x : 0;
+        }
+
+        private int SafeBoolToInt(ITelemetryValue<bool> v)
+		{
+            int value;
+
+            if(v != null)
+			{
+                if(v.Value == true)
+				{
+                    value = 1;
+				}
+                else
+				{
+                    value = 0;
+				}
+			}
+            else
+			{
+                value = -1;
+			}
+
+            return value;
         }
 
         /// <summary>
@@ -755,6 +900,20 @@ namespace RaceAdmin
             }
         }
 
+        private void DetectTowForCaution_CheckChanged(object sender, EventArgs e)
+		{
+            Properties.Settings.Default.detectTowForCaution = detectTowForCautionCheckBox.Checked;
+            Properties.Settings.Default.Save();
+		}
+
+        private void UseTotalIncidentsForCaution_CheckChanged(object sender, EventArgs e)
+		{
+            incidentsRequired.Visible = !incidentsRequired.Visible;
+            incidentsRequiredForCautionLabel.Visible = !incidentsRequiredForCautionLabel.Visible;
+
+            Properties.Settings.Default.useTotalIncidentsForCaution = useTotalIncidentsForCautionCheckBox.Checked;
+            Properties.Settings.Default.Save();
+        }
         private void HideIncidents_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.hideIncidents = hideIncidents.Checked;
