@@ -17,7 +17,7 @@
 		
 		// Live telemetry variables.
 		public float PercentAroundTrack { get; set; }
-		public int BetweenPitCones { get; set; }
+		public bool BetweenPitCones { get; set; }
 		public int CurrentLap { get; set; }
 		public int LapsCompleted { get; set; }
 		public TrackSurfaces TrackSurfaceMaterial { get; set; }
