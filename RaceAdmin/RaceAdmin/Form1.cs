@@ -531,7 +531,6 @@ namespace RaceAdmin
             }
 
             UpdateLiveCarInfo(e);
-
             CheckIncidentLimit();
             UpdateIncidentCountDisplay();
             CheckFlagStateChanges(e);
@@ -541,12 +540,12 @@ namespace RaceAdmin
 		{
             foreach(KeyValuePair<int, Car> car in cars)
 			{
-                car.Value.PercentAroundTrack = SafeFloat(e.TelemetryInfo.PercentAroundTrack);
-                car.Value.BetweenPitCones = SafeBoolToInt(e.TelemetryInfo.BetweenPitCones);
-                car.Value.CurrentLap = SafeInt(e.TelemetryInfo.CurrentLap);
-                car.Value.LapsCompleted = SafeInt(e.TelemetryInfo.LapsCompleted);
-                car.Value.OverallPositionInRace = SafeInt(e.TelemetryInfo.OverallPositionInRace);
-                car.Value.ClassPositionInRace = SafeInt(e.TelemetryInfo.ClassPositionInRace);
+                car.Value.PercentAroundTrack = e.TelemetryInfo.PercentAroundTrack.Value[car.Key];
+                car.Value.BetweenPitCones = e.TelemetryInfo.BetweenPitCones.Value[car.Key];
+                car.Value.CurrentLap = e.TelemetryInfo.CurrentLap.Value[car.Key];
+                car.Value.LapsCompleted = e.TelemetryInfo.LapsCompleted.Value[car.Key];
+                car.Value.OverallPositionInRace = e.TelemetryInfo.OverallPositionInRace.Value[car.Key];
+                car.Value.ClassPositionInRace = e.TelemetryInfo.ClassPositionInRace.Value[car.Key];
             }
 		}
 
@@ -564,7 +563,7 @@ namespace RaceAdmin
                 return;
             }
 
-            if (incsRequiredForCaution == 0 || incCountSinceCaution < incsRequiredForCaution)
+            if (!useTotalIncidentsForCautionCheckBox.Checked || incsRequiredForCaution == 0 || incCountSinceCaution < incsRequiredForCaution)
             {
                 // app not configured to trigger caution or not enough incidents to trigger caution
                 return;
@@ -809,11 +808,6 @@ namespace RaceAdmin
             return v != null ? v.Value : 0.0;
         }
 
-        private float SafeFloat(ITelemetryValue<float> v)
-        {
-            return v != null ? v.Value : 0.0f;
-        }
-
         private SessionFlag SafeSessionFlag(ITelemetryValue<SessionFlag> v)
         {
             return v != null ? v.Value : new SessionFlag(0);
@@ -822,29 +816,6 @@ namespace RaceAdmin
         private int SafeInt(string s)
         {
             return System.Int32.TryParse(s, out int x) ? x : 0;
-        }
-
-        private int SafeBoolToInt(ITelemetryValue<bool> v)
-		{
-            int value;
-
-            if(v != null)
-			{
-                if(v.Value == true)
-				{
-                    value = 1;
-				}
-                else
-				{
-                    value = 0;
-				}
-			}
-            else
-			{
-                value = -1;
-			}
-
-            return value;
         }
 
         /// <summary>
@@ -914,6 +885,7 @@ namespace RaceAdmin
             Properties.Settings.Default.useTotalIncidentsForCaution = useTotalIncidentsForCautionCheckBox.Checked;
             Properties.Settings.Default.Save();
         }
+
         private void HideIncidents_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.hideIncidents = hideIncidents.Checked;
