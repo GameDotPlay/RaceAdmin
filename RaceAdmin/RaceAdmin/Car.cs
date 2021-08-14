@@ -1,10 +1,13 @@
 ﻿namespace RaceAdmin
 {
 	using iRacingSdkWrapper;
-	class Car
+
+	public class Car
 	{
+		// Internally updated variables.
+		public bool LastBetweenPitCones { get; set; }
+
 		// Session info variables.
-		
 		public int CarIdx { get; set; }
 		public string CurrentDriver { get; set; }
 		public string TeamName { get; set; }
@@ -20,8 +23,8 @@
 		public bool BetweenPitCones { get; set; }
 		public int CurrentLap { get; set; }
 		public int LapsCompleted { get; set; }
-		public TrackSurfaces TrackSurfaceMaterial { get; set; }
 		public TrackSurfaces TrackSurface { get; set; }
+		public TrackSurfaceMaterials TrackSurfaceMaterial { get; set; }
 		public int OverallPositionInRace { get; set; }
 		public int ClassPositionInRace { get; set; }
 	}
