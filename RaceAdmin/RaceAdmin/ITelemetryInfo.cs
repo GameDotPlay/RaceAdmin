@@ -1,4 +1,5 @@
 ﻿using iRacingSdkWrapper.Bitfields;
+using iRacingSdkWrapper;
 
 namespace RaceAdmin
 {
@@ -15,6 +16,8 @@ namespace RaceAdmin
         ITelemetryValue<int[]> LapsCompleted { get; }
         ITelemetryValue<int[]> OverallPositionInRace { get; }
         ITelemetryValue<int[]> ClassPositionInRace { get; }
+        ITelemetryValue<TrackSurfaces[]> TrackSurface { get; }
+        ITelemetryValue<TrackSurfaceMaterials[]> TrackSurfaceMaterial { get; }
     }
 
 }

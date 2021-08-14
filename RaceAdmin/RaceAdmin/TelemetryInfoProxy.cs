@@ -25,6 +25,8 @@ namespace RaceAdmin
         public ITelemetryValue<int[]> LapsCompleted { get => new TelemetryValueProxy<int[]>(telemetryInfo.CarIdxLapCompleted); }
         public ITelemetryValue<int[]> OverallPositionInRace { get => new TelemetryValueProxy<int[]>(telemetryInfo.CarIdxPosition); }
         public ITelemetryValue<int[]> ClassPositionInRace { get => new TelemetryValueProxy<int[]>(telemetryInfo.CarIdxClassPosition); }
+        public ITelemetryValue<TrackSurfaces[]> TrackSurface { get => new TelemetryValueProxy<TrackSurfaces[]>(telemetryInfo.CarIdxTrackSurface); }
+        public ITelemetryValue<TrackSurfaceMaterials[]> TrackSurfaceMaterial { get => new TelemetryValueProxy<TrackSurfaceMaterials[]>(telemetryInfo.CarIdxTrackSurfaceMaterial); }
 
         // NOTE: To get telemetry values not defined in Nick's wrapper...
         //    var fictionalObject = wrapper.GetTelemetryValue<T>("VariableName");
