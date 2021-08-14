@@ -44,6 +44,7 @@ namespace RaceAdmin
     {
         public const int DefaultSessionNum = 0;
         public const int DefaultSessionUniqueID = 1;
+        private const float IgnorePitEntryPercentageThreshold = 60f;
 
         /// <summary>
         /// Tracks the current caution state on track.
@@ -158,6 +159,27 @@ namespace RaceAdmin
         /// </summary>
         private bool raceSession;
 
+        /// <summary>
+        /// List of PercentAroundTrack values for all cars as they entered pit road.
+        /// </summary>
+        private List<float> allCarsPitEntryLocations;
+
+        /// <summary>
+        /// List of PercentAroundTrack values for all cars as they exited pit road.
+        /// </summary>
+        private List<float> allCarsPitExitLocations;
+
+        /// <summary>
+        /// Running average location of the pit entry cones. Updated every time a car enters pit road. Should get more accurate over time.
+        /// </summary>
+        private float averagePitEntryLocation;
+
+        /// <summary>
+        /// Running average location of the pit exit cones. Updated every time a car exits pit road. Should get more accurate over time.
+        /// </summary>
+        private float averagePitExitLocation;
+
+
         // these are added for testing only
         public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
         public int SessionUniqueID { get => sessionUniqueID; }
@@ -185,6 +207,10 @@ namespace RaceAdmin
             {
                 { "default", new DefaultCautionHandler(this.CautionPanel) }
             };
+
+            // Initialize variables.
+            allCarsPitEntryLocations = new List<float>();
+            allCarsPitExitLocations = new List<float>();
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -531,16 +557,63 @@ namespace RaceAdmin
             }
 
             UpdateLiveCarInfo(e);
+            UpdatePitConePercentages();
             CheckIncidentLimit();
             UpdateIncidentCountDisplay();
             CheckFlagStateChanges(e);
         }
+
+        /// <summary>
+        /// Executes every OnTelemetryUpdated().
+        /// Iterates through every car in the session and checks if they have entered/exited pit road.
+        /// If a car has entered or exited pit road since the last update, add the respective PercentAroundTrack value to the ongoing average for all cars.
+        /// </summary>
+        private void UpdatePitConePercentages()
+		{
+            // Iterate over every car in the session and check if they've entered/exited pit road.
+            foreach(KeyValuePair<int, Car> car in cars)
+			{
+                // Car has entered or exited pit road since last update.
+                if(car.Value.BetweenPitCones != car.Value.LastBetweenPitCones)
+				{
+                    // To cut down on outliers...
+                    // If the car hasn't completed at least this percentage of the track then ignore this pit entry for calculating averages.
+                    // If the car is between the pit entry/exit zones but still on racing surface (stopped on start/finish straight for example) then ignore pit entry for calculating averages.
+                    if ((car.Value.PercentAroundTrack < IgnorePitEntryPercentageThreshold) ||
+                        ((car.Value.PercentAroundTrack > averagePitEntryLocation) &&
+                        (car.Value.PercentAroundTrack < averagePitExitLocation) &&
+                        (car.Value.TrackSurface == TrackSurfaces.OnTrack)))
+                    {
+                        continue;
+                    }
+                    else
+					{
+                        // Car has entered pit road since last update.
+                        if (car.Value.BetweenPitCones)
+                        {
+                            allCarsPitEntryLocations.Add(car.Value.PercentAroundTrack);
+                        }
+                    }
+                    
+                    // Always record pit exit location.
+                    if(!car.Value.BetweenPitCones) // Car has exited pit road since last update.
+					{
+                        allCarsPitExitLocations.Add(car.Value.PercentAroundTrack);
+                    }
+				}
+			}
+
+            // Update the average pit entry/exit locations.
+            averagePitEntryLocation = allCarsPitEntryLocations.Average();
+            averagePitExitLocation = allCarsPitExitLocations.Average();
+		}
 
         private void UpdateLiveCarInfo(ITelemetryUpdatedEvent e)
 		{
             foreach(KeyValuePair<int, Car> car in cars)
 			{
                 car.Value.PercentAroundTrack = e.TelemetryInfo.PercentAroundTrack.Value[car.Key];
+                car.Value.LastBetweenPitCones = car.Value.BetweenPitCones;
                 car.Value.BetweenPitCones = e.TelemetryInfo.BetweenPitCones.Value[car.Key];
                 car.Value.CurrentLap = e.TelemetryInfo.CurrentLap.Value[car.Key];
                 car.Value.LapsCompleted = e.TelemetryInfo.LapsCompleted.Value[car.Key];
