@@ -619,6 +619,8 @@ namespace RaceAdmin
                 car.Value.LapsCompleted = e.TelemetryInfo.LapsCompleted.Value[car.Key];
                 car.Value.OverallPositionInRace = e.TelemetryInfo.OverallPositionInRace.Value[car.Key];
                 car.Value.ClassPositionInRace = e.TelemetryInfo.ClassPositionInRace.Value[car.Key];
+                car.Value.TrackSurface = e.TelemetryInfo.TrackSurface.Value[car.Key];
+                car.Value.TrackSurfaceMaterial = e.TelemetryInfo.TrackSurfaceMaterial.Value[car.Key];
             }
 		}
 
