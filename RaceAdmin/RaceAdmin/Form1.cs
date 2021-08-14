@@ -499,8 +499,7 @@ namespace RaceAdmin
         }
 
         /// <summary>
-        /// Called every time the live telemetry gets updates. Currently configured to 4 times per second by setting wrapper.TelemetryUpdateFrequency. No need to update this 60 times per second.
-        /// Used as a known clock tick for animating color changes on CautionPanel after Incs required for caution value is reached.
+        /// Called every time the live telemetry gets updates. Currently configured to 4 times per second by setting wrapper.TelemetryUpdateFrequency.
         /// Checks current session ID to see if new session initialization should take place.
         /// Checks for change in flag state. When session goes green again after a caution the incs since last caution field is reset to zero.
         /// </summary>
