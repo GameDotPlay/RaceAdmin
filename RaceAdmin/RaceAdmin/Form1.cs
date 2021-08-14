@@ -570,7 +570,7 @@ namespace RaceAdmin
         /// </summary>
         private void UpdatePitConePercentages()
 		{
-            // Iterate over every car in the session and check if they've entered/exited pit road.
+            // Iterate over every car in the session and check if they've entered/exited pit road since the last update.
             foreach(KeyValuePair<int, Car> car in cars)
 			{
                 // Car has entered or exited pit road since last update.
@@ -600,12 +600,12 @@ namespace RaceAdmin
 					{
                         allCarsPitExitLocations.Add(car.Value.PercentAroundTrack);
                     }
-				}
-			}
 
-            // Update the average pit entry/exit locations.
-            averagePitEntryLocation = allCarsPitEntryLocations.Average();
-            averagePitExitLocation = allCarsPitExitLocations.Average();
+                    // Update the average pit entry/exit locations.
+                    averagePitEntryLocation = allCarsPitEntryLocations.Average();
+                    averagePitExitLocation = allCarsPitExitLocations.Average();
+                }
+			}
 		}
 
         private void UpdateLiveCarInfo(ITelemetryUpdatedEvent e)
