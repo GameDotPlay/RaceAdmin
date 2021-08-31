@@ -1,6 +1,7 @@
 ﻿namespace RaceAdmin
 {
 	using iRacingSdkWrapper;
+	using System;
 
 	public class Car
 	{
@@ -27,5 +28,10 @@
 		public TrackSurfaceMaterials TrackSurfaceMaterial { get; set; }
 		public int OverallPositionInRace { get; set; }
 		public int ClassPositionInRace { get; set; }
+
+		public override string ToString()
+		{
+			return $"CarIdx: {CarIdx}{Environment.NewLine}";
+		}
 	}
 }
