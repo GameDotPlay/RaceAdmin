@@ -31,7 +31,24 @@
 
 		public override string ToString()
 		{
-			return $"CarIdx: {CarIdx}{Environment.NewLine}";
+			return $"CarIdx: {CarIdx}{Environment.NewLine}" +
+				   $"Current Driver: {CurrentDriver}{Environment.NewLine}" +
+				   $"Team Name: {TeamName}{Environment.NewLine}" +
+				   $"Team ID: {TeamID}{Environment.NewLine}" +
+				   $"Team Incident Count: {TeamIncidentCount}{Environment.NewLine}" +
+				   $"Car Number: {CarNumber}{Environment.NewLine}" +
+				   $"Car Class ID: {CarClassID}{Environment.NewLine}" +
+				   $"Car Class: {CarClassShortName}{Environment.NewLine}" +
+
+				   $"Live variables: {Environment.NewLine}" +
+				   $"Percent Around Track: {PercentAroundTrack}{Environment.NewLine}" +
+				   $"Between Pit Cones: {BetweenPitCones}{Environment.NewLine}" +
+				   $"Current Lap: {CurrentLap}{Environment.NewLine}" +
+				   $"Laps Completed: {LapsCompleted}{Environment.NewLine}" +
+				   $"Track Surface: {TrackSurface}{Environment.NewLine}" +
+				   $"Track Surface Material: {TrackSurfaceMaterial}{Environment.NewLine}" +
+				   $"Overall Position in Race: {OverallPositionInRace}{Environment.NewLine}" +
+				   $"Class Position in Race: {ClassPositionInRace}{Environment.NewLine}";
 		}
 	}
 }
