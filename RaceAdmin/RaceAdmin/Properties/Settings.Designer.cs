@@ -166,5 +166,17 @@ namespace RaceAdmin.Properties {
                 this["useTotalIncidentsForCaution"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("70")]
+        public float IgnorePitEntryPercentageThreshold {
+            get {
+                return ((float)(this["IgnorePitEntryPercentageThreshold"]));
+            }
+            set {
+                this["IgnorePitEntryPercentageThreshold"] = value;
+            }
+        }
     }
 }
