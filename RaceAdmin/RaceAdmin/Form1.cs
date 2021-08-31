@@ -44,7 +44,6 @@ namespace RaceAdmin
     {
         public const int DefaultSessionNum = 0;
         public const int DefaultSessionUniqueID = 1;
-        private const float IgnorePitEntryPercentageThreshold = 60f;
 
         /// <summary>
         /// Tracks the current caution state on track.
@@ -578,7 +577,7 @@ namespace RaceAdmin
                     // To cut down on outliers...
                     // If the car hasn't completed at least this percentage of the track then ignore this pit entry for calculating averages.
                     // If the car is between the pit entry/exit zones but still on racing surface (stopped on start/finish straight for example) then ignore pit entry for calculating averages.
-                    if ((car.Value.PercentAroundTrack < IgnorePitEntryPercentageThreshold) ||
+                    if ((car.Value.PercentAroundTrack < Properties.Settings.Default.IgnorePitEntryPercentageThreshold) ||
                         ((car.Value.PercentAroundTrack > averagePitEntryLocation) &&
                         (car.Value.PercentAroundTrack < averagePitExitLocation) &&
                         (car.Value.TrackSurface == TrackSurfaces.OnTrack)))
@@ -592,20 +591,33 @@ namespace RaceAdmin
                         {
                             allCarsPitEntryLocations.Add(car.Value.PercentAroundTrack);
                         }
+                        else // Car has exited pit road since last update.
+                        {
+                            allCarsPitExitLocations.Add(car.Value.PercentAroundTrack);
+                        }
                     }
                     
-                    // Always record pit exit location.
-                    if(!car.Value.BetweenPitCones) // Car has exited pit road since last update.
-					{
-                        allCarsPitExitLocations.Add(car.Value.PercentAroundTrack);
-                    }
-
                     // Update the average pit entry/exit locations.
                     averagePitEntryLocation = allCarsPitEntryLocations.Average();
                     averagePitExitLocation = allCarsPitExitLocations.Average();
                 }
 			}
 		}
+
+        private void CheckForTow()
+        {
+            // Iterate over every car in the session and check if they have towed to pit lane since the last update.
+            foreach (KeyValuePair<int, Car> car in cars)
+            {
+                if (car.Value.BetweenPitCones != car.Value.LastBetweenPitCones)
+                {
+                    if(car.Value.BetweenPitCones)
+					{
+
+					}
+                }
+            }
+        }
 
         private void UpdateLiveCarInfo(ITelemetryUpdatedEvent e)
 		{
