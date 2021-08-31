@@ -556,9 +556,18 @@ namespace RaceAdmin
 
             UpdateLiveCarInfo(e);
             UpdatePitConePercentages();
-            CheckIncidentLimit();
             UpdateIncidentCountDisplay();
             CheckFlagStateChanges(e);
+
+            if(Properties.Settings.Default.useTotalIncidentsForCaution)
+			{
+                CheckIncidentLimit();
+            }
+
+            if(Properties.Settings.Default.detectTowForCaution)
+			{
+                CheckForTow();
+			}
         }
 
         /// <summary>
@@ -609,12 +618,22 @@ namespace RaceAdmin
             // Iterate over every car in the session and check if they have towed to pit lane since the last update.
             foreach (KeyValuePair<int, Car> car in cars)
             {
+                // Pit entry transition has occured.
                 if (car.Value.BetweenPitCones != car.Value.LastBetweenPitCones)
                 {
+                    // Car has entered pit lane.
                     if(car.Value.BetweenPitCones)
 					{
+                        // Car towed to pit lane.
+                        if(car.Value.PercentAroundTrack < averagePitEntryLocation)
+						{
+                            // Notify caution handlers
+                            cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
 
-					}
+                            // Move to next state in caution handling cycle
+                            cautionState = CautionState.ThresholdReached;
+                        }
+                    }
                 }
             }
         }
