@@ -154,4 +154,19 @@
   <data name="TableColumn_Team" xml:space="preserve">
     <value>Team</value>
   </data>
+  <data name="IncidentsTable_CarClass" xml:space="preserve">
+    <value>IncidentsCarClass</value>
+  </data>
+  <data name="IncidentsTable_CarNum" xml:space="preserve">
+    <value>IncidentsCarNum</value>
+  </data>
+  <data name="IncidentsTable_DriverName" xml:space="preserve">
+    <value>IncidentsDriverName</value>
+  </data>
+  <data name="IncidentsTable_IncCount" xml:space="preserve">
+    <value>IncidentsIncCount</value>
+  </data>
+  <data name="IncidentsTable_TeamName" xml:space="preserve">
+    <value>IncidentsTeamName</value>
+  </data>
 </root>
