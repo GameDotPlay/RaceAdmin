@@ -76,8 +76,7 @@ namespace RaceAdmin
         private bool sessionInitializationComplete = false;
 
         /// <summary>
-        /// The number of incidents required for a caution to be triggeed. Set by user in 
-        /// IncsRequiredForCautionTextBox object.
+        /// The number of incidents required for a caution to be triggeed. Set by user in Settings dialog.
         /// </summary>
         private int incsRequiredForCaution = 0;
 
@@ -178,14 +177,13 @@ namespace RaceAdmin
         /// </summary>
         private float averagePitExitLocation;
 
-
         // these are added for testing only
         public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
         public int SessionUniqueID { get => sessionUniqueID; }
         public int TotalIncCount { get => totalIncCount; }
         public int IncCountSinceCaution { get => incCountSinceCaution; set => incCountSinceCaution = value; }
-        public int LastLaps { set => lastLaps.Value = value; }
-        public int LastMinutes { set => lastMinutes.Value = value; }
+        public int LastLaps { set => Properties.Settings.Default.lastLaps = value; }
+        public int LastMinutes { set => Properties.Settings.Default.lastMinutes = value; }
         public bool RaceSession { set => raceSession = value; }
         public CautionState CautionState { get => cautionState; }
         public Dictionary<string, Driver> Drivers { get => drivers; }
@@ -202,9 +200,9 @@ namespace RaceAdmin
             this.versionLabel.Text = String.Format("v{0}", version);
 
             this.wrapper = wrapper;
-            this.cautionHandlers = new Dictionary<string, ICautionHandler>
+            cautionHandlers = new Dictionary<string, ICautionHandler>
             {
-                { "default", new DefaultCautionHandler(this.CautionPanel) }
+                { "default", new DefaultCautionHandler(this.cautionPanel) }
             };
 
             // Initialize variables.
@@ -225,7 +223,7 @@ namespace RaceAdmin
         // used for testing only
         public void SetTestCautionHandlers(Dictionary<string, ICautionHandler> cautionHandlers)
         {
-            this.cautionHandlers = cautionHandlers;
+            CautionHandlers = cautionHandlers;
         }
 
         private void RaceAdminMain_Load(object sender, EventArgs e)
@@ -252,23 +250,7 @@ namespace RaceAdmin
 
             Location = location;
             Size = new Size(Properties.Settings.Default.width, Properties.Settings.Default.height);
-
-            // full course yellow settings
-            detectTowForCautionCheckBox.Checked = Properties.Settings.Default.detectTowForCaution;
-            useTotalIncidentsForCautionCheckBox.Checked = Properties.Settings.Default.useTotalIncidentsForCaution;
-            incidentsRequired.Value = Properties.Settings.Default.incidentsRequired;
-            audioNotification.Checked = Properties.Settings.Default.audioNotification;
-            autoThrowCaution.Checked = Properties.Settings.Default.autoThrowCaution;
-            lastLaps.Value = Properties.Settings.Default.lastLaps;
-            lastMinutes.Value = Properties.Settings.Default.lastMinutes;
-            if (!useTotalIncidentsForCautionCheckBox.Checked)
-            {
-                incidentsRequired.Visible = false;
-                incidentsRequiredForCautionLabel.Visible = false;
-            }
-
-            // general settings
-            hideIncidents.Checked = Properties.Settings.Default.hideIncidents;
+            incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
         }
 
         private void RaceAdminMain_ResizeEnd(object sender, EventArgs e)
@@ -344,7 +326,7 @@ namespace RaceAdmin
             sessionLabel.Text = sessionName;
             if (sessionType == "Race")
             {
-                if (hideIncidents.Checked)
+                if (Properties.Settings.Default.hideIncidents)
                 {
                     ObscureIncidents();
                 }
@@ -379,10 +361,7 @@ namespace RaceAdmin
                 return;
             }
 
-            ObscurePanel1.Visible = true;
-            ObscurePanel1.BringToFront();
-            ObscurePanel2.Visible = true;
-            ObscurePanel2.BringToFront();
+            incidentCountPanel.Visible = false;
         }
 
         private void ShowIncidents()
@@ -393,10 +372,7 @@ namespace RaceAdmin
                 return;
             }
 
-            ObscurePanel1.Visible = false;
-            ObscurePanel1.SendToBack();
-            ObscurePanel2.Visible = false;
-            ObscurePanel2.SendToBack();
+            incidentCountPanel.Visible = true;
         }
 
         private void UpdateDriverIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
@@ -668,7 +644,7 @@ namespace RaceAdmin
                 return;
             }
 
-            if (!useTotalIncidentsForCautionCheckBox.Checked || incsRequiredForCaution == 0 || incCountSinceCaution < incsRequiredForCaution)
+            if (!Properties.Settings.Default.useTotalIncidentsForCaution || incsRequiredForCaution == 0 || incCountSinceCaution < incsRequiredForCaution)
             {
                 // app not configured to trigger caution or not enough incidents to trigger caution
                 return;
@@ -680,14 +656,14 @@ namespace RaceAdmin
                 return;
             }
 
-            if (sessionLapsRemain <= lastLaps.Value - 1)
+            if (sessionLapsRemain <= Properties.Settings.Default.lastLaps - 1)
             {
                 // no cautions during configured number of last laps of the race if the race
                 // distance is measured in laps
                 return;
             }
 
-            if (sessionTimeRemain <= (double)lastMinutes.Value * 60.0)
+            if (sessionTimeRemain <= (double)Properties.Settings.Default.lastMinutes * 60.0)
             {
                 // no cautions during configured last minutes of the race for timed races
                 return;
@@ -959,6 +935,17 @@ namespace RaceAdmin
         }
 
         /// <summary>
+        /// Opens the Settings dialog box.
+        /// </summary>
+        /// <param name="sender">Sender of the event.</param>
+        /// <param name="e">EventArgs event.</param>
+        private void SettingsMenuItem_Click(object sender, EventArgs e)
+        {
+            Form settings = new SettingsDialog(this);
+            settings.Show();
+        }
+
+        /// <summary>
         /// Exports the contents of the IncidentsTableView to the given writer in CSV format.
         /// </summary>
         /// <param name="writer">The TextWriter to which the contents should be written.</param>
@@ -974,83 +961,6 @@ namespace RaceAdmin
                 var cells = row.Cells.Cast<DataGridViewCell>();
                 writer.WriteLine(string.Join(",", cells.Select(cell => "\"" + cell.Value + "\"").ToArray()));
             }
-        }
-
-        private void DetectTowForCaution_CheckChanged(object sender, EventArgs e)
-		{
-            Properties.Settings.Default.detectTowForCaution = detectTowForCautionCheckBox.Checked;
-            Properties.Settings.Default.Save();
-		}
-
-        private void UseTotalIncidentsForCaution_CheckChanged(object sender, EventArgs e)
-		{
-            incidentsRequired.Visible = !incidentsRequired.Visible;
-            incidentsRequiredForCautionLabel.Visible = !incidentsRequiredForCautionLabel.Visible;
-
-            Properties.Settings.Default.useTotalIncidentsForCaution = useTotalIncidentsForCautionCheckBox.Checked;
-            Properties.Settings.Default.Save();
-        }
-
-        private void HideIncidents_CheckedChanged(object sender, EventArgs e)
-        {
-            Properties.Settings.Default.hideIncidents = hideIncidents.Checked;
-            Properties.Settings.Default.Save();
-        }
-
-        private void IncidentsRequired_ValueChanged(object sender, EventArgs e)
-        {
-            incsRequiredForCaution = (int)incidentsRequired.Value;
-
-            Properties.Settings.Default.incidentsRequired = incsRequiredForCaution;
-            Properties.Settings.Default.Save();
-        }
-
-        private void AudioNotification_CheckedChanged(object sender, EventArgs e)
-        {
-            if (audioNotification.Checked)
-            {
-                var player = new SoundPlayer(RaceAdmin.Resources.Caution);
-                var handler = new AudioCautionHandler(new SoundPlayerProxy(player))
-                {
-                    Repeat = 5, // times
-                    Interval = 1000 // ms
-                };
-
-                cautionHandlers.Add("audio", handler);
-            }
-            else
-            {
-                cautionHandlers.Remove("audio");
-            }
-
-            Properties.Settings.Default.audioNotification = audioNotification.Checked;
-            Properties.Settings.Default.Save();
-        }
-
-        private void AutoThrowCaution_CheckedChanged(object sender, EventArgs e)
-        {
-            if (autoThrowCaution.Checked)
-            {
-                cautionHandlers.Add("throw", new ThrowCautionHandler());
-            }
-            else
-            {
-                cautionHandlers.Remove("throw");
-            }
-            Properties.Settings.Default.autoThrowCaution = autoThrowCaution.Checked;
-            Properties.Settings.Default.Save();
-        }
-
-        private void LastLaps_ValueChanged(object sender, EventArgs e)
-        {
-            Properties.Settings.Default.lastLaps = (int)lastLaps.Value;
-            Properties.Settings.Default.Save();
-        }
-
-        private void LastMinutes_ValueChanged(object sender, EventArgs e)
-        {
-            Properties.Settings.Default.lastMinutes = (int)lastMinutes.Value;
-            Properties.Settings.Default.Save();
         }
 
         public void IncidentsTableView_SortCompare(object sender, DataGridViewSortCompareEventArgs e)
@@ -1074,6 +984,11 @@ namespace RaceAdmin
                 e.Handled = false;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the cautionHandlers field.
+        /// </summary>
+        public Dictionary<string, ICautionHandler> CautionHandlers;
 
         // Code below this comment is used to generate test data or to simulate behavior 
         // for UI testing. To use, create buttons on the form and connect them to the various
@@ -1154,8 +1069,89 @@ namespace RaceAdmin
             return testCurrentLap + rng.Next(2);
         }
 
-        // Code above this comment is used to generate test data or to simulate behavior 
-        // for UI testing. To use, create buttons on the form and connect them to the various
-        // event handler methods above.
-    }
+        public void SettingsChanged()
+		{
+            this.incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
+        }
+
+        /// <summary>
+        /// Checks or unchecks the menu item.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event parameters.</param>
+        private void hideIncidentTableMenuItem_Click(object sender, EventArgs e)
+		{
+            hideIncidentTableMenuItem.Checked = !hideIncidentTableMenuItem.Checked;
+		}
+
+		private void hideIncidentsCountMenuItem_Click(object sender, EventArgs e)
+		{
+            hideIncidentsCountMenuItem.Checked = !hideIncidentsCountMenuItem.Checked;
+		}
+
+        /// <summary>
+        /// Checks or unchecks the menu item.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event parameters.</param>
+		private void hideCautionPanelMenuItem_Click(object sender, EventArgs e)
+		{
+            hideCautionPanelMenuItem.Checked = !hideCautionPanelMenuItem.Checked;
+		}
+
+        /// <summary>
+        /// Shows or hides the caution indicator panel based on the checked status.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event parameters.</param>
+		private void hideCautionPanelMenuItem_CheckedChanged(object sender, EventArgs e)
+		{
+            if(hideCautionPanelMenuItem.Checked)
+			{
+                cautionPanel.Visible = true;
+			}
+            else
+			{
+                cautionPanel.Visible = false;
+			}
+		}
+
+        /// <summary>
+        /// Shows or hides the incident table based on the checked status.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event parameters.</param>
+		private void hideIncidentTableMenuItem_CheckedChanged(object sender, EventArgs e)
+		{
+            if (hideIncidentTableMenuItem.Checked)
+            {
+                incidentsTableView.Visible = true;
+            }
+            else
+			{
+                incidentsTableView.Visible = false;
+			}
+		}
+
+        /// <summary>
+        /// Shows or hides the incident count panel based on the checked status.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event parameters.</param>
+		private void hideIncidentsCountMenuItem_CheckedChanged(object sender, EventArgs e)
+		{
+            if(hideIncidentsCountMenuItem.Checked)
+			{
+                incidentCountPanel.Visible = true;
+			}
+            else
+			{
+                incidentCountPanel.Visible = false;
+			}
+		}
+
+		// Code above this comment is used to generate test data or to simulate behavior 
+		// for UI testing. To use, create buttons on the form and connect them to the various
+		// event handler methods above.
+	}
 }
