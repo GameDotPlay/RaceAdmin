@@ -62,11 +62,11 @@ namespace RaceAdmin
                     Interval = 1000 // ms
                 };
 
-                RaceAdminMain.CautionHandlers.Add("audio", handler);
+                parent.CautionHandlers.Add("audio", handler);
             }
             else
             {
-                RaceAdminMain.CautionHandlers.Remove("audio");
+                parent.CautionHandlers.Remove("audio");
             }
 
             Properties.Settings.Default.audioNotification = audioNotification.Checked;
@@ -77,11 +77,11 @@ namespace RaceAdmin
         {
             if (autoThrowCaution.Checked)
             {
-                RaceAdminMain.CautionHandlers.Add("throw", new ThrowCautionHandler());
+                parent.CautionHandlers.Add("throw", new ThrowCautionHandler());
             }
             else
             {
-                RaceAdminMain.CautionHandlers.Remove("throw");
+                parent.CautionHandlers.Remove("throw");
             }
             Properties.Settings.Default.autoThrowCaution = autoThrowCaution.Checked;
             Properties.Settings.Default.Save();
