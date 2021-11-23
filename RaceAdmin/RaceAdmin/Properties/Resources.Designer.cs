@@ -22,7 +22,7 @@ namespace RaceAdmin.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -73,7 +73,7 @@ namespace RaceAdmin.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Control.
         /// </summary>
-        public static string ColorName_Control {
+        internal static string ColorName_Control {
             get {
                 return ResourceManager.GetString("ColorName_Control", resourceCulture);
             }
@@ -82,7 +82,7 @@ namespace RaceAdmin.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Gold.
         /// </summary>
-        public static string ColorName_Gold {
+        internal static string ColorName_Gold {
             get {
                 return ResourceManager.GetString("ColorName_Gold", resourceCulture);
             }
@@ -103,6 +103,51 @@ namespace RaceAdmin.Properties {
         internal static string ErrorMessage_ValidNumberNotEntered {
             get {
                 return ResourceManager.GetString("ErrorMessage_ValidNumberNotEntered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IncidentsCarClass.
+        /// </summary>
+        internal static string IncidentsTable_CarClass {
+            get {
+                return ResourceManager.GetString("IncidentsTable_CarClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IncidentsCarNum.
+        /// </summary>
+        internal static string IncidentsTable_CarNum {
+            get {
+                return ResourceManager.GetString("IncidentsTable_CarNum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IncidentsDriverName.
+        /// </summary>
+        internal static string IncidentsTable_DriverName {
+            get {
+                return ResourceManager.GetString("IncidentsTable_DriverName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IncidentsIncCount.
+        /// </summary>
+        internal static string IncidentsTable_IncCount {
+            get {
+                return ResourceManager.GetString("IncidentsTable_IncCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IncidentsTeamName.
+        /// </summary>
+        internal static string IncidentsTable_TeamName {
+            get {
+                return ResourceManager.GetString("IncidentsTable_TeamName", resourceCulture);
             }
         }
         
