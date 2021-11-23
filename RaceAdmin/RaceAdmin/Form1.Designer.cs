@@ -74,6 +74,7 @@
 			this.mainTab = new System.Windows.Forms.TabPage();
 			this.incidentsTab = new System.Windows.Forms.TabPage();
 			this.liveStandingsTab = new System.Windows.Forms.TabPage();
+			this.incidentsFiltersGroupBox = new System.Windows.Forms.GroupBox();
 			((System.ComponentModel.ISupportInitialize)(this.incidentsTableView)).BeginInit();
 			this.cautionPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -81,6 +82,7 @@
 			this.incidentCountPanel.SuspendLayout();
 			this.tabControl.SuspendLayout();
 			this.mainTab.SuspendLayout();
+			this.incidentsTab.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// incidentsTableView
@@ -261,7 +263,7 @@
 			this.TotalIncidentCountLabel.Location = new System.Drawing.Point(0, 0);
 			this.TotalIncidentCountLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.TotalIncidentCountLabel.Name = "TotalIncidentCountLabel";
-			this.TotalIncidentCountLabel.Size = new System.Drawing.Size(376, 35);
+			this.TotalIncidentCountLabel.Size = new System.Drawing.Size(374, 33);
 			this.TotalIncidentCountLabel.TabIndex = 3;
 			this.TotalIncidentCountLabel.Text = "Total Incidents";
 			this.TotalIncidentCountLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -275,7 +277,7 @@
 			this.TotalIncidentCountNum.Location = new System.Drawing.Point(-3, 35);
 			this.TotalIncidentCountNum.Margin = new System.Windows.Forms.Padding(0);
 			this.TotalIncidentCountNum.Name = "TotalIncidentCountNum";
-			this.TotalIncidentCountNum.Size = new System.Drawing.Size(376, 84);
+			this.TotalIncidentCountNum.Size = new System.Drawing.Size(374, 82);
 			this.TotalIncidentCountNum.TabIndex = 4;
 			this.TotalIncidentCountNum.Text = "0";
 			this.TotalIncidentCountNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -289,9 +291,9 @@
 			this.cautionPanel.Controls.Add(this.sessionLabel);
 			this.cautionPanel.Location = new System.Drawing.Point(0, 0);
 			this.cautionPanel.Margin = new System.Windows.Forms.Padding(1);
-			this.cautionPanel.MinimumSize = new System.Drawing.Size(878, 200);
+			this.cautionPanel.MinimumSize = new System.Drawing.Size(878, 270);
 			this.cautionPanel.Name = "cautionPanel";
-			this.cautionPanel.Size = new System.Drawing.Size(878, 267);
+			this.cautionPanel.Size = new System.Drawing.Size(878, 270);
 			this.cautionPanel.TabIndex = 0;
 			// 
 			// sessionLabel
@@ -484,7 +486,7 @@
 			this.IncidentsSinceCautionNum.Location = new System.Drawing.Point(0, 161);
 			this.IncidentsSinceCautionNum.Margin = new System.Windows.Forms.Padding(0);
 			this.IncidentsSinceCautionNum.Name = "IncidentsSinceCautionNum";
-			this.IncidentsSinceCautionNum.Size = new System.Drawing.Size(376, 98);
+			this.IncidentsSinceCautionNum.Size = new System.Drawing.Size(374, 96);
 			this.IncidentsSinceCautionNum.TabIndex = 6;
 			this.IncidentsSinceCautionNum.Text = "0";
 			this.IncidentsSinceCautionNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -498,7 +500,7 @@
 			this.IncidentsSinceCautionLabel.Location = new System.Drawing.Point(0, 119);
 			this.IncidentsSinceCautionLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.IncidentsSinceCautionLabel.Name = "IncidentsSinceCautionLabel";
-			this.IncidentsSinceCautionLabel.Size = new System.Drawing.Size(376, 42);
+			this.IncidentsSinceCautionLabel.Size = new System.Drawing.Size(374, 40);
 			this.IncidentsSinceCautionLabel.TabIndex = 5;
 			this.IncidentsSinceCautionLabel.Text = "Since Last Caution";
 			this.IncidentsSinceCautionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -506,6 +508,7 @@
 			// incidentCountPanel
 			// 
 			this.incidentCountPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.incidentCountPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.incidentCountPanel.Controls.Add(this.IncidentsSinceCautionNum);
 			this.incidentCountPanel.Controls.Add(this.TotalIncidentCountLabel);
 			this.incidentCountPanel.Controls.Add(this.IncidentsSinceCautionLabel);
@@ -523,6 +526,7 @@
 			this.tabControl.Controls.Add(this.liveStandingsTab);
 			this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tabControl.Location = new System.Drawing.Point(0, 24);
+			this.tabControl.Margin = new System.Windows.Forms.Padding(1);
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
 			this.tabControl.Size = new System.Drawing.Size(1264, 657);
@@ -530,6 +534,7 @@
 			// 
 			// mainTab
 			// 
+			this.mainTab.BackColor = System.Drawing.SystemColors.Control;
 			this.mainTab.Controls.Add(this.cautionPanel);
 			this.mainTab.Controls.Add(this.incidentCountPanel);
 			this.mainTab.Controls.Add(this.incidentsTableView);
@@ -539,27 +544,37 @@
 			this.mainTab.Size = new System.Drawing.Size(1256, 631);
 			this.mainTab.TabIndex = 0;
 			this.mainTab.Text = "Main";
-			this.mainTab.UseVisualStyleBackColor = true;
 			// 
 			// incidentsTab
 			// 
+			this.incidentsTab.BackColor = System.Drawing.SystemColors.Control;
+			this.incidentsTab.Controls.Add(this.incidentsFiltersGroupBox);
 			this.incidentsTab.Location = new System.Drawing.Point(4, 22);
 			this.incidentsTab.Name = "incidentsTab";
 			this.incidentsTab.Padding = new System.Windows.Forms.Padding(3);
 			this.incidentsTab.Size = new System.Drawing.Size(1256, 631);
 			this.incidentsTab.TabIndex = 1;
 			this.incidentsTab.Text = "Incidents";
-			this.incidentsTab.UseVisualStyleBackColor = true;
 			// 
 			// liveStandingsTab
 			// 
+			this.liveStandingsTab.BackColor = System.Drawing.SystemColors.Control;
 			this.liveStandingsTab.Location = new System.Drawing.Point(4, 22);
 			this.liveStandingsTab.Name = "liveStandingsTab";
 			this.liveStandingsTab.Padding = new System.Windows.Forms.Padding(3);
 			this.liveStandingsTab.Size = new System.Drawing.Size(1256, 631);
 			this.liveStandingsTab.TabIndex = 2;
 			this.liveStandingsTab.Text = "Live Standings";
-			this.liveStandingsTab.UseVisualStyleBackColor = true;
+			// 
+			// incidentsFiltersGroupBox
+			// 
+			this.incidentsFiltersGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
+			this.incidentsFiltersGroupBox.Location = new System.Drawing.Point(3, 3);
+			this.incidentsFiltersGroupBox.Name = "incidentsFiltersGroupBox";
+			this.incidentsFiltersGroupBox.Size = new System.Drawing.Size(1250, 72);
+			this.incidentsFiltersGroupBox.TabIndex = 0;
+			this.incidentsFiltersGroupBox.TabStop = false;
+			this.incidentsFiltersGroupBox.Text = "Filters";
 			// 
 			// RaceAdminMain
 			// 
@@ -588,6 +603,7 @@
 			this.incidentCountPanel.ResumeLayout(false);
 			this.tabControl.ResumeLayout(false);
 			this.mainTab.ResumeLayout(false);
+			this.incidentsTab.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -632,6 +648,7 @@
 		private System.Windows.Forms.TabPage mainTab;
 		private System.Windows.Forms.TabPage incidentsTab;
 		private System.Windows.Forms.TabPage liveStandingsTab;
+		private System.Windows.Forms.GroupBox incidentsFiltersGroupBox;
 	}
 }
 
