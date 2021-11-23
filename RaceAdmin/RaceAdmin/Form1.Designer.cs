@@ -53,14 +53,12 @@
 			this.sessionLabel = new System.Windows.Forms.Label();
 			this.incidentsRequiredForCautionLabel = new System.Windows.Forms.Label();
 			this.audioNotification = new System.Windows.Forms.CheckBox();
-			this.exportButton = new System.Windows.Forms.Button();
 			this.versionLabel = new System.Windows.Forms.Label();
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.ObscurePanel1 = new System.Windows.Forms.Panel();
 			this.ObscurePanel2 = new System.Windows.Forms.Panel();
 			this.hideIncidents = new System.Windows.Forms.CheckBox();
 			this.autoThrowCaution = new System.Windows.Forms.CheckBox();
-			this.applyButton = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.incidentsRequired = new System.Windows.Forms.NumericUpDown();
 			this.lastMinutes = new System.Windows.Forms.NumericUpDown();
@@ -68,11 +66,16 @@
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
+			this.useTotalIncidentsForCautionCheckBox = new System.Windows.Forms.CheckBox();
+			this.detectTowForCautionCheckBox = new System.Windows.Forms.CheckBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.detectTowForCautionCheckBox = new System.Windows.Forms.CheckBox();
-			this.useTotalIncidentsForCautionCheckBox = new System.Windows.Forms.CheckBox();
+			this.menuStrip = new System.Windows.Forms.MenuStrip();
+			this.fIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.exportTableMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.settingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.incidentsTableView)).BeginInit();
 			this.CautionPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -81,6 +84,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.lastMinutes)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lastLaps)).BeginInit();
 			this.groupBox2.SuspendLayout();
+			this.menuStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// incidentsTableView
@@ -95,7 +99,7 @@
 			this.incidentsTableView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
 			dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
 			dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
 			dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -113,8 +117,8 @@
 			this.incidentsTableView.Cursor = System.Windows.Forms.Cursors.Arrow;
 			this.incidentsTableView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
 			this.incidentsTableView.EnableHeadersVisualStyles = false;
-			this.incidentsTableView.Location = new System.Drawing.Point(12, 291);
-			this.incidentsTableView.MinimumSize = new System.Drawing.Size(568, 309);
+			this.incidentsTableView.Location = new System.Drawing.Point(9, 303);
+			this.incidentsTableView.MinimumSize = new System.Drawing.Size(878, 345);
 			this.incidentsTableView.Name = "incidentsTableView";
 			this.incidentsTableView.ReadOnly = true;
 			this.incidentsTableView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
@@ -128,7 +132,7 @@
 			this.incidentsTableView.ShowCellToolTips = false;
 			this.incidentsTableView.ShowEditingIcon = false;
 			this.incidentsTableView.ShowRowErrors = false;
-			this.incidentsTableView.Size = new System.Drawing.Size(591, 329);
+			this.incidentsTableView.Size = new System.Drawing.Size(878, 345);
 			this.incidentsTableView.TabIndex = 1;
 			this.incidentsTableView.TabStop = false;
 			this.incidentsTableView.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.IncidentsTableView_SortCompare);
@@ -255,7 +259,7 @@
 			// 
 			this.TotalIncidentCountLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.TotalIncidentCountLabel.Font = new System.Drawing.Font("Arial", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TotalIncidentCountLabel.Location = new System.Drawing.Point(663, 31);
+			this.TotalIncidentCountLabel.Location = new System.Drawing.Point(950, 31);
 			this.TotalIncidentCountLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.TotalIncidentCountLabel.Name = "TotalIncidentCountLabel";
 			this.TotalIncidentCountLabel.Size = new System.Drawing.Size(288, 42);
@@ -267,7 +271,7 @@
 			// 
 			this.TotalIncidentCountNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.TotalIncidentCountNum.Font = new System.Drawing.Font("Arial", 60F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.TotalIncidentCountNum.Location = new System.Drawing.Point(663, 73);
+			this.TotalIncidentCountNum.Location = new System.Drawing.Point(950, 73);
 			this.TotalIncidentCountNum.Margin = new System.Windows.Forms.Padding(0);
 			this.TotalIncidentCountNum.Name = "TotalIncidentCountNum";
 			this.TotalIncidentCountNum.Size = new System.Drawing.Size(288, 100);
@@ -279,7 +283,7 @@
 			// 
 			this.IncidentsSinceCautionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.IncidentsSinceCautionLabel.Font = new System.Drawing.Font("Arial", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.IncidentsSinceCautionLabel.Location = new System.Drawing.Point(663, 172);
+			this.IncidentsSinceCautionLabel.Location = new System.Drawing.Point(950, 172);
 			this.IncidentsSinceCautionLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.IncidentsSinceCautionLabel.Name = "IncidentsSinceCautionLabel";
 			this.IncidentsSinceCautionLabel.Size = new System.Drawing.Size(288, 42);
@@ -291,7 +295,7 @@
 			// 
 			this.IncidentsSinceCautionNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.IncidentsSinceCautionNum.Font = new System.Drawing.Font("Arial", 60F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.IncidentsSinceCautionNum.Location = new System.Drawing.Point(663, 214);
+			this.IncidentsSinceCautionNum.Location = new System.Drawing.Point(950, 214);
 			this.IncidentsSinceCautionNum.Margin = new System.Windows.Forms.Padding(0);
 			this.IncidentsSinceCautionNum.Name = "IncidentsSinceCautionNum";
 			this.IncidentsSinceCautionNum.Size = new System.Drawing.Size(288, 100);
@@ -306,10 +310,10 @@
 			this.CautionPanel.BackColor = System.Drawing.SystemColors.Control;
 			this.CautionPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.CautionPanel.Controls.Add(this.sessionLabel);
-			this.CautionPanel.Location = new System.Drawing.Point(12, 12);
-			this.CautionPanel.MinimumSize = new System.Drawing.Size(568, 273);
+			this.CautionPanel.Location = new System.Drawing.Point(9, 27);
+			this.CautionPanel.MinimumSize = new System.Drawing.Size(878, 270);
 			this.CautionPanel.Name = "CautionPanel";
-			this.CautionPanel.Size = new System.Drawing.Size(591, 273);
+			this.CautionPanel.Size = new System.Drawing.Size(878, 270);
 			this.CautionPanel.TabIndex = 0;
 			// 
 			// sessionLabel
@@ -347,23 +351,11 @@
 			this.audioNotification.UseVisualStyleBackColor = true;
 			this.audioNotification.CheckedChanged += new System.EventHandler(this.AudioNotification_CheckedChanged);
 			// 
-			// exportButton
-			// 
-			this.exportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.exportButton.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.exportButton.Location = new System.Drawing.Point(506, 626);
-			this.exportButton.Name = "exportButton";
-			this.exportButton.Size = new System.Drawing.Size(97, 23);
-			this.exportButton.TabIndex = 10;
-			this.exportButton.Text = "Export...";
-			this.exportButton.UseVisualStyleBackColor = true;
-			this.exportButton.Click += new System.EventHandler(this.ExportButton_Click);
-			// 
 			// versionLabel
 			// 
 			this.versionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.versionLabel.AutoSize = true;
-			this.versionLabel.Location = new System.Drawing.Point(117, 631);
+			this.versionLabel.Location = new System.Drawing.Point(114, 663);
 			this.versionLabel.Name = "versionLabel";
 			this.versionLabel.Size = new System.Drawing.Size(37, 13);
 			this.versionLabel.TabIndex = 11;
@@ -373,7 +365,7 @@
 			// 
 			this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.pictureBox1.Image = global::RaceAdmin.Properties.Resources._2021_vApex_Flag_Logo4_RG_Black;
-			this.pictureBox1.Location = new System.Drawing.Point(12, 624);
+			this.pictureBox1.Location = new System.Drawing.Point(9, 651);
 			this.pictureBox1.Name = "pictureBox1";
 			this.pictureBox1.Size = new System.Drawing.Size(99, 25);
 			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -386,7 +378,7 @@
 			this.ObscurePanel1.BackColor = System.Drawing.SystemColors.ControlDark;
 			this.ObscurePanel1.CausesValidation = false;
 			this.ObscurePanel1.Enabled = false;
-			this.ObscurePanel1.Location = new System.Drawing.Point(610, 13);
+			this.ObscurePanel1.Location = new System.Drawing.Point(903, 27);
 			this.ObscurePanel1.Name = "ObscurePanel1";
 			this.ObscurePanel1.Size = new System.Drawing.Size(355, 301);
 			this.ObscurePanel1.TabIndex = 2;
@@ -398,9 +390,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.ObscurePanel2.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.ObscurePanel2.Location = new System.Drawing.Point(12, 291);
+			this.ObscurePanel2.Location = new System.Drawing.Point(9, 303);
+			this.ObscurePanel2.MinimumSize = new System.Drawing.Size(878, 345);
 			this.ObscurePanel2.Name = "ObscurePanel2";
-			this.ObscurePanel2.Size = new System.Drawing.Size(591, 329);
+			this.ObscurePanel2.Size = new System.Drawing.Size(878, 345);
 			this.ObscurePanel2.TabIndex = 11;
 			this.ObscurePanel2.Visible = false;
 			// 
@@ -430,17 +423,6 @@
 			this.autoThrowCaution.UseVisualStyleBackColor = true;
 			this.autoThrowCaution.CheckedChanged += new System.EventHandler(this.AutoThrowCaution_CheckedChanged);
 			// 
-			// applyButton
-			// 
-			this.applyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.applyButton.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.applyButton.Location = new System.Drawing.Point(890, 626);
-			this.applyButton.Name = "applyButton";
-			this.applyButton.Size = new System.Drawing.Size(75, 23);
-			this.applyButton.TabIndex = 9;
-			this.applyButton.Text = "Apply";
-			this.applyButton.UseVisualStyleBackColor = true;
-			// 
 			// groupBox1
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -458,7 +440,7 @@
 			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Controls.Add(this.incidentsRequiredForCautionLabel);
 			this.groupBox1.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.groupBox1.Location = new System.Drawing.Point(610, 320);
+			this.groupBox1.Location = new System.Drawing.Point(897, 340);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(355, 244);
 			this.groupBox1.TabIndex = 7;
@@ -549,6 +531,32 @@
 			this.label3.TabIndex = 7;
 			this.label3.Text = "laps (lap count races only)";
 			// 
+			// useTotalIncidentsForCautionCheckBox
+			// 
+			this.useTotalIncidentsForCautionCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.useTotalIncidentsForCautionCheckBox.AutoSize = true;
+			this.useTotalIncidentsForCautionCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.useTotalIncidentsForCautionCheckBox.Location = new System.Drawing.Point(13, 45);
+			this.useTotalIncidentsForCautionCheckBox.Name = "useTotalIncidentsForCautionCheckBox";
+			this.useTotalIncidentsForCautionCheckBox.Size = new System.Drawing.Size(236, 20);
+			this.useTotalIncidentsForCautionCheckBox.TabIndex = 2;
+			this.useTotalIncidentsForCautionCheckBox.Text = "Use total incidents to trigger caution";
+			this.useTotalIncidentsForCautionCheckBox.UseVisualStyleBackColor = true;
+			this.useTotalIncidentsForCautionCheckBox.CheckedChanged += new System.EventHandler(this.UseTotalIncidentsForCaution_CheckChanged);
+			// 
+			// detectTowForCautionCheckBox
+			// 
+			this.detectTowForCautionCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.detectTowForCautionCheckBox.AutoSize = true;
+			this.detectTowForCautionCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.detectTowForCautionCheckBox.Location = new System.Drawing.Point(13, 21);
+			this.detectTowForCautionCheckBox.Name = "detectTowForCautionCheckBox";
+			this.detectTowForCautionCheckBox.Size = new System.Drawing.Size(153, 20);
+			this.detectTowForCautionCheckBox.TabIndex = 2;
+			this.detectTowForCautionCheckBox.Text = "Detect tow for caution";
+			this.detectTowForCautionCheckBox.UseVisualStyleBackColor = true;
+			this.detectTowForCautionCheckBox.CheckedChanged += new System.EventHandler(this.DetectTowForCaution_CheckChanged);
+			// 
 			// label2
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -574,62 +582,76 @@
 			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.hideIncidents);
 			this.groupBox2.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.groupBox2.Location = new System.Drawing.Point(610, 570);
+			this.groupBox2.Location = new System.Drawing.Point(897, 590);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(355, 50);
 			this.groupBox2.TabIndex = 8;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "General";
 			// 
-			// detectTowForCautionCheckBox
+			// menuStrip
 			// 
-			this.detectTowForCautionCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.detectTowForCautionCheckBox.AutoSize = true;
-			this.detectTowForCautionCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.detectTowForCautionCheckBox.Location = new System.Drawing.Point(13, 21);
-			this.detectTowForCautionCheckBox.Name = "detectTowForCautionCheckBox";
-			this.detectTowForCautionCheckBox.Size = new System.Drawing.Size(153, 20);
-			this.detectTowForCautionCheckBox.TabIndex = 2;
-			this.detectTowForCautionCheckBox.Text = "Detect tow for caution";
-			this.detectTowForCautionCheckBox.UseVisualStyleBackColor = true;
-			this.detectTowForCautionCheckBox.CheckedChanged += new System.EventHandler(this.DetectTowForCaution_CheckChanged);
+			this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fIleToolStripMenuItem,
+            this.settingsToolStripMenuItem});
+			this.menuStrip.Location = new System.Drawing.Point(0, 0);
+			this.menuStrip.Name = "menuStrip";
+			this.menuStrip.Size = new System.Drawing.Size(1264, 24);
+			this.menuStrip.TabIndex = 12;
+			this.menuStrip.Text = "menuStrip1";
 			// 
-			// useTotalIncidentsForCautionCheckBox
+			// fIleToolStripMenuItem
 			// 
-			this.useTotalIncidentsForCautionCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.useTotalIncidentsForCautionCheckBox.AutoSize = true;
-			this.useTotalIncidentsForCautionCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.useTotalIncidentsForCautionCheckBox.Location = new System.Drawing.Point(13, 45);
-			this.useTotalIncidentsForCautionCheckBox.Name = "useTotalIncidentsForCautionCheckBox";
-			this.useTotalIncidentsForCautionCheckBox.Size = new System.Drawing.Size(236, 20);
-			this.useTotalIncidentsForCautionCheckBox.TabIndex = 2;
-			this.useTotalIncidentsForCautionCheckBox.Text = "Use total incidents to trigger caution";
-			this.useTotalIncidentsForCautionCheckBox.UseVisualStyleBackColor = true;
-			this.useTotalIncidentsForCautionCheckBox.CheckedChanged += new System.EventHandler(this.UseTotalIncidentsForCaution_CheckChanged);
+			this.fIleToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportTableMenuItem});
+			this.fIleToolStripMenuItem.Name = "fIleToolStripMenuItem";
+			this.fIleToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+			this.fIleToolStripMenuItem.Text = "FIle";
+			// 
+			// settingsToolStripMenuItem
+			// 
+			this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.settingsMenuItem});
+			this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+			this.settingsToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+			this.settingsToolStripMenuItem.Text = "Edit";
+			// 
+			// exportTableMenuItem
+			// 
+			this.exportTableMenuItem.Name = "exportTableMenuItem";
+			this.exportTableMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.exportTableMenuItem.Text = "Export Table";
+			this.exportTableMenuItem.Click += new System.EventHandler(this.ExportButton_Click);
+			// 
+			// settingsMenuItem
+			// 
+			this.settingsMenuItem.Name = "settingsMenuItem";
+			this.settingsMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.settingsMenuItem.Text = "Settings";
 			// 
 			// RaceAdminMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Control;
-			this.ClientSize = new System.Drawing.Size(977, 661);
+			this.ClientSize = new System.Drawing.Size(1264, 681);
+			this.Controls.Add(this.incidentsTableView);
 			this.Controls.Add(this.groupBox2);
-			this.Controls.Add(this.applyButton);
 			this.Controls.Add(this.pictureBox1);
 			this.Controls.Add(this.versionLabel);
-			this.Controls.Add(this.exportButton);
 			this.Controls.Add(this.CautionPanel);
 			this.Controls.Add(this.IncidentsSinceCautionNum);
 			this.Controls.Add(this.IncidentsSinceCautionLabel);
 			this.Controls.Add(this.TotalIncidentCountNum);
-			this.Controls.Add(this.incidentsTableView);
 			this.Controls.Add(this.ObscurePanel2);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.TotalIncidentCountLabel);
 			this.Controls.Add(this.ObscurePanel1);
+			this.Controls.Add(this.menuStrip);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MainMenuStrip = this.menuStrip;
 			this.MaximizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(993, 700);
+			this.MinimumSize = new System.Drawing.Size(1280, 720);
 			this.Name = "RaceAdminMain";
 			this.Text = "Race Administrator";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.RaceAdminMain_FormClosing);
@@ -646,6 +668,8 @@
 			((System.ComponentModel.ISupportInitialize)(this.lastLaps)).EndInit();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
+			this.menuStrip.ResumeLayout(false);
+			this.menuStrip.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -661,7 +685,6 @@
         private System.Windows.Forms.Panel CautionPanel;
         private System.Windows.Forms.Label incidentsRequiredForCautionLabel;
         private System.Windows.Forms.CheckBox audioNotification;
-        private System.Windows.Forms.Button exportButton;
         private System.Windows.Forms.Label versionLabel;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Time;
@@ -676,7 +699,6 @@
         private System.Windows.Forms.Label sessionLabel;
         private System.Windows.Forms.CheckBox hideIncidents;
         private System.Windows.Forms.CheckBox autoThrowCaution;
-        private System.Windows.Forms.Button applyButton;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
@@ -689,6 +711,11 @@
         private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.CheckBox useTotalIncidentsForCautionCheckBox;
 		private System.Windows.Forms.CheckBox detectTowForCautionCheckBox;
+		private System.Windows.Forms.MenuStrip menuStrip;
+		private System.Windows.Forms.ToolStripMenuItem fIleToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem exportTableMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem settingsMenuItem;
 	}
 }
 
