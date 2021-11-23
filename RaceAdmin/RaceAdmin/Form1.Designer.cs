@@ -645,7 +645,7 @@
 			this.filterTimeComboBox.Name = "filterTimeComboBox";
 			this.filterTimeComboBox.Size = new System.Drawing.Size(121, 24);
 			this.filterTimeComboBox.TabIndex = 1;
-			this.filterTimeComboBox.Text = "30 Minutes";
+			this.filterTimeComboBox.Text = "Forever";
 			// 
 			// filterIncidentsComboBox
 			// 
