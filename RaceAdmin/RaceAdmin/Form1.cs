@@ -303,6 +303,7 @@ namespace RaceAdmin
             UpdateDriverLapCounts(e);
 
             UpdateCarTeamIncidentCounts(e);
+            PopulateIncidentsTable();
 
             var resultsOfficial = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", sessionNum]["ResultsOfficial"].Value;
             if (raceSession && resultsOfficial == "1")
@@ -733,6 +734,49 @@ namespace RaceAdmin
         }
 
         /// <summary>
+        /// Populates the incidents table on the Incidents tab after session initialization.
+        /// </summary>
+        private void PopulateIncidentsTable()
+		{
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => PopulateIncidentsTable()));
+                return;
+            }
+
+            allIncidentsTable.Rows.Clear();
+
+            if (carFilterRadio.Checked)
+			{
+                foreach (var car in cars.Values)
+                {
+                    int rowId = allIncidentsTable.Rows.Add();
+                    DataGridViewRow newRow = allIncidentsTable.Rows[rowId];
+                    newRow.Cells[Properties.Resources.IncidentsTable_CarNum].Value = car.CarNumber;
+                    newRow.Cells[Properties.Resources.IncidentsTable_CarClass].Value = car.CarClassShortName;
+                    newRow.Cells[Properties.Resources.IncidentsTable_TeamName].Value = car.TeamName;
+                    newRow.Cells[Properties.Resources.IncidentsTable_DriverName].Value = car.CurrentDriver;
+                    newRow.Cells[Properties.Resources.IncidentsTable_IncCount].Value = car.TeamIncidentCount;
+                }
+            }
+            else
+			{
+                foreach (var driver in drivers.Values)
+                {
+                    int rowId = allIncidentsTable.Rows.Add();
+                    DataGridViewRow newRow = allIncidentsTable.Rows[rowId];
+                    newRow.Cells[Properties.Resources.IncidentsTable_CarNum].Value = driver.CarNum;
+                    newRow.Cells[Properties.Resources.IncidentsTable_CarClass].Value = cars[driver.CarIdx].CarClassShortName;
+                    newRow.Cells[Properties.Resources.IncidentsTable_TeamName].Value = driver.TeamName;
+                    newRow.Cells[Properties.Resources.IncidentsTable_DriverName].Value = driver.FullName;
+                    newRow.Cells[Properties.Resources.IncidentsTable_IncCount].Value = driver.NewIncs;
+                }
+            }
+
+            allIncidentsTable.FirstDisplayedScrollingRowIndex = allIncidentsTable.RowCount - 1;
+        }
+
+        /// <summary>
         /// Inserts new row in incident log.
         /// </summary>
         /// <param name="driver">Driver associated with the latest incident.</param>
@@ -1147,6 +1191,22 @@ namespace RaceAdmin
             else
 			{
                 incidentCountPanel.Visible = false;
+			}
+		}
+
+		private void carFilterRadio_CheckedChanged(object sender, EventArgs e)
+		{
+            if(carFilterRadio.Checked)
+			{
+                PopulateIncidentsTable();
+			}
+		}
+
+		private void driverFilterRadio_CheckedChanged(object sender, EventArgs e)
+		{
+            if(driverFilterRadio.Checked)
+			{
+                PopulateIncidentsTable();
 			}
 		}
 
