@@ -35,6 +35,7 @@ namespace RaceAdmin
 			this.autoThrowCaution = new System.Windows.Forms.CheckBox();
 			this.lastMinutes = new System.Windows.Forms.NumericUpDown();
 			this.lastLaps = new System.Windows.Forms.NumericUpDown();
+			this.incidentsRequiredForCautionLabel = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
@@ -43,7 +44,6 @@ namespace RaceAdmin
 			this.audioNotification = new System.Windows.Forms.CheckBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.incidentsRequiredForCautionLabel = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.hideIncidents = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
@@ -139,6 +139,17 @@ namespace RaceAdmin
             0});
 			this.lastLaps.ValueChanged += new System.EventHandler(this.LastLaps_ValueChanged);
 			// 
+			// incidentsRequiredForCautionLabel
+			// 
+			this.incidentsRequiredForCautionLabel.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.incidentsRequiredForCautionLabel.Location = new System.Drawing.Point(62, 125);
+			this.incidentsRequiredForCautionLabel.Margin = new System.Windows.Forms.Padding(0);
+			this.incidentsRequiredForCautionLabel.Name = "incidentsRequiredForCautionLabel";
+			this.incidentsRequiredForCautionLabel.Size = new System.Drawing.Size(179, 23);
+			this.incidentsRequiredForCautionLabel.TabIndex = 1;
+			this.incidentsRequiredForCautionLabel.Text = "Incidents required for caution";
+			this.incidentsRequiredForCautionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
@@ -220,17 +231,6 @@ namespace RaceAdmin
 			this.label1.TabIndex = 4;
 			this.label1.Text = "No cautions:";
 			// 
-			// incidentsRequiredForCautionLabel
-			// 
-			this.incidentsRequiredForCautionLabel.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.incidentsRequiredForCautionLabel.Location = new System.Drawing.Point(62, 125);
-			this.incidentsRequiredForCautionLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.incidentsRequiredForCautionLabel.Name = "incidentsRequiredForCautionLabel";
-			this.incidentsRequiredForCautionLabel.Size = new System.Drawing.Size(179, 23);
-			this.incidentsRequiredForCautionLabel.TabIndex = 1;
-			this.incidentsRequiredForCautionLabel.Text = "Incidents required for caution";
-			this.incidentsRequiredForCautionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.hideIncidents);
@@ -268,7 +268,7 @@ namespace RaceAdmin
 			this.MinimumSize = new System.Drawing.Size(660, 366);
 			this.Name = "SettingsDialog";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Settings";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsDialog_FormClosing);
 			this.groupBox1.ResumeLayout(false);
