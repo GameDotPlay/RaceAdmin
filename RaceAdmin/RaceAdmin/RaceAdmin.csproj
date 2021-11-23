@@ -177,6 +177,12 @@
     </Compile>
     <Compile Include="SdkReplayProxy.cs" />
     <Compile Include="SdkWrapperProxy.cs" />
+    <Compile Include="Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings.Designer.cs">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="SoundPlayerProxy.cs" />
     <Compile Include="TelemetryInfoProxy.cs" />
     <Compile Include="TelemetryUpdatedEventProxy.cs" />
@@ -199,6 +205,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings.resx">
+      <DependentUpon>Settings.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
