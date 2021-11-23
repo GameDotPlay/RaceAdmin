@@ -184,9 +184,9 @@ namespace RaceAdmin
 			this.detectTowForCautionCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
 			this.detectTowForCautionCheckBox.Location = new System.Drawing.Point(11, 21);
 			this.detectTowForCautionCheckBox.Name = "detectTowForCautionCheckBox";
-			this.detectTowForCautionCheckBox.Size = new System.Drawing.Size(153, 20);
+			this.detectTowForCautionCheckBox.Size = new System.Drawing.Size(190, 20);
 			this.detectTowForCautionCheckBox.TabIndex = 2;
-			this.detectTowForCautionCheckBox.Text = "Detect tow for caution";
+			this.detectTowForCautionCheckBox.Text = "Detect tow for caution (WIP)";
 			this.detectTowForCautionCheckBox.UseVisualStyleBackColor = true;
 			this.detectTowForCautionCheckBox.CheckedChanged += new System.EventHandler(this.DetectTowForCaution_CheckChanged);
 			// 
