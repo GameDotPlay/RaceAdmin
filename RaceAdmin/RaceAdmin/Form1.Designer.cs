@@ -37,15 +37,16 @@
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RaceAdminMain));
 			this.incidentsTableView = new System.Windows.Forms.DataGridView();
 			this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -94,15 +95,7 @@
 			this.driverFilterRadio = new System.Windows.Forms.RadioButton();
 			this.carFilterRadio = new System.Windows.Forms.RadioButton();
 			this.allIncidentsTable = new System.Windows.Forms.DataGridView();
-			this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.CarClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.liveStandingsTab = new System.Windows.Forms.TabPage();
-			this.liveStandingsFilterGroupBox = new System.Windows.Forms.GroupBox();
-			this.filterClassComboBox = new System.Windows.Forms.ComboBox();
-			this.filterClassLabel = new System.Windows.Forms.Label();
 			this.dataGridView1 = new System.Windows.Forms.DataGridView();
 			this.OverallPosition = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -111,6 +104,14 @@
 			this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.dataGridViewTextBoxColumn9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.liveStandingsFilterGroupBox = new System.Windows.Forms.GroupBox();
+			this.filterClassComboBox = new System.Windows.Forms.ComboBox();
+			this.filterClassLabel = new System.Windows.Forms.Label();
+			this.IncidentsCarNum = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.IncidentsCarClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.IncidentsTeamName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.IncidentsDriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.IncidentsIncCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			((System.ComponentModel.ISupportInitialize)(this.incidentsTableView)).BeginInit();
 			this.cautionPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -122,8 +123,8 @@
 			this.incidentFiltersGroupBox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.allIncidentsTable)).BeginInit();
 			this.liveStandingsTab.SuspendLayout();
-			this.liveStandingsFilterGroupBox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+			this.liveStandingsFilterGroupBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// incidentsTableView
@@ -700,13 +701,14 @@
 			this.driverFilterRadio.Name = "driverFilterRadio";
 			this.driverFilterRadio.Size = new System.Drawing.Size(69, 20);
 			this.driverFilterRadio.TabIndex = 2;
-			this.driverFilterRadio.TabStop = true;
 			this.driverFilterRadio.Text = "Drivers";
 			this.driverFilterRadio.UseVisualStyleBackColor = true;
+			this.driverFilterRadio.CheckedChanged += new System.EventHandler(this.driverFilterRadio_CheckedChanged);
 			// 
 			// carFilterRadio
 			// 
 			this.carFilterRadio.AutoSize = true;
+			this.carFilterRadio.Checked = true;
 			this.carFilterRadio.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.carFilterRadio.Location = new System.Drawing.Point(300, 19);
 			this.carFilterRadio.Name = "carFilterRadio";
@@ -715,6 +717,7 @@
 			this.carFilterRadio.TabStop = true;
 			this.carFilterRadio.Text = "Cars";
 			this.carFilterRadio.UseVisualStyleBackColor = true;
+			this.carFilterRadio.CheckedChanged += new System.EventHandler(this.carFilterRadio_CheckedChanged);
 			// 
 			// allIncidentsTable
 			// 
@@ -736,11 +739,11 @@
 			this.allIncidentsTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
 			this.allIncidentsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
 			this.allIncidentsTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn2,
-            this.CarClass,
-            this.dataGridViewTextBoxColumn3,
-            this.dataGridViewTextBoxColumn4,
-            this.dataGridViewTextBoxColumn6});
+            this.IncidentsCarNum,
+            this.IncidentsCarClass,
+            this.IncidentsTeamName,
+            this.IncidentsDriverName,
+            this.IncidentsIncCount});
 			this.allIncidentsTable.Cursor = System.Windows.Forms.Cursors.Arrow;
 			this.allIncidentsTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
 			this.allIncidentsTable.EnableHeadersVisualStyles = false;
@@ -764,87 +767,6 @@
 			this.allIncidentsTable.TabIndex = 3;
 			this.allIncidentsTable.TabStop = false;
 			// 
-			// dataGridViewTextBoxColumn2
-			// 
-			this.dataGridViewTextBoxColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-			dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle10.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Black;
-			dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn2.DefaultCellStyle = dataGridViewCellStyle10;
-			this.dataGridViewTextBoxColumn2.DividerWidth = 1;
-			this.dataGridViewTextBoxColumn2.HeaderText = "Car #";
-			this.dataGridViewTextBoxColumn2.MinimumWidth = 75;
-			this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-			this.dataGridViewTextBoxColumn2.ReadOnly = true;
-			this.dataGridViewTextBoxColumn2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn2.ToolTipText = "Car number";
-			this.dataGridViewTextBoxColumn2.Width = 75;
-			// 
-			// CarClass
-			// 
-			this.CarClass.DividerWidth = 1;
-			this.CarClass.HeaderText = "Class";
-			this.CarClass.Name = "CarClass";
-			this.CarClass.ReadOnly = true;
-			this.CarClass.ToolTipText = "The car class";
-			// 
-			// dataGridViewTextBoxColumn3
-			// 
-			this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-			dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle11.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.Black;
-			this.dataGridViewTextBoxColumn3.DefaultCellStyle = dataGridViewCellStyle11;
-			this.dataGridViewTextBoxColumn3.DividerWidth = 1;
-			this.dataGridViewTextBoxColumn3.FillWeight = 50F;
-			this.dataGridViewTextBoxColumn3.HeaderText = "Team";
-			this.dataGridViewTextBoxColumn3.MinimumWidth = 250;
-			this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-			this.dataGridViewTextBoxColumn3.ReadOnly = true;
-			this.dataGridViewTextBoxColumn3.ToolTipText = "The team name";
-			// 
-			// dataGridViewTextBoxColumn4
-			// 
-			this.dataGridViewTextBoxColumn4.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-			dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle12.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle12.SelectionForeColor = System.Drawing.Color.Black;
-			dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle12;
-			this.dataGridViewTextBoxColumn4.DividerWidth = 1;
-			this.dataGridViewTextBoxColumn4.FillWeight = 50F;
-			this.dataGridViewTextBoxColumn4.HeaderText = "Driver";
-			this.dataGridViewTextBoxColumn4.MinimumWidth = 250;
-			this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-			this.dataGridViewTextBoxColumn4.ReadOnly = true;
-			this.dataGridViewTextBoxColumn4.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-			this.dataGridViewTextBoxColumn4.ToolTipText = "The name of the driver currently driving this car";
-			// 
-			// dataGridViewTextBoxColumn6
-			// 
-			this.dataGridViewTextBoxColumn6.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-			dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle13.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Black;
-			dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn6.DefaultCellStyle = dataGridViewCellStyle13;
-			this.dataGridViewTextBoxColumn6.DividerWidth = 1;
-			this.dataGridViewTextBoxColumn6.HeaderText = "Incidents";
-			this.dataGridViewTextBoxColumn6.MinimumWidth = 75;
-			this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
-			this.dataGridViewTextBoxColumn6.ReadOnly = true;
-			this.dataGridViewTextBoxColumn6.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn6.ToolTipText = "The total number of incidents for this entry";
-			this.dataGridViewTextBoxColumn6.Width = 75;
-			// 
 			// liveStandingsTab
 			// 
 			this.liveStandingsTab.BackColor = System.Drawing.SystemColors.Control;
@@ -857,37 +779,6 @@
 			this.liveStandingsTab.TabIndex = 2;
 			this.liveStandingsTab.Text = "Live Standings";
 			// 
-			// liveStandingsFilterGroupBox
-			// 
-			this.liveStandingsFilterGroupBox.Controls.Add(this.filterClassComboBox);
-			this.liveStandingsFilterGroupBox.Controls.Add(this.filterClassLabel);
-			this.liveStandingsFilterGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
-			this.liveStandingsFilterGroupBox.Location = new System.Drawing.Point(3, 3);
-			this.liveStandingsFilterGroupBox.Name = "liveStandingsFilterGroupBox";
-			this.liveStandingsFilterGroupBox.Size = new System.Drawing.Size(1250, 58);
-			this.liveStandingsFilterGroupBox.TabIndex = 6;
-			this.liveStandingsFilterGroupBox.TabStop = false;
-			this.liveStandingsFilterGroupBox.Text = "Filters";
-			// 
-			// filterClassComboBox
-			// 
-			this.filterClassComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.filterClassComboBox.FormattingEnabled = true;
-			this.filterClassComboBox.Location = new System.Drawing.Point(89, 18);
-			this.filterClassComboBox.Name = "filterClassComboBox";
-			this.filterClassComboBox.Size = new System.Drawing.Size(121, 24);
-			this.filterClassComboBox.TabIndex = 1;
-			// 
-			// filterClassLabel
-			// 
-			this.filterClassLabel.AutoSize = true;
-			this.filterClassLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.filterClassLabel.Location = new System.Drawing.Point(6, 21);
-			this.filterClassLabel.Name = "filterClassLabel";
-			this.filterClassLabel.Size = new System.Drawing.Size(77, 16);
-			this.filterClassLabel.TabIndex = 0;
-			this.filterClassLabel.Text = "Filter Class:";
-			// 
 			// dataGridView1
 			// 
 			this.dataGridView1.AllowUserToAddRows = false;
@@ -899,14 +790,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleVertical;
 			this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-			dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-			dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-			this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle14;
+			dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle15;
 			this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
 			this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.OverallPosition,
@@ -969,13 +860,13 @@
 			// dataGridViewTextBoxColumn1
 			// 
 			this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-			dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle15.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Black;
-			dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle15;
+			dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle16.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Black;
+			dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle16;
 			this.dataGridViewTextBoxColumn1.DividerWidth = 1;
 			this.dataGridViewTextBoxColumn1.HeaderText = "Car #";
 			this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
@@ -987,11 +878,11 @@
 			// dataGridViewTextBoxColumn7
 			// 
 			this.dataGridViewTextBoxColumn7.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-			dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle16.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Black;
-			this.dataGridViewTextBoxColumn7.DefaultCellStyle = dataGridViewCellStyle16;
+			dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle17.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.Black;
+			this.dataGridViewTextBoxColumn7.DefaultCellStyle = dataGridViewCellStyle17;
 			this.dataGridViewTextBoxColumn7.DividerWidth = 1;
 			this.dataGridViewTextBoxColumn7.FillWeight = 50F;
 			this.dataGridViewTextBoxColumn7.HeaderText = "Team";
@@ -1002,13 +893,13 @@
 			// dataGridViewTextBoxColumn8
 			// 
 			this.dataGridViewTextBoxColumn8.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-			dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle17.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle17.SelectionForeColor = System.Drawing.Color.Black;
-			dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn8.DefaultCellStyle = dataGridViewCellStyle17;
+			dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle18.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Black;
+			dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.dataGridViewTextBoxColumn8.DefaultCellStyle = dataGridViewCellStyle18;
 			this.dataGridViewTextBoxColumn8.DividerWidth = 1;
 			this.dataGridViewTextBoxColumn8.FillWeight = 50F;
 			this.dataGridViewTextBoxColumn8.HeaderText = "Driver";
@@ -1020,13 +911,13 @@
 			// dataGridViewTextBoxColumn9
 			// 
 			this.dataGridViewTextBoxColumn9.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-			dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle18.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Black;
-			dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridViewTextBoxColumn9.DefaultCellStyle = dataGridViewCellStyle18;
+			dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle19.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle19.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.Black;
+			dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.dataGridViewTextBoxColumn9.DefaultCellStyle = dataGridViewCellStyle19;
 			this.dataGridViewTextBoxColumn9.DividerWidth = 1;
 			this.dataGridViewTextBoxColumn9.HeaderText = "Incidents";
 			this.dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
@@ -1034,6 +925,124 @@
 			this.dataGridViewTextBoxColumn9.Resizable = System.Windows.Forms.DataGridViewTriState.True;
 			this.dataGridViewTextBoxColumn9.ToolTipText = "The total number of incidents for this entry";
 			this.dataGridViewTextBoxColumn9.Width = 60;
+			// 
+			// liveStandingsFilterGroupBox
+			// 
+			this.liveStandingsFilterGroupBox.Controls.Add(this.filterClassComboBox);
+			this.liveStandingsFilterGroupBox.Controls.Add(this.filterClassLabel);
+			this.liveStandingsFilterGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
+			this.liveStandingsFilterGroupBox.Location = new System.Drawing.Point(3, 3);
+			this.liveStandingsFilterGroupBox.Name = "liveStandingsFilterGroupBox";
+			this.liveStandingsFilterGroupBox.Size = new System.Drawing.Size(1250, 58);
+			this.liveStandingsFilterGroupBox.TabIndex = 6;
+			this.liveStandingsFilterGroupBox.TabStop = false;
+			this.liveStandingsFilterGroupBox.Text = "Filters";
+			// 
+			// filterClassComboBox
+			// 
+			this.filterClassComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.filterClassComboBox.FormattingEnabled = true;
+			this.filterClassComboBox.Location = new System.Drawing.Point(89, 18);
+			this.filterClassComboBox.Name = "filterClassComboBox";
+			this.filterClassComboBox.Size = new System.Drawing.Size(121, 24);
+			this.filterClassComboBox.TabIndex = 1;
+			// 
+			// filterClassLabel
+			// 
+			this.filterClassLabel.AutoSize = true;
+			this.filterClassLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.filterClassLabel.Location = new System.Drawing.Point(6, 21);
+			this.filterClassLabel.Name = "filterClassLabel";
+			this.filterClassLabel.Size = new System.Drawing.Size(77, 16);
+			this.filterClassLabel.TabIndex = 0;
+			this.filterClassLabel.Text = "Filter Class:";
+			// 
+			// IncidentsCarNum
+			// 
+			this.IncidentsCarNum.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			this.IncidentsCarNum.DataPropertyName = "IncidentsCarNum";
+			dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle10.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Black;
+			dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.IncidentsCarNum.DefaultCellStyle = dataGridViewCellStyle10;
+			this.IncidentsCarNum.DividerWidth = 1;
+			this.IncidentsCarNum.HeaderText = "Car #";
+			this.IncidentsCarNum.Name = "IncidentsCarNum";
+			this.IncidentsCarNum.ReadOnly = true;
+			this.IncidentsCarNum.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.IncidentsCarNum.ToolTipText = "Car number";
+			this.IncidentsCarNum.Width = 75;
+			// 
+			// IncidentsCarClass
+			// 
+			this.IncidentsCarClass.DataPropertyName = "IncidentsCarClass";
+			dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle11.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.Black;
+			this.IncidentsCarClass.DefaultCellStyle = dataGridViewCellStyle11;
+			this.IncidentsCarClass.DividerWidth = 1;
+			this.IncidentsCarClass.HeaderText = "Class";
+			this.IncidentsCarClass.Name = "IncidentsCarClass";
+			this.IncidentsCarClass.ReadOnly = true;
+			this.IncidentsCarClass.ToolTipText = "The car class";
+			// 
+			// IncidentsTeamName
+			// 
+			this.IncidentsTeamName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+			this.IncidentsTeamName.DataPropertyName = "IncidentsTeamName";
+			dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle12.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle12.SelectionForeColor = System.Drawing.Color.Black;
+			this.IncidentsTeamName.DefaultCellStyle = dataGridViewCellStyle12;
+			this.IncidentsTeamName.DividerWidth = 1;
+			this.IncidentsTeamName.FillWeight = 50F;
+			this.IncidentsTeamName.HeaderText = "Team";
+			this.IncidentsTeamName.Name = "IncidentsTeamName";
+			this.IncidentsTeamName.ReadOnly = true;
+			this.IncidentsTeamName.ToolTipText = "The team name";
+			// 
+			// IncidentsDriverName
+			// 
+			this.IncidentsDriverName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+			this.IncidentsDriverName.DataPropertyName = "IncidentsDriverName";
+			dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle13.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Black;
+			dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.IncidentsDriverName.DefaultCellStyle = dataGridViewCellStyle13;
+			this.IncidentsDriverName.DividerWidth = 1;
+			this.IncidentsDriverName.FillWeight = 50F;
+			this.IncidentsDriverName.HeaderText = "Driver";
+			this.IncidentsDriverName.Name = "IncidentsDriverName";
+			this.IncidentsDriverName.ReadOnly = true;
+			this.IncidentsDriverName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.IncidentsDriverName.ToolTipText = "The name of the driver currently driving this car";
+			// 
+			// IncidentsIncCount
+			// 
+			this.IncidentsIncCount.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			this.IncidentsIncCount.DataPropertyName = "IncidentsIncCount";
+			dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle14.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Black;
+			dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.IncidentsIncCount.DefaultCellStyle = dataGridViewCellStyle14;
+			this.IncidentsIncCount.DividerWidth = 1;
+			this.IncidentsIncCount.HeaderText = "Incidents";
+			this.IncidentsIncCount.Name = "IncidentsIncCount";
+			this.IncidentsIncCount.ReadOnly = true;
+			this.IncidentsIncCount.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+			this.IncidentsIncCount.ToolTipText = "The total number of incidents for this entry";
+			this.IncidentsIncCount.Width = 75;
 			// 
 			// RaceAdminMain
 			// 
@@ -1067,9 +1076,9 @@
 			this.incidentFiltersGroupBox.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.allIncidentsTable)).EndInit();
 			this.liveStandingsTab.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
 			this.liveStandingsFilterGroupBox.ResumeLayout(false);
 			this.liveStandingsFilterGroupBox.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1125,11 +1134,6 @@
 		private System.Windows.Forms.GroupBox incidentFiltersGroupBox;
 		private System.Windows.Forms.Label filterTimeLabel;
 		private System.Windows.Forms.ComboBox filterTimeComboBox;
-		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
-		private System.Windows.Forms.DataGridViewTextBoxColumn CarClass;
-		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
-		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
-		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
 		private System.Windows.Forms.GroupBox liveStandingsFilterGroupBox;
 		private System.Windows.Forms.ComboBox filterClassComboBox;
 		private System.Windows.Forms.Label filterClassLabel;
@@ -1141,6 +1145,11 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
 		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
 		private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
+		private System.Windows.Forms.DataGridViewTextBoxColumn IncidentsCarNum;
+		private System.Windows.Forms.DataGridViewTextBoxColumn IncidentsCarClass;
+		private System.Windows.Forms.DataGridViewTextBoxColumn IncidentsTeamName;
+		private System.Windows.Forms.DataGridViewTextBoxColumn IncidentsDriverName;
+		private System.Windows.Forms.DataGridViewTextBoxColumn IncidentsIncCount;
 	}
 }
 
