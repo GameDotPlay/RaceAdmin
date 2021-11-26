@@ -787,7 +787,11 @@
 						{
                             row.Visible = false;
 						}
-					}
+                        else
+                        {
+                            row.Visible = true;
+                        }
+                    }
 
                     break;
 

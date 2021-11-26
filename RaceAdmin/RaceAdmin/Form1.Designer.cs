@@ -1082,7 +1082,7 @@
 			this.debugTable.Cursor = System.Windows.Forms.Cursors.Arrow;
 			this.debugTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
 			this.debugTable.EnableHeadersVisualStyles = false;
-			this.debugTable.Location = new System.Drawing.Point(0, 98);
+			this.debugTable.Location = new System.Drawing.Point(0, 62);
 			this.debugTable.Margin = new System.Windows.Forms.Padding(1);
 			this.debugTable.MinimumSize = new System.Drawing.Size(1200, 250);
 			this.debugTable.Name = "debugTable";
@@ -1098,7 +1098,7 @@
 			this.debugTable.ShowCellToolTips = false;
 			this.debugTable.ShowEditingIcon = false;
 			this.debugTable.ShowRowErrors = false;
-			this.debugTable.Size = new System.Drawing.Size(1256, 533);
+			this.debugTable.Size = new System.Drawing.Size(1256, 569);
 			this.debugTable.TabIndex = 8;
 			this.debugTable.TabStop = false;
 			// 
