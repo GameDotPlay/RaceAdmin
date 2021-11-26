@@ -149,6 +149,7 @@
   <ItemGroup>
     <Compile Include="AudioCautionHandler.cs" />
     <Compile Include="Car.cs" />
+    <Compile Include="CautionState.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DateUtil.cs" />
     <Compile Include="DefaultCautionHandler.cs" />
@@ -163,6 +164,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="ICautionHandler.cs" />
+    <Compile Include="Incident.cs" />
     <Compile Include="ISdkWrapper.cs" />
     <Compile Include="ISoundPlayer.cs" />
     <Compile Include="ITelemetryInfo.cs" />
@@ -238,6 +240,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GreenCheckeredFlags.ico" />
+    <Content Include="Resources\ConeEmpty.bmp" />
+    <Content Include="Resources\ConeFull.bmp" />
     <None Include="Resources\2021 vApex Flag Logo4-RG-Black.png" />
     <None Include="Resources\Caution.wav" />
   </ItemGroup>
