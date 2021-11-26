@@ -169,4 +169,10 @@
   <data name="IncidentsTable_TeamName" xml:space="preserve">
     <value>IncidentsTeamName</value>
   </data>
+  <data name="ConeEmpty" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ConeEmpty.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ConeFull" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ConeFull.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

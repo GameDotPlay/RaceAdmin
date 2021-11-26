@@ -98,6 +98,26 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ConeEmpty {
+            get {
+                object obj = ResourceManager.GetObject("ConeEmpty", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ConeFull {
+            get {
+                object obj = ResourceManager.GetObject("ConeFull", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A valid number was not entered..
         /// </summary>
         internal static string ErrorMessage_ValidNumberNotEntered {
