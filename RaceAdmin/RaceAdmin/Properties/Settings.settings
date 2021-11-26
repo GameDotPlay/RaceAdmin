@@ -41,5 +41,8 @@
     <Setting Name="IgnorePitEntryPercentageThreshold" Type="System.Single" Scope="User">
       <Value Profile="(Default)">70</Value>
     </Setting>
+    <Setting Name="telemetryPollRate" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

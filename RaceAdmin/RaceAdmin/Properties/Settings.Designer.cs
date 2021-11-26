@@ -178,5 +178,17 @@ namespace RaceAdmin.Properties {
                 this["IgnorePitEntryPercentageThreshold"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int telemetryPollRate {
+            get {
+                return ((int)(this["telemetryPollRate"]));
+            }
+            set {
+                this["telemetryPollRate"] = value;
+            }
+        }
     }
 }
