@@ -533,7 +533,7 @@
                     continue;
                 }
 
-                if (!cars.TryGetValue(carIdx, out Car car))
+                if (!cars.ContainsKey(carIdx))
                 {
                     carIdx++;
                     query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
@@ -541,7 +541,7 @@
                     continue;
                 }
 
-                car.TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value);
+                cars[carIdx].TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value);
 
                 carIdx++;
                 query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
@@ -752,16 +752,29 @@
 
             int rowId = allIncidentsTable.Rows.Add();
             DataGridViewRow newRow = allIncidentsTable.Rows[rowId];
-            newRow.Cells["incidentsTimeStamp"].Value = MakeTimeString(newInc.UpdateTime);
-            newRow.Cells["incidentsCarNum"].Value = cars[newInc.CarIdx].CarNumber;
-            newRow.Cells["incidentsTeamName"].Value = cars[newInc.CarIdx].TeamName;
-            newRow.Cells["incidentsCurrentDriver"].Value = cars[newInc.CarIdx].CurrentDriver;
-            newRow.Cells["incidentsNewInc"].Value = $"{newInc.Value}x";
-            newRow.Cells["incidentsTotalIncs"].Value = cars[newInc.CarIdx].TeamIncidentCount;
-            newRow.Cells["incidentsCarLapNum"].Value = cars[newInc.CarIdx].CurrentLap;
+            newRow.Cells[Properties.Resources.IncidentsTable_TimeStamp].Value = MakeTimeString(newInc.UpdateTime);
+            newRow.Cells[Properties.Resources.IncidentsTable_CarNum].Value = cars[newInc.CarIdx].CarNumber;
+            if (teamRacing)
+            {
+                newRow.Cells[Properties.Resources.IncidentsTable_TeamName].Value = cars[newInc.CarIdx].TeamName;
+            }
+            newRow.Cells[Properties.Resources.IncidentsTable_CurrentDriver].Value = cars[newInc.CarIdx].CurrentDriver;
+            newRow.Cells[Properties.Resources.IncidentsTable_NewInc].Value = $"{newInc.Value}x";
+            string total;
+            if (teamRacing)
+            {
+                // iRacing-style team incidents. (TeamIncs,DriverIncs)
+                total = $"{cars[newInc.CarIdx].TeamIncidentCount},{drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs}";
+            }
+            else
+            {
+                total = drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs.ToString();
+            }
+            newRow.Cells[Properties.Resources.IncidentsTable_TotalIncs].Value = total;
+            newRow.Cells[Properties.Resources.IncidentsTable_CarLapNum].Value = cars[newInc.CarIdx].CurrentLap;
 
             if (allIncidentsTable.RowCount > 0)
-			{
+            {
                 allIncidentsTable.FirstDisplayedScrollingRowIndex = allIncidentsTable.RowCount - 1;
             }
         }
@@ -951,8 +964,7 @@
         /// <summary>
         /// Inserts new row in incident log.
         /// </summary>
-        /// <param name="driver">Driver associated with the latest incident.</param>
-        /// <param name="delta">The number of incident points gained by this driver on this occasion.</param>
+        /// <param name="newInc"><see cref="Incident"/> object containing information about the latest incident.</param>
         private void LogNewIncident(Incident newInc)
         {
             if (InvokeRequired)
