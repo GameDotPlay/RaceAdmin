@@ -151,26 +151,6 @@
         private bool raceSession;
 
         /// <summary>
-        /// List of PercentAroundTrack values for all cars as they entered pit road.
-        /// </summary>
-        private List<float> allCarsPitEntryLocations;
-
-        /// <summary>
-        /// List of PercentAroundTrack values for all cars as they exited pit road.
-        /// </summary>
-        private List<float> allCarsPitExitLocations;
-
-        /// <summary>
-        /// Running average location of the pit entry cones. Updated every time a car enters pit road. Should get more accurate over time.
-        /// </summary>
-        private float averagePitEntryLocation;
-
-        /// <summary>
-        /// Running average location of the pit exit cones. Updated every time a car exits pit road. Should get more accurate over time.
-        /// </summary>
-        private float averagePitExitLocation;
-
-        /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
         /// </summary>
         public RaceAdminMain(ISdkWrapper wrapper)
@@ -196,8 +176,6 @@
             cars = new Dictionary<int, Car>();
             incidents = new List<Incident>();
             sessionFlags = new SessionFlag(0);
-            allCarsPitEntryLocations = new List<float>();
-            allCarsPitExitLocations = new List<float>();
             telemetryPollRate = Properties.Settings.Default.telemetryPollRate;
             telemetryPollRateTextBox.Text = telemetryPollRate.ToString();
             incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
@@ -212,63 +190,6 @@
 
             // Start the wrapper.
             wrapper.Start();
-        }
-
-        private void RaceAdminMain_Load(object sender, EventArgs e)
-        {
-            // location && size
-            var location = new Point(Properties.Settings.Default.x, Properties.Settings.Default.y);
-            Screen screen = Screen.FromPoint(location);
-            if (location.X < screen.Bounds.X)
-            {
-                location.X = screen.Bounds.X;
-            }
-            else if (location.X > screen.Bounds.X + screen.Bounds.Width - 50)
-            {
-                location.X = screen.Bounds.X + screen.Bounds.Width - 400;
-            }
-            if (location.Y < screen.Bounds.Y)
-            {
-                location.Y = screen.Bounds.Y;
-            }
-            else if (location.Y > screen.Bounds.Y + screen.Bounds.Height - 50)
-            {
-                location.Y = screen.Bounds.Y + screen.Bounds.Height - 400;
-            }
-
-            Location = location;
-            Size = new Size(Properties.Settings.Default.width, Properties.Settings.Default.height);
-        }
-
-        private void RaceAdminMain_ResizeEnd(object sender, EventArgs e)
-        {
-            if (Size.Width >= MinimumSize.Width && Size.Height >= MinimumSize.Height)
-            {
-                Properties.Settings.Default.width = Size.Width;
-                Properties.Settings.Default.height = Size.Height;
-                Properties.Settings.Default.Save();
-            }
-        }
-
-        /// <summary>
-        /// Closes the current environment when the X button is clicked.
-        /// </summary>
-        /// <param name="sender">Sender of the event.</param>
-        /// <param name="e">FormClosing event.</param>
-        private void RaceAdminMain_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (Location.X >= 0 && Location.Y >= 0)
-            {
-                Properties.Settings.Default.x = Location.X;
-                Properties.Settings.Default.y = Location.Y;
-                Properties.Settings.Default.Save();
-            }
-
-            Properties.Settings.Default.telemetryPollRate = telemetryPollRate;
-            Properties.Settings.Default.Save();
-
-            wrapper.Stop();
-            Environment.Exit(0);
         }
 
         /// <summary>
@@ -288,7 +209,8 @@
                 sessionInitializationComplete = true;
             }
 
-            AddNewCarsAndDrivers(e);
+            AddNewDrivers(e);
+            AddNewCars(e);
             UpdateDriverIncidentCounts(e);
             UpdateDriverLapCounts(e);
             UpdateCarTeamIncidentCounts(e);
@@ -308,7 +230,7 @@
         /// Checks for change in flag state. When session goes green again after a caution the incs since last caution field is reset to zero.
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
-        /// <param name="e">Telemetry data changed event.</param>
+        /// <param name="e">TelemetryUpdated event args.</param>
         public void OnTelemetryUpdated(object sender, ITelemetryUpdatedEvent e)
         {
             if (InvokeRequired)
@@ -360,7 +282,7 @@
             }
 
             UpdateLiveCarInfo(e);
-            UpdatePitConePercentages();
+            //UpdatePitConePercentages();
             UpdateIncidentCountDisplay();
 
 #if DEBUG
@@ -380,6 +302,10 @@
             }
         }
 
+        /// <summary>
+        /// Performs some initialization of internal variables and states relevant to the current session.
+        /// </summary>
+        /// <param name="e">SessionInfoUpdated event args.</param>
         private void InitializeSession(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             if (InvokeRequired)
@@ -420,11 +346,15 @@
             ClearIncidents();
 
 #if DEBUG
-            AddNewCarsAndDrivers(e);
+            AddNewDrivers(e);
+            AddNewCars(e);
             PopulateDebugTable();
 #endif
         }
 
+        /// <summary>
+        /// Hides the incident counts from the user.
+        /// </summary>
         private void ObscureIncidents()
         {
             if (InvokeRequired)
@@ -436,6 +366,9 @@
             incidentCountPanel.Visible = false;
         }
 
+        /// <summary>
+        /// Shows the incident counts to the user.
+        /// </summary>
         private void ShowIncidents()
         {
             if (InvokeRequired)
@@ -447,6 +380,10 @@
             incidentCountPanel.Visible = true;
         }
 
+        /// <summary>
+        /// Iterates through all drivers in the session and updates their incident counts, logs a new incident if one is detected.
+        /// </summary>
+        /// <param name="e">SessionInfoUpdated event args.</param>
         private void UpdateDriverIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             int carIdx = 0;
@@ -497,6 +434,10 @@
             }
         }
 
+        /// <summary>
+        /// Iterates through all drivers in the session and updates their completed laps and current lap number.
+        /// </summary>
+        /// <param name="e">SessionInfoUpdated event args.</param>
         private void UpdateDriverLapCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             int i = 1;
@@ -520,6 +461,10 @@
             }
         }
 
+        /// <summary>
+        /// Iterates through all cars in the session and updates the team incident count.
+        /// </summary>
+        /// <param name="e">SessionInfoUpdated event args.</param>
         private void UpdateCarTeamIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
 		{
             int carIdx = 0;
@@ -549,62 +494,22 @@
         }
 
         /// <summary>
-        /// Executes every OnTelemetryUpdated().
-        /// Iterates through every car in the session and checks if they have entered/exited pit road.
-        /// If a car has entered or exited pit road since the last update, add the respective PercentAroundTrack value to the ongoing average for all cars.
+        /// Iterates through every car in the session and checks if it has towed to pit lane since the last update.
         /// </summary>
-        private void UpdatePitConePercentages()
-		{
-            // Iterate over every car in the session and check if they've entered/exited pit road since the last update.
-            foreach(KeyValuePair<int, Car> car in cars)
-			{
-                // Car has entered or exited pit road since last update.
-                if(car.Value.BetweenPitCones != car.Value.LastBetweenPitCones)
-				{
-                    // To cut down on outliers...
-                    // If the car hasn't completed at least this percentage of the track then ignore this pit entry for calculating averages.
-                    // If the car is between the pit entry/exit zones but still on racing surface (stopped on start/finish straight for example) then ignore pit entry for calculating averages.
-                    if ((car.Value.PercentAroundTrack < Properties.Settings.Default.IgnorePitEntryPercentageThreshold) ||
-                        ((car.Value.PercentAroundTrack > averagePitEntryLocation) &&
-                        (car.Value.PercentAroundTrack < averagePitExitLocation) &&
-                        (car.Value.TrackSurface == TrackSurfaces.OnTrack)))
-                    {
-                        continue;
-                    }
-                    else
-					{
-                        // Car has entered pit road since last update.
-                        if (car.Value.BetweenPitCones)
-                        {
-                            allCarsPitEntryLocations.Add(car.Value.PercentAroundTrack);
-                        }
-                        else // Car has exited pit road since last update.
-                        {
-                            allCarsPitExitLocations.Add(car.Value.PercentAroundTrack);
-                        }
-                    }
-                    
-                    // Update the average pit entry/exit locations.
-                    averagePitEntryLocation = allCarsPitEntryLocations.Average();
-                    averagePitExitLocation = allCarsPitExitLocations.Average();
-                }
-			}
-		}
-
         private void CheckForTow()
         {
             // Iterate over every car in the session and check if they have towed to pit lane since the last update.
-            foreach (KeyValuePair<int, Car> car in cars)
+            foreach (var car in cars.Values)
             {
-                // Pit entry transition has occured.
-                if (car.Value.BetweenPitCones != car.Value.LastBetweenPitCones)
-                {
-                    // Car has entered pit lane.
-                    if(car.Value.BetweenPitCones)
-					{
-                        // Car towed to pit lane.
-                        if(car.Value.PercentAroundTrack < averagePitEntryLocation)
-						{
+                // If car is already "ApproachingPits" when tow occurs then ignore.
+                if(car.TrackSurface != TrackSurfaces.AproachingPits)
+				{
+                    // Pit entry transition has occured.
+                    if (car.BetweenPitCones != car.LastBetweenPitCones)
+                    {
+                        // Car has entered pit lane.
+                        if (car.BetweenPitCones)
+                        {
                             // Notify caution handlers
                             cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
 
@@ -636,6 +541,9 @@
             }
 		}
 
+        /// <summary>
+        /// Runs checks on conditions to determine if a caution threshold has been reached and notifies the caution handlers.
+        /// </summary>
         private void CheckIncidentLimit()
         {
             if (!raceSession)
@@ -692,12 +600,19 @@
             cautionState = CautionState.ThresholdReached;
         }
 
+        /// <summary>
+        /// Updates the text incident counters on the main tab.
+        /// </summary>
         private void UpdateIncidentCountDisplay()
         {
             TotalIncidentCountNum.Text = totalIncCount.ToString();
             IncidentsSinceCautionNum.Text = incCountSinceCaution.ToString();
         }
 
+        /// <summary>
+        /// Checks for caution state changes. No caution=>Caution. Caution=>Green.
+        /// </summary>
+        /// <param name="e">Event parameters.</param>
         private void CheckFlagStateChanges(ITelemetryUpdatedEvent e)
         {
             // has caution flag been deployed?
@@ -721,6 +636,10 @@
             }
         }
 
+        /// <summary>
+        /// Clears incident counts from drivers.
+        /// Clears all incident rows from main incidents table and allIncidentsTable.
+        /// </summary>
         private void ClearIncidents()
         {
             if (InvokeRequired)
@@ -779,6 +698,9 @@
             }
         }
 
+        /// <summary>
+        /// Applies any user filtering to the allIncidentsTable.
+        /// </summary>
         private void ApplyIncidentTableIncidentFilters()
 		{
             switch(filterIncidentsComboBox.Text)
@@ -857,14 +779,12 @@
 
             foreach (var car in cars.Values)
             {
-                int rowId = debugTable.Rows.Add();
-                DataGridViewRow newRow = debugTable.Rows[rowId];
-                AddNewCarDebugTable(newRow, car);
+                AddNewCarDebugTable(car);
             }
         }
 
         /// <summary>
-        /// Checks for new cars. Updates the values for each car in the debugTable.
+        /// Updates the values for each car in the debugTable.
         /// </summary>
         private void UpdateDebugTable()
 		{
@@ -874,71 +794,48 @@
                 return;
             }
 
-            // Check for new cars.
             foreach(DataGridViewRow row in debugTable.Rows)
 			{
-                int carIdx = (int)row.Cells["debugCarID"].Value;
-                if (cars.ContainsKey(carIdx))
-                {
-                    continue;
-                }
-                else
+                if(filterNotInWorldCheckBox.Checked)
 				{
-                    int rowId = debugTable.Rows.Add();
-                    DataGridViewRow newRow = debugTable.Rows[rowId];
-                    AddNewCarDebugTable(newRow, cars[carIdx]);
-                }
-			}
-
-            foreach(DataGridViewRow row in debugTable.Rows)
-			{
-                row.Cells["overallPositionInRace"].Value = cars[(int)row.Cells["debugCarID"].Value].OverallPositionInRace;
-                row.Cells["classPosition"].Value = cars[(int)row.Cells["debugCarID"].Value].ClassPositionInRace;
-                row.Cells["currentDriver"].Value = cars[(int)row.Cells["debugCarID"].Value].CurrentDriver;
-                row.Cells["percentAroundTrack"].Value = cars[(int)row.Cells["debugCarID"].Value].PercentAroundTrack;
-                if (cars[(int)row.Cells["debugCarID"].Value].BetweenPitCones)
-                {
-                    row.Cells["betweenPitCones"].Value = Properties.Resources.ConeFull;
-                }
-                else
-                {
-                    row.Cells["betweenPitCones"].Value = Properties.Resources.ConeEmpty;
-                }
-
-                row.Cells["currentLap"].Value = cars[(int)row.Cells["debugCarID"].Value].CurrentLap;
-                row.Cells["lapsCompleted"].Value = cars[(int)row.Cells["debugCarID"].Value].LapsCompleted;
-                row.Cells["trackSurface"].Value = cars[(int)row.Cells["debugCarID"].Value].TrackSurface;
-                row.Cells["trackSurfaceMaterial"].Value = cars[(int)row.Cells["debugCarID"].Value].TrackSurfaceMaterial;
-            }
-
-            ApplyDebugTableFilters();
-        }
-
-        private void ApplyDebugTableFilters()
-		{
-            foreach(DataGridViewRow row in debugTable.Rows)
-			{
-                if (filterNotInWorldCheckBox.Checked)
-                {
-                    if ((TrackSurfaces)row.Cells["trackSurface"].Value == TrackSurfaces.NotInWorld)
+                    if (cars[(int)row.Cells["debugCarID"].Value].TrackSurface == TrackSurfaces.NotInWorld)
                     {
                         row.Visible = false;
+                        continue;
                     }
                 }
                 else
-                {
+				{
                     row.Visible = true;
+                    row.Cells["overallPositionInRace"].Value = cars[(int)row.Cells["debugCarID"].Value].OverallPositionInRace;
+                    row.Cells["classPosition"].Value = cars[(int)row.Cells["debugCarID"].Value].ClassPositionInRace;
+                    row.Cells["currentDriver"].Value = cars[(int)row.Cells["debugCarID"].Value].CurrentDriver;
+                    row.Cells["percentAroundTrack"].Value = cars[(int)row.Cells["debugCarID"].Value].PercentAroundTrack;
+                    if (cars[(int)row.Cells["debugCarID"].Value].BetweenPitCones)
+                    {
+                        row.Cells["betweenPitCones"].Value = Properties.Resources.ConeFull;
+                    }
+                    else
+                    {
+                        row.Cells["betweenPitCones"].Value = Properties.Resources.ConeEmpty;
+                    }
+
+                    row.Cells["currentLap"].Value = cars[(int)row.Cells["debugCarID"].Value].CurrentLap;
+                    row.Cells["lapsCompleted"].Value = cars[(int)row.Cells["debugCarID"].Value].LapsCompleted;
+                    row.Cells["trackSurface"].Value = cars[(int)row.Cells["debugCarID"].Value].TrackSurface;
+                    row.Cells["trackSurfaceMaterial"].Value = cars[(int)row.Cells["debugCarID"].Value].TrackSurfaceMaterial;
                 }
             }
-		}
+        }
 
         /// <summary>
         /// Adds a new car row to the debugTable.
         /// </summary>
-        /// <param name="newRow">The new row to populate.</param>
         /// <param name="newCar">The car to draw values from.</param>
-        private void AddNewCarDebugTable(DataGridViewRow newRow, Car newCar)
+        private void AddNewCarDebugTable(Car newCar)
 		{
+            int rowId = debugTable.Rows.Add();
+            DataGridViewRow newRow = debugTable.Rows[rowId];
             newRow.Cells["debugCarID"].Value = newCar.CarIdx;
             newRow.Cells["debugCarNum"].Value = newCar.CarNumber;
             newRow.Cells["overallPositionInRace"].Value = newCar.OverallPositionInRace;
@@ -1064,10 +961,9 @@
 
         /// <summary>
         /// Populates a Dictionary<name, Driver> of drivers in the current session.
-        /// Populates a Dictionary<CarIdx, Car> of cars in the current session.
         /// </summary>
         /// <param name="e">Session string changed event. Object that conatains info from session string that can be queried.</param>
-        private void AddNewCarsAndDrivers(SdkWrapper.SessionInfoUpdatedEventArgs e)
+        private void AddNewDrivers(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             int carIdx = 0;
             YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
@@ -1088,27 +984,8 @@
                             NewIncs = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"].Value)
                         };
 
-                        Console.WriteLine("Adding driver {0}", fullName);
+                        Console.WriteLine($"Adding driver {fullName}");
                         drivers.Add(fullName, driver);
-                    }
-
-                    if (!cars.ContainsKey(carIdx))
-                    {
-                        var car = new Car
-                        {
-                            CarIdx = carIdx,
-                            CurrentDriver = fullName,
-                            TeamName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamName"].Value,
-                            TeamID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamID"].Value,
-                            TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value),
-                            CarNumber = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarNumber"].Value,
-                            CarClassID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassID"].Value,
-                            CarScreenName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarScreenName"].Value,
-                            CarClassShortName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassShortName"].Value,
-                        };
-
-                        Console.WriteLine("Adding car {0}", carIdx);
-                        cars.Add(carIdx, car);
                     }
 
                     carIdx++;
@@ -1118,14 +995,13 @@
         }
 
         /// <summary>
-        /// Started making this as separate from AddNewDrivers but 80% of it is the same so I added the important bits to AddNewDrivers() and renamed the method.
-        /// Might be better in the future to keep these separate so I'll keep this method here for now, but it is not used.
+        /// Populates a Dictionary<carIdx, Car> of cars in the current session.
         /// </summary>
         /// <param name="e">Session string changed event. Object that conatains info from session string that can be queried.</param>
         private void AddNewCars(SdkWrapper.SessionInfoUpdatedEventArgs e)
 		{
             int carIdx = 0;
-            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx];
             while (query.TryGetValue(out string fullName))
             {
                 if (fullName != null)
@@ -1145,12 +1021,15 @@
                             CarClassShortName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassShortName"].Value,
                         };
 
-                        Console.WriteLine("Adding car {0}", carIdx);
+                        Console.WriteLine($"Adding car {carIdx}");
                         cars.Add(carIdx, car);
+#if DEBUG
+						AddNewCarDebugTable(car);
+#endif
                     }
 
                     carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx];
                 }
             }
         }
@@ -1204,12 +1083,79 @@
         }
 
 #region EVENT_HANDLERS
-		/// <summary>
-		/// Exports the incidents table to a CSV file when the Export... button is clicked.
-		/// </summary>
-		/// <param name="sender">Sender of the event.</param>
-		/// <param name="e">EventArgs event.</param>
-		private void ExportButton_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Performs some intialization of size and position of the main RaceAdmin form.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The event args.</param>
+        private void RaceAdminMain_Load(object sender, EventArgs e)
+        {
+            // location && size
+            var location = new Point(Properties.Settings.Default.x, Properties.Settings.Default.y);
+            Screen screen = Screen.FromPoint(location);
+            if (location.X < screen.Bounds.X)
+            {
+                location.X = screen.Bounds.X;
+            }
+            else if (location.X > screen.Bounds.X + screen.Bounds.Width - 50)
+            {
+                location.X = screen.Bounds.X + screen.Bounds.Width - 400;
+            }
+            if (location.Y < screen.Bounds.Y)
+            {
+                location.Y = screen.Bounds.Y;
+            }
+            else if (location.Y > screen.Bounds.Y + screen.Bounds.Height - 50)
+            {
+                location.Y = screen.Bounds.Y + screen.Bounds.Height - 400;
+            }
+
+            Location = location;
+            Size = new Size(Properties.Settings.Default.width, Properties.Settings.Default.height);
+        }
+
+        /// <summary>
+        /// Handles the ResizeEnd event of the main RaceAdmin form.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The event args.</param>
+        private void RaceAdminMain_ResizeEnd(object sender, EventArgs e)
+        {
+            if (Size.Width >= MinimumSize.Width && Size.Height >= MinimumSize.Height)
+            {
+                Properties.Settings.Default.width = Size.Width;
+                Properties.Settings.Default.height = Size.Height;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        /// <summary>
+        /// Closes the current environment when the X button is clicked.
+        /// </summary>
+        /// <param name="sender">Sender of the event.</param>
+        /// <param name="e">FormClosing event.</param>
+        private void RaceAdminMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Location.X >= 0 && Location.Y >= 0)
+            {
+                Properties.Settings.Default.x = Location.X;
+                Properties.Settings.Default.y = Location.Y;
+                Properties.Settings.Default.Save();
+            }
+
+            Properties.Settings.Default.telemetryPollRate = telemetryPollRate;
+            Properties.Settings.Default.Save();
+
+            wrapper.Stop();
+            Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// Exports the incidents table to a CSV file when the Export... button is clicked.
+        /// </summary>
+        /// <param name="sender">Sender of the event.</param>
+        /// <param name="e">EventArgs event.</param>
+        private void ExportButton_Click(object sender, EventArgs e)
         {
             Thread t = new Thread((ThreadStart)(() =>
             {
@@ -1381,6 +1327,11 @@
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// Handles the event of the incidents table incident type drop down value has changed.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The event args.</param>
         private void filterIncidentsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             ApplyIncidentTableIncidentFilters();
