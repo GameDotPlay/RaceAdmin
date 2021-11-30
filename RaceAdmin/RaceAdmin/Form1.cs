@@ -282,7 +282,6 @@
             }
 
             UpdateLiveCarInfo(e);
-            //UpdatePitConePercentages();
             UpdateIncidentCountDisplay();
 
 #if DEBUG
@@ -1336,7 +1335,7 @@
         {
             ApplyIncidentTableIncidentFilters();
         }
-        #endregion EVENT_HANDLERS
+#endregion EVENT_HANDLERS
 
 #region PUBLIC_PROPERTIES
         /// <summary>
