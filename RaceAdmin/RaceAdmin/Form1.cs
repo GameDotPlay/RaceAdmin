@@ -34,7 +34,7 @@
         private CautionState cautionState = CautionState.None;
 
         /// <summary>
-        /// The rate at which to poll the live telemetry. Can be changed by the user at runtime on the Debug tab of the UI.
+        /// The rate at which to poll the live telemetry. Can be changed by the user at runtime on the Debug tab of the UI. Persists on app close.
         /// </summary>
         private int telemetryPollRate = 4;
 
@@ -649,6 +649,8 @@
 
             incidentsTableView.Rows.Clear();
             allIncidentsTable.Rows.Clear();
+            incidents.Clear();
+
             foreach (var driver in drivers.Values)
             {
                 driver.NewIncs = 0;
@@ -700,7 +702,7 @@
         /// <summary>
         /// Applies any user filtering to the allIncidentsTable.
         /// </summary>
-        private void ApplyIncidentTableIncidentFilters()
+        private void ApplyIncidentTableIncidentFilter()
 		{
             switch(filterIncidentsComboBox.Text)
 			{
@@ -763,6 +765,47 @@
             }
 		}
 
+        private void ApplyIncidentTableTimeFilter()
+		{
+   //         switch(filterTimeComboBox.SelectedIndex)
+			//{
+   //             case 0:
+   //                 foreach (DataGridViewRow row in allIncidentsTable.Rows)
+   //                 {
+   //                     row.Visible = true;
+   //                 }
+   //                 break;
+
+   //             case 1:
+   //                 foreach (DataGridViewRow row in allIncidentsTable.Rows)
+   //                 {
+   //                     DateTime incidentTime = DateTime.Parse(row.Cells[Properties.Resources.IncidentsTable_TimeStamp].Value.ToString());
+   //                     if ((DateTime)row.Cells[Properties.Resources.IncidentsTable_TimeStamp].Value > DateTime.Now.AddMinutes(-30))
+			//			{
+   //                         row.Visible = false;
+			//			}
+			//			else
+			//			{
+   //                         row.Visible = true;
+			//			}
+   //                 }
+   //                 break;
+
+   //             case 2:
+   //                 break;
+
+   //             case 3:
+   //                 break;
+
+   //             case 4:
+   //                 break;
+
+   //             case 5:
+   //                 break;
+
+			//}
+		}
+
         /// <summary>
         /// Populates the table on the Debug tab after session initialization.
         /// </summary>
@@ -795,13 +838,9 @@
 
             foreach(DataGridViewRow row in debugTable.Rows)
 			{
-                if(filterNotInWorldCheckBox.Checked)
-				{
-                    if (cars[(int)row.Cells["debugCarID"].Value].TrackSurface == TrackSurfaces.NotInWorld)
-                    {
-                        row.Visible = false;
-                        continue;
-                    }
+                if (cars[(int)row.Cells["debugCarID"].Value].TrackSurface == TrackSurfaces.NotInWorld && filterNotInWorldCheckBox.Checked)
+                {
+                    row.Visible = false;
                 }
                 else
 				{
@@ -833,6 +872,12 @@
         /// <param name="newCar">The car to draw values from.</param>
         private void AddNewCarDebugTable(Car newCar)
 		{
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => AddNewCarDebugTable(newCar)));
+                return;
+            }
+
             int rowId = debugTable.Rows.Add();
             DataGridViewRow newRow = debugTable.Rows[rowId];
             newRow.Cells["debugCarID"].Value = newCar.CarIdx;
@@ -1000,7 +1045,7 @@
         private void AddNewCars(SdkWrapper.SessionInfoUpdatedEventArgs e)
 		{
             int carIdx = 0;
-            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx];
+            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
             while (query.TryGetValue(out string fullName))
             {
                 if (fullName != null)
@@ -1028,7 +1073,7 @@
                     }
 
                     carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx];
+                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
                 }
             }
         }
@@ -1333,11 +1378,21 @@
         /// <param name="e">The event args.</param>
         private void filterIncidentsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ApplyIncidentTableIncidentFilters();
+            ApplyIncidentTableIncidentFilter();
         }
-#endregion EVENT_HANDLERS
 
-#region PUBLIC_PROPERTIES
+        /// <summary>
+        /// Handles the event of the incidents table history drop down value has changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void filterTimeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ApplyIncidentTableTimeFilter();
+        }
+        #endregion EVENT_HANDLERS
+
+        #region PUBLIC_PROPERTIES
         /// <summary>
         /// Gets or sets the cautionHandlers field.
         /// </summary>
