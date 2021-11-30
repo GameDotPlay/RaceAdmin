@@ -127,7 +127,7 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IncidentsCarClass.
+        ///   Looks up a localized string similar to incidentsCarClass.
         /// </summary>
         internal static string IncidentsTable_CarClass {
             get {
@@ -136,7 +136,16 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IncidentsCarNum.
+        ///   Looks up a localized string similar to incidentsCarLapNum.
+        /// </summary>
+        internal static string IncidentsTable_CarLapNum {
+            get {
+                return ResourceManager.GetString("IncidentsTable_CarLapNum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to incidentsCarNum.
         /// </summary>
         internal static string IncidentsTable_CarNum {
             get {
@@ -145,29 +154,47 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IncidentsDriverName.
+        ///   Looks up a localized string similar to incidentsCurrentDriver.
         /// </summary>
-        internal static string IncidentsTable_DriverName {
+        internal static string IncidentsTable_CurrentDriver {
             get {
-                return ResourceManager.GetString("IncidentsTable_DriverName", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_CurrentDriver", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IncidentsIncCount.
+        ///   Looks up a localized string similar to incidentsNewInc.
         /// </summary>
-        internal static string IncidentsTable_IncCount {
+        internal static string IncidentsTable_NewInc {
             get {
-                return ResourceManager.GetString("IncidentsTable_IncCount", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_NewInc", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IncidentsTeamName.
+        ///   Looks up a localized string similar to incidentsTeamName.
         /// </summary>
         internal static string IncidentsTable_TeamName {
             get {
                 return ResourceManager.GetString("IncidentsTable_TeamName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to incidentsTimeStamp.
+        /// </summary>
+        internal static string IncidentsTable_TimeStamp {
+            get {
+                return ResourceManager.GetString("IncidentsTable_TimeStamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to incidentsTotalIncs.
+        /// </summary>
+        internal static string IncidentsTable_TotalIncs {
+            get {
+                return ResourceManager.GetString("IncidentsTable_TotalIncs", resourceCulture);
             }
         }
         

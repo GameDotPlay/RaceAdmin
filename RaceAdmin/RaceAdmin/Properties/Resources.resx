@@ -155,24 +155,33 @@
     <value>Team</value>
   </data>
   <data name="IncidentsTable_CarClass" xml:space="preserve">
-    <value>IncidentsCarClass</value>
+    <value>incidentsCarClass</value>
   </data>
   <data name="IncidentsTable_CarNum" xml:space="preserve">
-    <value>IncidentsCarNum</value>
+    <value>incidentsCarNum</value>
   </data>
-  <data name="IncidentsTable_DriverName" xml:space="preserve">
-    <value>IncidentsDriverName</value>
+  <data name="IncidentsTable_CurrentDriver" xml:space="preserve">
+    <value>incidentsCurrentDriver</value>
   </data>
-  <data name="IncidentsTable_IncCount" xml:space="preserve">
-    <value>IncidentsIncCount</value>
+  <data name="IncidentsTable_TotalIncs" xml:space="preserve">
+    <value>incidentsTotalIncs</value>
   </data>
   <data name="IncidentsTable_TeamName" xml:space="preserve">
-    <value>IncidentsTeamName</value>
+    <value>incidentsTeamName</value>
   </data>
   <data name="ConeEmpty" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ConeEmpty.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ConeFull" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ConeFull.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="IncidentsTable_CarLapNum" xml:space="preserve">
+    <value>incidentsCarLapNum</value>
+  </data>
+  <data name="IncidentsTable_NewInc" xml:space="preserve">
+    <value>incidentsNewInc</value>
+  </data>
+  <data name="IncidentsTable_TimeStamp" xml:space="preserve">
+    <value>incidentsTimeStamp</value>
   </data>
 </root>
