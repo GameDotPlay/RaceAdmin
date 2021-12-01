@@ -54,7 +54,7 @@
         /// This value should not change once initially set though this has not been 
         /// proved through exhaustive testing.
         /// </summary>
-        private bool teamRacing;
+        private int teamRacing;
 
         /// <summary>
         /// Flag to indicate whether the initialization for the current session has occured.
@@ -67,6 +67,10 @@
         /// The number of incidents required for a caution to be triggeed. Set by user in Settings dialog.
         /// </summary>
         private int incsRequiredForCaution = 0;
+
+        private bool highlight4xIncidents;
+
+        private bool highlightIncidentThatTriggeredCaution;
 
         /// <summary>
         /// The current session number obtained from the live telemetry.
@@ -128,11 +132,6 @@
         private Dictionary<int, Car> cars;
 
         /// <summary>
-        /// List of all incidents in the session since the app was launched.
-        /// </summary>
-        private List<Incident> incidents;
-
-        /// <summary>
         /// ISdkWrapper object.
         /// </summary>
         private ISdkWrapper wrapper;
@@ -149,6 +148,13 @@
         /// Updated during session initialization when processing a session info update.
         /// </summary>
         private bool raceSession;
+
+        /// <summary>
+        /// Backing data source for the main incidents table. Shown on UI as a DataView based on user filters.
+        /// </summary>
+        private DataTable incidentsDataTable;
+
+        private BindingSource incidentsBindingSource;
 
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
@@ -171,15 +177,17 @@
                 { "default", new DefaultCautionHandler(this.cautionPanel) }
             };
 
-            // Initialize variables.
+            // Initialize variables and starting state.
             drivers = new Dictionary<string, Driver>();
             cars = new Dictionary<int, Car>();
-            incidents = new List<Incident>();
             sessionFlags = new SessionFlag(0);
             telemetryPollRate = Properties.Settings.Default.telemetryPollRate;
             telemetryPollRateTextBox.Text = telemetryPollRate.ToString();
             incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
-            allIncidentsTable.Sort(allIncidentsTable.Columns["incidentsTimeStamp"], System.ComponentModel.ListSortDirection.Descending);
+            highlight4xIncidents = Properties.Settings.Default.highlight4xIncidents;
+            highlightIncidentThatTriggeredCaution = Properties.Settings.Default.highlightIncidentThatTriggeredCaution;
+            InitializeIncidentsDataSource();
+            InitializeIncidentsGridView();
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -192,18 +200,106 @@
             wrapper.Start();
         }
 
+        private void InitializeIncidentsDataSource()
+		{
+            incidentsDataTable = new DataTable("incidentsDataTable");
+            incidentsBindingSource = new BindingSource();
+            InitializeIncidentsDataTableColumns(incidentsDataTable.Columns);
+            incidentsBindingSource.DataSource = incidentsDataTable;
+        }
+
+        private void InitializeIncidentsGridView()
+		{
+            incidentsView.AutoGenerateColumns = true;
+            incidentsView.DataSource = incidentsBindingSource;
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].HeaderText = "Local Time";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            incidentsView.DisableFilterChecklist(incidentsView.Columns["localTime"]);
+            incidentsView.DisableFilterCustom(incidentsView.Columns["localTime"]);
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime].HeaderText = "Session Time";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            incidentsView.DisableFilterChecklist(incidentsView.Columns["sessionTime"]);
+            incidentsView.DisableFilterCustom(incidentsView.Columns["sessionTime"]);
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].HeaderText = "Car Class";
+            
+            incidentsView.Columns[Properties.Resources.IncidentsTable_CarNumber].HeaderText = "Car #";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_CarNumber].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_TeamName].HeaderText = "Team Name";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_TeamName].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_DriverName].HeaderText = "Driver Name";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_DriverName].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_IncidentValue].HeaderText = "Incident";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_IncidentValue].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents].HeaderText = "Total";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            incidentsView.DisableFilterChecklist(incidentsView.Columns["totalIncidents"]);
+            incidentsView.DisableFilterCustom(incidentsView.Columns["totalIncidents"]);
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].HeaderText = "Lap #";
+            incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+        }
+
+        private void InitializeIncidentsDataTableColumns(DataColumnCollection columns)
+		{
+            DataColumn localTimeColumn = new DataColumn("localTime", Type.GetType("System.String"));
+            localTimeColumn.ReadOnly = true;
+            columns.Add(localTimeColumn);
+
+            DataColumn sessionTimeColumn = new DataColumn("sessionTime", Type.GetType("System.String"));
+            sessionTimeColumn.ReadOnly = true;
+            columns.Add(sessionTimeColumn);
+
+            DataColumn carClassColumn = new DataColumn("carClass", Type.GetType("System.String"));
+            carClassColumn.ReadOnly = true;
+            columns.Add(carClassColumn);
+
+            DataColumn carNumberColumn = new DataColumn("carNumber", Type.GetType("System.String"));
+            carNumberColumn.ReadOnly = true;
+            columns.Add(carNumberColumn);
+
+            DataColumn teamNameColumn = new DataColumn("teamName", Type.GetType("System.String"));
+            teamNameColumn.ReadOnly = true;
+            columns.Add(teamNameColumn);
+
+            DataColumn driverNameColumn = new DataColumn("driverName", Type.GetType("System.String"));
+            driverNameColumn.ReadOnly = true;
+            columns.Add(driverNameColumn);
+
+            DataColumn incidentValueColumn = new DataColumn("incidentValue", Type.GetType("System.String"));
+            incidentValueColumn.ReadOnly = true;
+            columns.Add(incidentValueColumn);
+
+            DataColumn totalIncidentsColumn = new DataColumn("totalIncidents", Type.GetType("System.String"));
+            totalIncidentsColumn.ReadOnly = true;
+            columns.Add(totalIncidentsColumn);
+
+            DataColumn driverLapNumberColumn = new DataColumn("driverLapNumber", Type.GetType("System.String"));
+            driverLapNumberColumn.ReadOnly = true;
+            columns.Add(driverLapNumberColumn);
+		}
+
         /// <summary>
         /// Called when the session string has been updated by the simulator.
         /// Checks for new drivers that have entered the session and populates/updates list of drivers.
+        /// Checks for new cars that have entered the session and populates/updates list of cars.
         /// Checks each driver for a change in incidents, logs new incident to the table if so.
         /// Updates laps completed for each driver.
+        /// Updates car team incident counts for each car.
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">Session string changed event. Contains info from session string that can be queried.</param>
         public void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             // Perform some initialization if this is the first time being called in this session...
-            if (!this.sessionInitializationComplete)
+            if (!sessionInitializationComplete)
             {
                 InitializeSession(e);
                 sessionInitializationComplete = true;
@@ -212,8 +308,10 @@
             AddNewDrivers(e);
             AddNewCars(e);
             UpdateDriverIncidentCounts(e);
+            ApplyIncidentTableColorHighlighting(null);
             UpdateDriverLapCounts(e);
             UpdateCarTeamIncidentCounts(e);
+            UpdateIncidentCountDisplay();
 
             var resultsOfficial = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", sessionNum]["ResultsOfficial"].Value;
             if (raceSession && resultsOfficial == "1")
@@ -225,9 +323,11 @@
         }
 
         /// <summary>
-        /// Called every time the live telemetry gets updates. Currently configured to 4 times per second by setting wrapper.TelemetryUpdateFrequency.
+        /// Called every time the live telemetry gets updates. The poll rate of live telemetry is stored in this.telemetryPollRate and can be changed by the user at runtime.
         /// Checks current session ID to see if new session initialization should take place.
         /// Checks for change in flag state. When session goes green again after a caution the incs since last caution field is reset to zero.
+        /// Iterates through all cars in the session and updates their telemetry values.
+        /// Set telemetry poll rate by setting wrapper.TelemetryUpdateFrequency(telemetryPollRate)
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">TelemetryUpdated event args.</param>
@@ -266,8 +366,7 @@
                 || sessionTimeRemain != this.sessionTimeRemain
                 || sessionFlags.Value != this.sessionFlags.Value)
             {
-                Console.WriteLine("id = {0}, num = {1}, lapsLeft = {2}, timeLeft = {3}, flags = {4}",
-                    sessionUniqueID, sessionNum, sessionLapsRemain, sessionTimeRemain, sessionFlags);
+                Console.WriteLine($"id = {sessionUniqueID}, num = {sessionNum}, lapsLeft = {sessionLapsRemain}, timeLeft = {sessionTimeRemain}, flags = {sessionFlags}");
             }
 
             this.sessionLapsRemain = sessionLapsRemain;
@@ -282,7 +381,6 @@
             }
 
             UpdateLiveCarInfo(e);
-            UpdateIncidentCountDisplay();
 
 #if DEBUG
             UpdateDebugTable();
@@ -290,12 +388,12 @@
 
             CheckFlagStateChanges(e);
 
-            if (Properties.Settings.Default.useTotalIncidentsForCaution)
+            if (raceSession && Properties.Settings.Default.useTotalIncidentsForCaution)
             {
                 CheckIncidentLimit();
             }
 
-            if (Properties.Settings.Default.detectTowForCaution)
+            if (raceSession && Properties.Settings.Default.detectTowForCaution)
             {
                 CheckForTow();
             }
@@ -315,7 +413,11 @@
 
             var sessionType = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", sessionNum]["SessionType"].Value;
             var sessionName = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", sessionNum]["SessionName"].Value;
+
+            Console.WriteLine($"initializing session {sessionName} ({sessionType})");
+
             sessionLabel.Text = sessionName;
+
             if (sessionType == "Race")
             {
                 if (Properties.Settings.Default.hideIncidents)
@@ -328,21 +430,28 @@
             {
                 raceSession = false;
             }
-            Console.WriteLine("initializing session {0} ({1})", sessionName, sessionType);
-
-            YamlQuery query = e.SessionInfo["WeekendInfo"]["TeamRacing"];
-            query.TryGetValue(out string temp);
-            System.Int32.TryParse(temp, out int tempInt);
-            teamRacing = tempInt > 0;
-            var teamColName = RaceAdmin.Properties.Resources.TableColumn_Team;
-            if (!teamRacing && incidentsTableView.Columns.Contains(teamColName))
-            {
-                incidentsTableView.Columns.Remove(incidentsTableView.Columns[teamColName]);
+            
+            // If this is not a team session, hide the team name column.
+            if(int.TryParse(e.SessionInfo["WeekendInfo"]["TeamRacing"].Value, out teamRacing))
+			{
+                if (teamRacing == 0 && incidentsView.Columns.Contains(Properties.Resources.IncidentsTable_TeamName))
+                {
+                    incidentsView.Columns[Properties.Resources.IncidentsTable_TeamName].Visible = false;
+                }
             }
+            
+            // If this is not a multiclass sesion, hide the car class column.
+            if(int.TryParse(e.SessionInfo["WeekendInfo"]["NumCarClasses"].Value, out int numClasses))
+			{
+                if(numClasses < 2)
+				{
+                    incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].Visible = false;
+                }
+			}
 
+            ClearIncidents();
             this.totalIncCount = 0;
             this.incCountSinceCaution = 0;
-            ClearIncidents();
 
 #if DEBUG
             AddNewDrivers(e);
@@ -362,7 +471,10 @@
                 return;
             }
 
-            incidentCountPanel.Visible = false;
+            totalIncidentCountLabel.Visible = false;
+            totalIncidentCountNum.Visible = false;
+            incidentsSinceCautionLabel.Visible = false;
+            incidentsSinceCautionNum.Visible = false;
         }
 
         /// <summary>
@@ -376,7 +488,10 @@
                 return;
             }
 
-            incidentCountPanel.Visible = true;
+            totalIncidentCountLabel.Visible = true;
+            totalIncidentCountNum.Visible = true;
+            incidentsSinceCautionLabel.Visible = true;
+            incidentsSinceCautionNum.Visible = true;
         }
 
         /// <summary>
@@ -400,31 +515,29 @@
                 {
                     carIdx++;
                     query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                    Console.WriteLine("ERROR: driver {0} not found in session driver list", name);
+                    Console.WriteLine($"ERROR: driver {name} not found in session driver list");
                     continue;
                 }
 
-                if (teamRacing)
+                if (teamRacing != 0)
                 {
                     drivers[name].TeamIncs = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value;
                 }
 
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"];
-                query.TryGetValue(out string s_newIncs);
-                System.Int32.TryParse(s_newIncs, out int i_newIncs);
+                int.TryParse(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CurDriverIncidentCount"].Value, out int newIncidentCount);
 
                 // delta can be negative if a driver or the person running the RaceAdmin program 
                 // disconnects and then reconnects; overall the negative rows and then the positive
                 // rows added back total up to the same amount, so we can just ignore these. The negative
                 // rows cause confusion and make the incident count fluctuate unnaturally.
-                var delta = i_newIncs - drivers[name].OldIncs;
+                int delta = newIncidentCount - drivers[name].OldIncs;
                 if (delta > 0)
                 {
-                    drivers[name].NewIncs = i_newIncs;
+                    drivers[name].NewIncs = newIncidentCount;
                     Incident newInc = new Incident(e.SessionInfo.UpdateTime, DateTime.Now, delta, carIdx);
-                    incidents.Add(newInc);
+                    totalIncCount += newInc.Value;
+                    incCountSinceCaution += newInc.Value;
                     LogNewIncident(newInc);
-                    UpdateIncidentsTable(newInc);
                     drivers[name].OldIncs = drivers[name].NewIncs;
                 }
 
@@ -450,7 +563,7 @@
                     {
                         query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.sessionNum]["ResultsPositions"]["Position", i]["LapsComplete"];
                         query.TryGetValue(out string s_lapsComplete);
-                        System.Int32.TryParse(s_lapsComplete, out int i_lapsComplete);
+						int.TryParse(s_lapsComplete, out int i_lapsComplete);
                         driver.CurrentLap = i_lapsComplete + 1;
                     }
                 }
@@ -481,7 +594,7 @@
                 {
                     carIdx++;
                     query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-                    Console.WriteLine("ERROR: car {0} not found in session driver list", carIdx);
+                    Console.WriteLine($"ERROR: car {carIdx} not found in session driver list");
                     continue;
                 }
 
@@ -489,34 +602,6 @@
 
                 carIdx++;
                 query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            }
-        }
-
-        /// <summary>
-        /// Iterates through every car in the session and checks if it has towed to pit lane since the last update.
-        /// </summary>
-        private void CheckForTow()
-        {
-            // Iterate over every car in the session and check if they have towed to pit lane since the last update.
-            foreach (var car in cars.Values)
-            {
-                // If car is already "ApproachingPits" when tow occurs then ignore.
-                if(car.TrackSurface != TrackSurfaces.AproachingPits)
-				{
-                    // Pit entry transition has occured.
-                    if (car.BetweenPitCones != car.LastBetweenPitCones)
-                    {
-                        // Car has entered pit lane.
-                        if (car.BetweenPitCones)
-                        {
-                            // Notify caution handlers
-                            cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
-
-                            // Move to next state in caution handling cycle
-                            cautionState = CautionState.ThresholdReached;
-                        }
-                    }
-                }
             }
         }
 
@@ -541,61 +626,126 @@
 		}
 
         /// <summary>
+        /// Iterates through every car in the session and checks if it has towed to pit lane since the last update.
+        /// </summary>
+        private void CheckForTow()
+        {
+            if (!raceSession)
+            {
+                // Only trigger cautions during races.
+                return;
+            }
+
+            if (sessionFlags.Contains(SessionFlags.Checkered))
+            {
+                // Don't trigger cautions after the checkered flag is out.
+                return;
+            }
+
+            if (!Properties.Settings.Default.detectTowForCaution)
+            {
+                // App not configured to trigger caution on tow.
+                return;
+            }
+
+            if (cautionState != CautionState.None)
+            {
+                // Already triggered a caution; nothing to do.
+                return;
+            }
+
+            if (sessionLapsRemain <= Properties.Settings.Default.lastLaps - 1)
+            {
+                // No cautions during configured number of last laps of the race if the race
+                // distance is measured in laps.
+                return;
+            }
+
+            if (sessionTimeRemain <= (double)Properties.Settings.Default.lastMinutes * 60.0)
+            {
+                // No cautions during configured last minutes of the race for timed races.
+                return;
+            }
+
+            // Iterate over every car in the session and check if they have towed to pit lane since the last update.
+            foreach (var car in cars.Values)
+            {
+                // If car is already "ApproachingPits" when tow occurs then ignore.
+                if (car.TrackSurface != TrackSurfaces.AproachingPits)
+                {
+                    // Pit entry transition has occured.
+                    if (car.BetweenPitCones != car.LastBetweenPitCones)
+                    {
+                        // Car has entered pit lane.
+                        if (car.BetweenPitCones)
+                        {
+                            // Notify caution handlers
+                            Console.WriteLine("Caution condition met; notifying caution handlers.");
+                            cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
+
+                            // Move to next state in caution handling cycle
+                            cautionState = CautionState.ThresholdReached;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Runs checks on conditions to determine if a caution threshold has been reached and notifies the caution handlers.
         /// </summary>
         private void CheckIncidentLimit()
         {
             if (!raceSession)
             {
-                // only trigger cautions during races
+                // Only trigger cautions during races.
                 return;
             }
 
             if (sessionFlags.Contains(SessionFlags.Checkered))
             {
-                // don't trigger cautions after the checkered flag is out
+                // Don't trigger cautions after the checkered flag is out.
                 return;
             }
 
             if (!Properties.Settings.Default.useTotalIncidentsForCaution || incsRequiredForCaution == 0 || incCountSinceCaution < incsRequiredForCaution)
             {
-                // app not configured to trigger caution or not enough incidents to trigger caution
+                // App not configured to trigger caution or not enough incidents to trigger caution.
                 return;
             }
 
             if (cautionState != CautionState.None)
             {
-                // already triggered a caution; nothing to do
+                // Already triggered a caution; nothing to do.
                 return;
             }
 
             if (sessionLapsRemain <= Properties.Settings.Default.lastLaps - 1)
             {
-                // no cautions during configured number of last laps of the race if the race
-                // distance is measured in laps
+                // No cautions during configured number of last laps of the race if the race
+                // distance is measured in laps.
                 return;
             }
 
             if (sessionTimeRemain <= (double)Properties.Settings.Default.lastMinutes * 60.0)
             {
-                // no cautions during configured last minutes of the race for timed races
+                // No cautions during configured last minutes of the race for timed races.
                 return;
             }
 
-            Console.WriteLine("caution conditions met; notifying caution handlers");
+            Console.WriteLine("Caution condition met; notifying caution handlers.");
 
-            // TODO: find a better way to do this (table contains no rows during unit testing)
-            if (incidentsTableView.Rows.Count > 0)
+            // TODO: Find a better way to do this(table contains no rows during unit testing)
+            if (incidentsView.Rows.Count > 0)
             {
-                // tag the incident row which triggered the caution with a yellow background in the table
-                var lastRow = incidentsTableView.Rows[incidentsTableView.Rows.Count - 1];
-                lastRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Resources.ColorName_Gold);
+                // Tag the incident row which triggered the caution with a yellow background in the table.
+                ApplyIncidentTableColorHighlighting(incidentsView.Rows[incidentsView.Rows.Count - 1]);
             }
 
-            // notify caution handlers
+            // Notify caution handlers.
             cautionHandlers.Values.ToList().ForEach(h => h.CautionThresholdReached());
 
-            // move to next state in caution handling cycle
+            // Move to next state in caution handling cycle.
             cautionState = CautionState.ThresholdReached;
         }
 
@@ -604,8 +754,14 @@
         /// </summary>
         private void UpdateIncidentCountDisplay()
         {
-            TotalIncidentCountNum.Text = totalIncCount.ToString();
-            IncidentsSinceCautionNum.Text = incCountSinceCaution.ToString();
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => UpdateIncidentCountDisplay()));
+                return;
+            }
+
+            totalIncidentCountNum.Text = totalIncCount.ToString();
+            incidentsSinceCautionNum.Text = incCountSinceCaution.ToString();
         }
 
         /// <summary>
@@ -614,30 +770,31 @@
         /// <param name="e">Event parameters.</param>
         private void CheckFlagStateChanges(ITelemetryUpdatedEvent e)
         {
-            // has caution flag been deployed?
+            // Has caution flag been deployed?
             if (sessionFlags.Contains(SessionFlags.Caution) && cautionState == CautionState.ThresholdReached)
             {
-                // notify caution handlers than the yellow flag has been thrown
-                // and move to next state in caution handling cycle
+                // Notify caution handlers than the yellow flag has been thrown
+                // and move to next state in caution handling cycle.
                 cautionHandlers.Values.ToList().ForEach(h => h.YellowFlagThrown());
                 cautionState = CautionState.YellowFlagDeployed;
             }
 
-            // has green flag been thrown?
+            // Has green flag been thrown?
             if (sessionFlags.Contains(SessionFlags.Green) && cautionState == CautionState.YellowFlagDeployed)
             {
-                // notify caution handlers than the race has resumed and move back
-                // to initial state in caution handling cycle
+                // Notify caution handlers than the race has resumed and move back
+                // to initial state in caution handling cycle.
                 cautionHandlers.Values.ToList().ForEach(h => h.GreenFlagThrown());
                 cautionState = CautionState.None;
-                // reset incident count
+
+                // Reset incident count.
                 incCountSinceCaution = 0;
             }
         }
 
         /// <summary>
         /// Clears incident counts from drivers.
-        /// Clears all incident rows from main incidents table and allIncidentsTable.
+        /// Clears all incident rows from main incidents table.
         /// </summary>
         private void ClearIncidents()
         {
@@ -647,164 +804,15 @@
                 return;
             }
 
-            incidentsTableView.Rows.Clear();
-            allIncidentsTable.Rows.Clear();
-            incidents.Clear();
+            incidentsDataTable.Rows.Clear();
 
             foreach (var driver in drivers.Values)
             {
                 driver.NewIncs = 0;
                 driver.OldIncs = 0;
-                driver.TeamIncs = "";
+                driver.TeamIncs = "0";
             }
         }
-
-        /// <summary>
-        /// Updates the incident table after every new incident.
-        /// </summary>
-        private void UpdateIncidentsTable(Incident newInc)
-		{
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => UpdateIncidentsTable(newInc)));
-                return;
-            }
-
-            int rowId = allIncidentsTable.Rows.Add();
-            DataGridViewRow newRow = allIncidentsTable.Rows[rowId];
-            newRow.Cells[Properties.Resources.IncidentsTable_TimeStamp].Value = MakeTimeString(newInc.UpdateTime);
-            newRow.Cells[Properties.Resources.IncidentsTable_CarNum].Value = cars[newInc.CarIdx].CarNumber;
-            if (teamRacing)
-            {
-                newRow.Cells[Properties.Resources.IncidentsTable_TeamName].Value = cars[newInc.CarIdx].TeamName;
-            }
-            newRow.Cells[Properties.Resources.IncidentsTable_CurrentDriver].Value = cars[newInc.CarIdx].CurrentDriver;
-            newRow.Cells[Properties.Resources.IncidentsTable_NewInc].Value = $"{newInc.Value}x";
-            string total;
-            if (teamRacing)
-            {
-                // iRacing-style team incidents. (TeamIncs,DriverIncs)
-                total = $"{cars[newInc.CarIdx].TeamIncidentCount},{drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs}";
-            }
-            else
-            {
-                total = drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs.ToString();
-            }
-            newRow.Cells[Properties.Resources.IncidentsTable_TotalIncs].Value = total;
-            newRow.Cells[Properties.Resources.IncidentsTable_CarLapNum].Value = cars[newInc.CarIdx].CurrentLap;
-
-            if (allIncidentsTable.RowCount > 0)
-            {
-                allIncidentsTable.FirstDisplayedScrollingRowIndex = allIncidentsTable.RowCount - 1;
-            }
-        }
-
-        /// <summary>
-        /// Applies any user filtering to the allIncidentsTable.
-        /// </summary>
-        private void ApplyIncidentTableIncidentFilter()
-		{
-            switch(filterIncidentsComboBox.Text)
-			{
-                case "All":
-
-                    foreach (DataGridViewRow row in allIncidentsTable.Rows)
-                    {
-                        row.Visible = true;   
-                    }
-
-                    break;
-
-                case "1x":
-
-                    foreach(DataGridViewRow row in allIncidentsTable.Rows)
-					{
-                        if(!(row.Cells["incidentsNewInc"].Value.ToString() == "1x"))
-						{
-                            row.Visible = false;
-						}
-                        else
-                        {
-                            row.Visible = true;
-                        }
-                    }
-
-                    break;
-
-                case "2x":
-
-                    foreach (DataGridViewRow row in allIncidentsTable.Rows)
-                    {
-                        if (!(row.Cells["incidentsNewInc"].Value.ToString() == "2x"))
-                        {
-                            row.Visible = false;
-                        }
-                        else
-                        {
-                            row.Visible = true;
-                        }
-                    }
-
-                    break;
-
-                case "4x":
-
-                    foreach (DataGridViewRow row in allIncidentsTable.Rows)
-                    {
-                        if (!(row.Cells["incidentsNewInc"].Value.ToString() == "4x"))
-                        {
-                            row.Visible = false;
-                        }
-                        else
-                        {
-                            row.Visible = true;
-                        }
-                    }
-
-                    break;
-            }
-		}
-
-        private void ApplyIncidentTableTimeFilter()
-		{
-   //         switch(filterTimeComboBox.SelectedIndex)
-			//{
-   //             case 0:
-   //                 foreach (DataGridViewRow row in allIncidentsTable.Rows)
-   //                 {
-   //                     row.Visible = true;
-   //                 }
-   //                 break;
-
-   //             case 1:
-   //                 foreach (DataGridViewRow row in allIncidentsTable.Rows)
-   //                 {
-   //                     DateTime incidentTime = DateTime.Parse(row.Cells[Properties.Resources.IncidentsTable_TimeStamp].Value.ToString());
-   //                     if ((DateTime)row.Cells[Properties.Resources.IncidentsTable_TimeStamp].Value > DateTime.Now.AddMinutes(-30))
-			//			{
-   //                         row.Visible = false;
-			//			}
-			//			else
-			//			{
-   //                         row.Visible = true;
-			//			}
-   //                 }
-   //                 break;
-
-   //             case 2:
-   //                 break;
-
-   //             case 3:
-   //                 break;
-
-   //             case 4:
-   //                 break;
-
-   //             case 5:
-   //                 break;
-
-			//}
-		}
 
         /// <summary>
         /// Populates the table on the Debug tab after session initialization.
@@ -902,11 +910,62 @@
             newRow.Cells["trackSurfaceMaterial"].Value = newCar.TrackSurfaceMaterial;
         }
 
-        /// <summary>
-        /// Inserts new row in incident log.
-        /// </summary>
-        /// <param name="newInc"><see cref="Incident"/> object containing information about the latest incident.</param>
-        private void LogNewIncident(Incident newInc)
+		///// <summary>
+		///// Inserts new row in incident log.
+		///// </summary>
+		///// <param name="newInc"><see cref="Incident"/> object containing information about the latest incident.</param>
+		//private void LogNewIncident(Incident newInc)
+		//{
+		//	if (InvokeRequired)
+		//	{
+		//		Invoke(new Action(() => LogNewIncident(newInc)));
+		//		return;
+		//	}
+
+		//	int rowId = incidentsTableView.Rows.Add();
+		//	DataGridViewRow newRow = incidentsTableView.Rows[rowId];
+		//	newRow.Cells["oldTime"].Value = MakeTimeString(newInc.SessionTime);
+		//	newRow.Cells["oldCarNum"].Value = cars[newInc.CarIdx].CarNumber;
+		//	if (teamRacing)
+		//	{
+		//		newRow.Cells["oldTeam"].Value = cars[newInc.CarIdx].TeamName;
+		//	}
+		//	newRow.Cells["oldDrivername"].Value = cars[newInc.CarIdx].CurrentDriver;
+		//	newRow.Cells["oldIncident"].Value = $"{newInc.Value}x";
+		//	string total;
+		//	if (teamRacing)
+		//	{
+		//		// iracing-style team incidents
+		//		total = $"{cars[newInc.CarIdx].TeamIncidentCount},{drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs}";
+		//	}
+		//	else
+		//	{
+		//		total = drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs.ToString();
+		//	}
+		//	newRow.Cells["oldTotal"].Value = total;
+		//	newRow.Cells["oldDriverLapNum"].Value = cars[newInc.CarIdx].CurrentLap;
+		//	this.totalIncCount += newInc.Value;
+		//	this.incCountSinceCaution += newInc.Value;
+		//	totalIncidentCountNum.Text = this.totalIncCount.ToString();
+		//	incidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
+		//	if (newInc.Value == 4)
+		//	{
+		//		newRow.DefaultCellStyle.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_IndianRed);
+		//	}
+
+		//	if (incidentsTableView.RowCount > 0)
+		//	{
+		//		incidentsTableView.FirstDisplayedScrollingRowIndex = incidentsTableView.RowCount - 1;
+		//	}
+
+		//	Console.WriteLine("{0}; driver = {1}", newRow.Cells["oldIncident"].Value, drivers[cars[newInc.CarIdx].CurrentDriver].FullName);
+		//}
+
+		/// <summary>
+		/// Inserts new row into the incident data table.
+		/// </summary>
+		/// <param name="newInc"><see cref="Incident"/> object containing information about the latest incident.</param>
+		private void LogNewIncident(Incident newInc)
         {
             if (InvokeRequired)
             {
@@ -914,44 +973,57 @@
                 return;
             }
 
-            int rowId = incidentsTableView.Rows.Add();
-            DataGridViewRow newRow = incidentsTableView.Rows[rowId];
-            newRow.Cells[Properties.Resources.TableColumn_Time].Value = MakeTimeString(newInc.UpdateTime);
-            newRow.Cells[Properties.Resources.TableColumn_CarNum].Value = cars[newInc.CarIdx].CarNumber;
-            if (teamRacing)
+            DataRow newRow = incidentsDataTable.NewRow();
+            newRow[Properties.Resources.IncidentsTable_LocalTime] = newInc.TimeStamp.ToShortTimeString();
+            newRow[Properties.Resources.IncidentsTable_SessionTime] = MakeTimeString(newInc.SessionTime);
+            newRow[Properties.Resources.IncidentsTable_CarNumber] = cars[newInc.CarIdx].CarNumber;
+            if (teamRacing != 0)
             {
-                newRow.Cells[Properties.Resources.TableColumn_Team].Value = cars[newInc.CarIdx].TeamName;
+                newRow[Properties.Resources.IncidentsTable_TeamName] = cars[newInc.CarIdx].TeamName;
             }
-            newRow.Cells[Properties.Resources.TableColumn_DriverName].Value = cars[newInc.CarIdx].CurrentDriver;
-            newRow.Cells[Properties.Resources.TableColumn_Incident].Value = $"{newInc.Value}x";
+            newRow[Properties.Resources.IncidentsTable_DriverName] = cars[newInc.CarIdx].CurrentDriver;
+            newRow[Properties.Resources.IncidentsTable_IncidentValue] = $"{newInc.Value}x";
             string total;
-            if (teamRacing)
+            if (teamRacing != 0)
             {
-                // iracing-style team incidents
+                // iRacing-style team incidents. (Team count, driver count)
                 total = $"{cars[newInc.CarIdx].TeamIncidentCount},{drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs}";
             }
             else
             {
                 total = drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs.ToString();
             }
-            newRow.Cells[Properties.Resources.TableColumn_Total].Value = total;
-            newRow.Cells[Properties.Resources.TableColumn_DriverLapNum].Value = cars[newInc.CarIdx].CurrentLap;
-            this.totalIncCount += newInc.Value;
-            this.incCountSinceCaution += newInc.Value;
-            TotalIncidentCountNum.Text = this.totalIncCount.ToString();
-            IncidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
-            if (newInc.Value == 4)
+            newRow[Properties.Resources.IncidentsTable_TotalIncidents] = total;
+            newRow[Properties.Resources.IncidentsTable_DriverLapNumber] = cars[newInc.CarIdx].CurrentLap;
+
+            incidentsDataTable.Rows.Add(newRow);
+
+            incidentsView.FirstDisplayedScrollingRowIndex = incidentsView.RowCount - 1;
+
+            Console.WriteLine($"{newRow[Properties.Resources.IncidentsTable_IncidentValue]}; driver = {drivers[cars[newInc.CarIdx].CurrentDriver].FullName}");
+        }
+
+        private void ApplyIncidentTableColorHighlighting(DataGridViewRow cautionRow)
+		{
+            if (highlight4xIncidents)
             {
-                newRow.DefaultCellStyle.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_IndianRed);
+                foreach (DataGridViewRow row in incidentsView.Rows)
+                {
+                    if(row.Cells[Properties.Resources.IncidentsTable_IncidentValue].Value.ToString() == "4x")
+					{
+                        row.DefaultCellStyle.BackColor = Color.IndianRed;
+					}
+                }
             }
 
-            if(incidentsTableView.RowCount > 0)
+            if(highlightIncidentThatTriggeredCaution)
 			{
-                incidentsTableView.FirstDisplayedScrollingRowIndex = incidentsTableView.RowCount - 1;
+                if (cautionRow != null)
+                {
+                    cautionRow.DefaultCellStyle.BackColor = Color.LightYellow;
+                }
             }
-            
-            Console.WriteLine("{0}; driver = {1}", newRow.Cells[Properties.Resources.TableColumn_Incident].Value, drivers[cars[newInc.CarIdx].CurrentDriver].FullName);
-        }
+		}
 
         /// <summary>
         /// Takes a session time value from iRacing and returns a formatted time string: hh:mm:ss
@@ -964,17 +1036,17 @@
         }
 
         /// <summary>
-        /// Exports the contents of the IncidentsTableView to the given writer in CSV format.
+        /// Exports the currently visible contents of the IncidentsView to the given writer in CSV format.
         /// </summary>
         /// <param name="writer">The TextWriter to which the contents should be written.</param>
         public void ExportIncidentTableToCsv(TextWriter writer)
         {
-            // write the column headers
-            var headers = incidentsTableView.Columns.Cast<DataGridViewColumn>();
+            // Write the column headers.
+            var headers = incidentsView.Columns.Cast<DataGridViewColumn>();
             writer.WriteLine(string.Join(",", headers.Select(column => "\"" + column.HeaderText + "\"").ToArray()));
 
-            // iterate through each row of the incidents table and write
-            foreach (DataGridViewRow row in incidentsTableView.Rows)
+            // Iterate through each row of the incidents table and write.
+            foreach (DataGridViewRow row in incidentsView.Rows)
             {
                 var cells = row.Cells.Cast<DataGridViewCell>();
                 writer.WriteLine(string.Join(",", cells.Select(cell => "\"" + cell.Value + "\"").ToArray()));
@@ -1083,7 +1155,9 @@
         /// </summary>
         public void SettingsChanged()
         {
-            this.incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
+            incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
+            highlight4xIncidents = Properties.Settings.Default.highlight4xIncidents;
+            highlightIncidentThatTriggeredCaution = Properties.Settings.Default.highlightIncidentThatTriggeredCaution;
         }
 
         /// <summary>
@@ -1126,12 +1200,12 @@
             return System.Int32.TryParse(s, out int x) ? x : 0;
         }
 
-#region EVENT_HANDLERS
+        #region EVENT_HANDLERS
         /// <summary>
         /// Performs some intialization of size and position of the main RaceAdmin form.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">The event args.</param>
+        /// <param name="e">Event args.</param>
         private void RaceAdminMain_Load(object sender, EventArgs e)
         {
             // location && size
@@ -1162,7 +1236,7 @@
         /// Handles the ResizeEnd event of the main RaceAdmin form.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">The event args.</param>
+        /// <param name="e">Event args.</param>
         private void RaceAdminMain_ResizeEnd(object sender, EventArgs e)
         {
             if (Size.Width >= MinimumSize.Width && Size.Height >= MinimumSize.Height)
@@ -1177,7 +1251,7 @@
         /// Closes the current environment when the X button is clicked.
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
-        /// <param name="e">FormClosing event.</param>
+        /// <param name="e">Event args.</param>
         private void RaceAdminMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (Location.X >= 0 && Location.Y >= 0)
@@ -1198,7 +1272,7 @@
         /// Exports the incidents table to a CSV file when the Export... button is clicked.
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
-        /// <param name="e">EventArgs event.</param>
+        /// <param name="e">Event args.</param>
         private void ExportButton_Click(object sender, EventArgs e)
         {
             Thread t = new Thread((ThreadStart)(() =>
@@ -1233,7 +1307,7 @@
         /// Opens the Settings dialog box.
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
-        /// <param name="e">EventArgs event.</param>
+        /// <param name="e">Event args.</param>
         private void SettingsMenuItem_Click(object sender, EventArgs e)
         {
             Form settings = new SettingsDialog(this);
@@ -1244,40 +1318,40 @@
         /// Checks or unchecks the menu item.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">Event parameters.</param>
-        private void hideIncidentTableMenuItem_Click(object sender, EventArgs e)
+        /// <param name="e">Event args.</param>
+        private void viewIncidentTableMenuItem_Click(object sender, EventArgs e)
         {
-            hideIncidentTableMenuItem.Checked = !hideIncidentTableMenuItem.Checked;
+            viewIncidentTableMenuItem.Checked = !viewIncidentTableMenuItem.Checked;
         }
 
         /// <summary>
         /// Checks or unchecks the menu item.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">The event parameters.</param>
-        private void hideIncidentsCountMenuItem_Click(object sender, EventArgs e)
+        /// <param name="e">Event args.</param>
+        private void viewIncidentsCountMenuItem_Click(object sender, EventArgs e)
         {
-            hideIncidentsCountMenuItem.Checked = !hideIncidentsCountMenuItem.Checked;
+            viewIncidentsCountMenuItem.Checked = !viewIncidentsCountMenuItem.Checked;
         }
 
         /// <summary>
         /// Checks or unchecks the menu item.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">Event parameters.</param>
-		private void hideCautionPanelMenuItem_Click(object sender, EventArgs e)
+        /// <param name="e">Event args.</param>
+		private void viewCautionPanelMenuItem_Click(object sender, EventArgs e)
         {
-            hideCautionPanelMenuItem.Checked = !hideCautionPanelMenuItem.Checked;
+            viewCautionPanelMenuItem.Checked = !viewCautionPanelMenuItem.Checked;
         }
 
         /// <summary>
         /// Shows or hides the caution indicator panel based on the checked status.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">Event parameters.</param>
-		private void hideCautionPanelMenuItem_CheckedChanged(object sender, EventArgs e)
+        /// <param name="e">Event args.</param>
+		private void viewCautionPanelMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            if (hideCautionPanelMenuItem.Checked)
+            if (viewCautionPanelMenuItem.Checked)
             {
                 cautionPanel.Visible = true;
             }
@@ -1292,32 +1366,86 @@
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
         /// <param name="e">Event parameters.</param>
-		private void hideIncidentTableMenuItem_CheckedChanged(object sender, EventArgs e)
+		private void viewIncidentTableMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            if (hideIncidentTableMenuItem.Checked)
+            if (viewIncidentTableMenuItem.Checked)
             {
-                incidentsTableView.Visible = true;
+                incidentsView.Visible = true;
             }
             else
             {
-                incidentsTableView.Visible = false;
+                incidentsView.Visible = false;
             }
         }
 
         /// <summary>
-        /// Shows or hides the incident count panel based on the checked status.
+        /// Shows or hides the incident counts based on the checked status.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">Event parameters.</param>
-		private void hideIncidentsCountMenuItem_CheckedChanged(object sender, EventArgs e)
+        /// <param name="e">Event args.</param>
+		private void viewIncidentsCountMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            if (hideIncidentsCountMenuItem.Checked)
+            if (viewIncidentsCountMenuItem.Checked)
             {
-                incidentCountPanel.Visible = true;
+                totalIncidentCountLabel.Visible = true;
+                totalIncidentCountNum.Visible = true;
+                incidentsSinceCautionLabel.Visible = true;
+                incidentsSinceCautionNum.Visible = true;
             }
             else
             {
-                incidentCountPanel.Visible = false;
+                totalIncidentCountLabel.Visible = false;
+                totalIncidentCountNum.Visible = false;
+                incidentsSinceCautionLabel.Visible = false;
+                incidentsSinceCautionNum.Visible = false;
+            }
+        }
+
+        /// <summary>
+        /// Change the backColor of the incident count items to match the backColor of caution panel.
+        /// This has to be done because Windows Forms doesn't support transparent controls.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
+        private void cautionPanel_BackColorChanged(object sender, EventArgs e)
+        {
+            if(viewCautionPanelMenuItem.Checked)
+			{
+                totalIncidentCountLabel.BackColor = cautionPanel.BackColor;
+                totalIncidentCountNum.BackColor = cautionPanel.BackColor;
+                incidentsSinceCautionLabel.BackColor = cautionPanel.BackColor;
+                incidentsSinceCautionNum.BackColor = cautionPanel.BackColor;
+            }
+            else
+			{
+                totalIncidentCountLabel.BackColor = totalIncidentCountLabel.Parent.BackColor;
+                totalIncidentCountNum.BackColor = totalIncidentCountNum.Parent.BackColor;
+                incidentsSinceCautionLabel.BackColor = incidentsSinceCautionLabel.Parent.BackColor;
+                incidentsSinceCautionNum.BackColor = incidentsSinceCautionNum.Parent.BackColor;
+            }
+        }
+
+        /// <summary>
+        /// Change the backColor of the incident count items to match the backColor of caution panel.
+        /// This has to be done because Windows Forms doesn't support transparent controls.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
+        private void cautionPanel_VisibleChanged(object sender, EventArgs e)
+        {
+            if (viewCautionPanelMenuItem.Checked)
+            {
+                totalIncidentCountLabel.BackColor = cautionPanel.BackColor;
+                totalIncidentCountNum.BackColor = cautionPanel.BackColor;
+                incidentsSinceCautionLabel.BackColor = cautionPanel.BackColor;
+                incidentsSinceCautionNum.BackColor = cautionPanel.BackColor;
+            }
+            else
+            {
+                totalIncidentCountLabel.BackColor = totalIncidentCountLabel.Parent.BackColor;
+                totalIncidentCountNum.BackColor = totalIncidentCountNum.Parent.BackColor;
+                incidentsSinceCautionLabel.BackColor = incidentsSinceCautionLabel.Parent.BackColor;
+                incidentsSinceCautionNum.BackColor = incidentsSinceCautionNum.Parent.BackColor;
             }
         }
 
@@ -1325,7 +1453,7 @@
         /// Sets the poll rate of live telemetry after the user changed the value.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">The event parameters.</param>
+        /// <param name="e">Event args.</param>
         private void telemetryPollRateTextBox_TextChanged(object sender, EventArgs e)
         {
             if(System.Int32.TryParse(telemetryPollRateTextBox.Text, out int x))
@@ -1354,7 +1482,7 @@
         /// Handles the Exit menu item.
         /// </summary>
         /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">The event parameters.</param>
+        /// <param name="e">Event args.</param>
         private void exitMenuItem_Click(object sender, EventArgs e)
         {
             if (Location.X >= 0 && Location.Y >= 0)
@@ -1370,26 +1498,6 @@
             wrapper.Stop();
             Environment.Exit(0);
         }
-
-        /// <summary>
-        /// Handles the event of the incidents table incident type drop down value has changed.
-        /// </summary>
-        /// <param name="sender">The sender of the event.</param>
-        /// <param name="e">The event args.</param>
-        private void filterIncidentsComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ApplyIncidentTableIncidentFilter();
-        }
-
-        /// <summary>
-        /// Handles the event of the incidents table history drop down value has changed.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void filterTimeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ApplyIncidentTableTimeFilter();
-        }
         #endregion EVENT_HANDLERS
 
         #region PUBLIC_PROPERTIES
@@ -1402,7 +1510,7 @@
         // Code in the region below is used to generate test data or to simulate behavior 
         // for UI testing. To use, create buttons on the form and connect them to the various
         // event handler methods below.
-#region TESTING
+        #region TESTING
 
         // these are added for testing only
         public int IncsRequiredForCaution { get => incsRequiredForCaution; set => incsRequiredForCaution = value; }
