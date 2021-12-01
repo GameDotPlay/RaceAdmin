@@ -45,7 +45,9 @@ namespace RaceAdmin
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.hideIncidents = new System.Windows.Forms.CheckBox();
+			this.highlightIncidentThatTriggeredCautionCheckBox = new System.Windows.Forms.CheckBox();
+			this.highlight4xIncidentsCheckBox = new System.Windows.Forms.CheckBox();
+			this.hideIncidentsCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.incidentsRequiredForCaution)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lastMinutes)).BeginInit();
@@ -197,7 +199,7 @@ namespace RaceAdmin
 			this.detectTowForCautionCheckBox.Name = "detectTowForCautionCheckBox";
 			this.detectTowForCautionCheckBox.Size = new System.Drawing.Size(190, 20);
 			this.detectTowForCautionCheckBox.TabIndex = 2;
-			this.detectTowForCautionCheckBox.Text = "Detect tow for caution (WIP)";
+			this.detectTowForCautionCheckBox.Text = "Detect tow for caution (beta)";
 			this.detectTowForCautionCheckBox.UseVisualStyleBackColor = true;
 			this.detectTowForCautionCheckBox.CheckedChanged += new System.EventHandler(this.DetectTowForCaution_CheckChanged);
 			// 
@@ -233,26 +235,52 @@ namespace RaceAdmin
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Controls.Add(this.hideIncidents);
+			this.groupBox2.Controls.Add(this.highlightIncidentThatTriggeredCautionCheckBox);
+			this.groupBox2.Controls.Add(this.highlight4xIncidentsCheckBox);
+			this.groupBox2.Controls.Add(this.hideIncidentsCheckBox);
 			this.groupBox2.Font = new System.Drawing.Font("Arial", 9.75F);
 			this.groupBox2.Location = new System.Drawing.Point(12, 12);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(256, 50);
+			this.groupBox2.Size = new System.Drawing.Size(256, 119);
 			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "General";
 			// 
-			// hideIncidents
+			// highlightIncidentThatTriggeredCautionCheckBox
 			// 
-			this.hideIncidents.AutoSize = true;
-			this.hideIncidents.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.hideIncidents.Location = new System.Drawing.Point(6, 21);
-			this.hideIncidents.Name = "hideIncidents";
-			this.hideIncidents.Size = new System.Drawing.Size(177, 20);
-			this.hideIncidents.TabIndex = 0;
-			this.hideIncidents.Text = "Hide incidents during race";
-			this.hideIncidents.UseVisualStyleBackColor = true;
-			this.hideIncidents.CheckedChanged += new System.EventHandler(this.HideIncidents_CheckedChanged);
+			this.highlightIncidentThatTriggeredCautionCheckBox.AutoSize = true;
+			this.highlightIncidentThatTriggeredCautionCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.highlightIncidentThatTriggeredCautionCheckBox.Location = new System.Drawing.Point(6, 73);
+			this.highlightIncidentThatTriggeredCautionCheckBox.Name = "highlightIncidentThatTriggeredCautionCheckBox";
+			this.highlightIncidentThatTriggeredCautionCheckBox.Size = new System.Drawing.Size(252, 20);
+			this.highlightIncidentThatTriggeredCautionCheckBox.TabIndex = 0;
+			this.highlightIncidentThatTriggeredCautionCheckBox.Text = "Highlight incident that triggered caution";
+			this.highlightIncidentThatTriggeredCautionCheckBox.UseVisualStyleBackColor = true;
+			this.highlightIncidentThatTriggeredCautionCheckBox.CheckedChanged += new System.EventHandler(this.highlightIncidentThatTriggeredCautionCheckBox_CheckedChanged);
+			// 
+			// highlight4xIncidentsCheckBox
+			// 
+			this.highlight4xIncidentsCheckBox.AutoSize = true;
+			this.highlight4xIncidentsCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.highlight4xIncidentsCheckBox.Location = new System.Drawing.Point(6, 47);
+			this.highlight4xIncidentsCheckBox.Name = "highlight4xIncidentsCheckBox";
+			this.highlight4xIncidentsCheckBox.Size = new System.Drawing.Size(151, 20);
+			this.highlight4xIncidentsCheckBox.TabIndex = 0;
+			this.highlight4xIncidentsCheckBox.Text = "Highlight 4x incidents";
+			this.highlight4xIncidentsCheckBox.UseVisualStyleBackColor = true;
+			this.highlight4xIncidentsCheckBox.CheckedChanged += new System.EventHandler(this.highlight4xIncidentsCheckBox_CheckedChanged);
+			// 
+			// hideIncidentsCheckBox
+			// 
+			this.hideIncidentsCheckBox.AutoSize = true;
+			this.hideIncidentsCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.hideIncidentsCheckBox.Location = new System.Drawing.Point(6, 21);
+			this.hideIncidentsCheckBox.Name = "hideIncidentsCheckBox";
+			this.hideIncidentsCheckBox.Size = new System.Drawing.Size(177, 20);
+			this.hideIncidentsCheckBox.TabIndex = 0;
+			this.hideIncidentsCheckBox.Text = "Hide incidents during race";
+			this.hideIncidentsCheckBox.UseVisualStyleBackColor = true;
+			this.hideIncidentsCheckBox.CheckedChanged += new System.EventHandler(this.hideIncidentsCheckBox_CheckedChanged);
 			// 
 			// SettingsDialog
 			// 
@@ -299,6 +327,8 @@ namespace RaceAdmin
 		public System.Windows.Forms.Label label1;
 		public System.Windows.Forms.Label incidentsRequiredForCautionLabel;
 		public System.Windows.Forms.GroupBox groupBox2;
-		public System.Windows.Forms.CheckBox hideIncidents;
+		public System.Windows.Forms.CheckBox hideIncidentsCheckBox;
+		public System.Windows.Forms.CheckBox highlightIncidentThatTriggeredCautionCheckBox;
+		public System.Windows.Forms.CheckBox highlight4xIncidentsCheckBox;
 	}
 }

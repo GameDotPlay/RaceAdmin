@@ -24,7 +24,9 @@ namespace RaceAdmin
             incidentsRequiredForCaution.Value = Properties.Settings.Default.incidentsRequired;
 
             // General settings
-            hideIncidents.Checked = Properties.Settings.Default.hideIncidents;
+            hideIncidentsCheckBox.Checked = Properties.Settings.Default.hideIncidents;
+            highlight4xIncidentsCheckBox.Checked = Properties.Settings.Default.highlight4xIncidents;
+            highlightIncidentThatTriggeredCautionCheckBox.Checked = Properties.Settings.Default.highlightIncidentThatTriggeredCaution;
         }
 
         private void DetectTowForCaution_CheckChanged(object sender, System.EventArgs e)
@@ -39,9 +41,9 @@ namespace RaceAdmin
             Properties.Settings.Default.Save();
         }
 
-        private void HideIncidents_CheckedChanged(object sender, EventArgs e)
+        private void hideIncidentsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.hideIncidents = hideIncidents.Checked;
+            Properties.Settings.Default.hideIncidents = hideIncidentsCheckBox.Checked;
             Properties.Settings.Default.Save();
         }
 
@@ -103,5 +105,17 @@ namespace RaceAdmin
 		{
             this.parent.SettingsChanged();
 		}
+
+		private void highlight4xIncidentsCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+            Properties.Settings.Default.highlight4xIncidents = highlight4xIncidentsCheckBox.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+		private void highlightIncidentThatTriggeredCautionCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+            Properties.Settings.Default.highlightIncidentThatTriggeredCaution = highlightIncidentThatTriggeredCautionCheckBox.Checked;
+            Properties.Settings.Default.Save();
+        }
 	}
 }
