@@ -26,8 +26,8 @@ namespace RaceAdmin
 
         static DefaultCautionHandler()
         {
-            control = Color.FromName(RaceAdmin.Properties.Resources.ColorName_Control);
-            gold = Color.FromName(RaceAdmin.Properties.Resources.ColorName_Gold);
+            control = Color.FromName("Control");
+            gold = Color.Yellow;
         }
 
         /// <summary>
