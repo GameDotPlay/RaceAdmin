@@ -190,5 +190,29 @@ namespace RaceAdmin.Properties {
                 this["telemetryPollRate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool highlight4xIncidents {
+            get {
+                return ((bool)(this["highlight4xIncidents"]));
+            }
+            set {
+                this["highlight4xIncidents"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool highlightIncidentThatTriggeredCaution {
+            get {
+                return ((bool)(this["highlightIncidentThatTriggeredCaution"]));
+            }
+            set {
+                this["highlightIncidentThatTriggeredCaution"] = value;
+            }
+        }
     }
 }
