@@ -117,57 +117,27 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ColorName_IndianRed" xml:space="preserve">
-    <value>IndianRed</value>
-  </data>
-  <data name="ColorName_Gold" xml:space="preserve">
-    <value>Gold</value>
-  </data>
-  <data name="TableColumn_Total" xml:space="preserve">
-    <value>Total</value>
-  </data>
-  <data name="TableColumn_DriverLapNum" xml:space="preserve">
-    <value>DriverLapNum</value>
-  </data>
   <data name="ErrorMessage_ValidNumberNotEntered" xml:space="preserve">
     <value>A valid number was not entered.</value>
-  </data>
-  <data name="TableColumn_DriverName" xml:space="preserve">
-    <value>DriverName</value>
-  </data>
-  <data name="ColorName_Control" xml:space="preserve">
-    <value>Control</value>
-  </data>
-  <data name="TableColumn_CarNum" xml:space="preserve">
-    <value>CarNum</value>
-  </data>
-  <data name="TableColumn_Incident" xml:space="preserve">
-    <value>Incident</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="2021 vApex Flag Logo4-RG-Black" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\2021 vApex Flag Logo4-RG-Black.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="TableColumn_Time" xml:space="preserve">
-    <value>Time</value>
-  </data>
-  <data name="TableColumn_Team" xml:space="preserve">
-    <value>Team</value>
-  </data>
   <data name="IncidentsTable_CarClass" xml:space="preserve">
-    <value>incidentsCarClass</value>
+    <value>carClass</value>
   </data>
-  <data name="IncidentsTable_CarNum" xml:space="preserve">
-    <value>incidentsCarNum</value>
+  <data name="IncidentsTable_CarNumber" xml:space="preserve">
+    <value>carNumber</value>
   </data>
-  <data name="IncidentsTable_CurrentDriver" xml:space="preserve">
-    <value>incidentsCurrentDriver</value>
+  <data name="IncidentsTable_DriverName" xml:space="preserve">
+    <value>driverName</value>
   </data>
-  <data name="IncidentsTable_TotalIncs" xml:space="preserve">
-    <value>incidentsTotalIncs</value>
+  <data name="IncidentsTable_SessionTime" xml:space="preserve">
+    <value>sessionTime</value>
   </data>
   <data name="IncidentsTable_TeamName" xml:space="preserve">
-    <value>incidentsTeamName</value>
+    <value>teamName</value>
   </data>
   <data name="ConeEmpty" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ConeEmpty.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -175,13 +145,16 @@
   <data name="ConeFull" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ConeFull.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="IncidentsTable_CarLapNum" xml:space="preserve">
-    <value>incidentsCarLapNum</value>
+  <data name="IncidentsTable_DriverLapNumber" xml:space="preserve">
+    <value>driverLapNumber</value>
   </data>
-  <data name="IncidentsTable_NewInc" xml:space="preserve">
-    <value>incidentsNewInc</value>
+  <data name="IncidentsTable_IncidentValue" xml:space="preserve">
+    <value>incidentValue</value>
   </data>
-  <data name="IncidentsTable_TimeStamp" xml:space="preserve">
-    <value>incidentsTimeStamp</value>
+  <data name="IncidentsTable_LocalTime" xml:space="preserve">
+    <value>localTime</value>
+  </data>
+  <data name="IncidentsTable_TotalIncidents" xml:space="preserve">
+    <value>totalIncidents</value>
   </data>
 </root>
