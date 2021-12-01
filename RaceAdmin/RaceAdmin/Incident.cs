@@ -3,16 +3,16 @@
 	using System;
 	public class Incident
 	{
-		public Incident(double updateTime, DateTime timeStamp, int value, int carIdx)
+		public Incident(double sessionTime, DateTime timeStamp, int value, int carIdx)
 		{
-			UpdateTime = updateTime;
-			TimeStamp = timeStamp;
-			Value = value;
-			CarIdx = carIdx;
+			this.SessionTime = sessionTime;
+			this.TimeStamp = timeStamp;
+			this.Value = value;
+			this.CarIdx = carIdx;
 		}
 
-		public double UpdateTime { get; set; }
 		public DateTime TimeStamp { get; set; }
+		public double SessionTime { get; set; }
 		public int Value { get; set; }
 		public int CarIdx { get; set; }
 	}
