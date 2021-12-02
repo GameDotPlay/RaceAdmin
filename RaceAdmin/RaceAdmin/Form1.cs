@@ -28,6 +28,8 @@
         /// </summary>
         public const int DefaultSessionUniqueID = 1;
 
+        private const int MAX_DRIVERS = 65;
+
         /// <summary>
         /// Tracks the current caution state on track.
         /// </summary>
@@ -212,6 +214,7 @@
 		{
             incidentsView.AutoGenerateColumns = true;
             incidentsView.DataSource = incidentsBindingSource;
+            incidentsView.SetDoubleBuffered();
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].HeaderText = "Local Time";
             incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
@@ -501,20 +504,23 @@
         private void UpdateDriverIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             int carIdx = 0;
-            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            while (query.TryGetValue(out string name))
+            YamlQuery query;
+            for(; carIdx < MAX_DRIVERS; carIdx++)
             {
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+
+                if(!query.TryGetValue(out string name))
+				{
+                    continue;
+				}
+
                 if (name == null || name == "Pace Car")
                 {
-                    carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
                     continue;
                 }
 
                 if (!drivers.ContainsKey(name))
                 {
-                    carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
                     Console.WriteLine($"ERROR: driver {name} not found in session driver list");
                     continue;
                 }
@@ -540,9 +546,6 @@
                     LogNewIncident(newInc);
                     drivers[name].OldIncs = drivers[name].NewIncs;
                 }
-
-                carIdx++;
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
             }
         }
 
@@ -552,24 +555,28 @@
         /// <param name="e">SessionInfoUpdated event args.</param>
         private void UpdateDriverLapCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
-            int i = 1;
-            YamlQuery query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.sessionNum]["ResultsPositions"]["Position", i]["CarIdx"];
-            while (query.TryGetValue(out string s_carIdx))
+            YamlQuery query;
+            for(int position = 1; position < MAX_DRIVERS; position++)
             {
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", s_carIdx]["UserName"];
+                query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.sessionNum]["ResultsPositions"]["Position", position]["CarIdx"];
+
+                if (!query.TryGetValue(out string carIdx))
+				{
+                    continue;
+				}
+
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+
                 if (query.TryGetValue(out string userName))
                 {
                     if (drivers.TryGetValue(userName, out Driver driver))
                     {
-                        query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.sessionNum]["ResultsPositions"]["Position", i]["LapsComplete"];
+                        query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.sessionNum]["ResultsPositions"]["Position", position]["LapsComplete"];
                         query.TryGetValue(out string s_lapsComplete);
 						int.TryParse(s_lapsComplete, out int i_lapsComplete);
                         driver.CurrentLap = i_lapsComplete + 1;
                     }
                 }
-
-                i++;
-                query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.sessionNum]["ResultsPositions"]["Position", i]["CarIdx"];
             }
         }
 
@@ -579,29 +586,28 @@
         /// <param name="e">SessionInfoUpdated event args.</param>
         private void UpdateCarTeamIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
 		{
-            int carIdx = 0;
-            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            while (query.TryGetValue(out string name))
+            YamlQuery query;
+            for(int carIdx = 0; carIdx < MAX_DRIVERS; carIdx++)
             {
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+
+                if (!query.TryGetValue(out string name))
+				{
+                    continue;
+				}
+
                 if (name == null || name == "Pace Car")
                 {
-                    carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
                     continue;
                 }
 
                 if (!cars.ContainsKey(carIdx))
                 {
-                    carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
                     Console.WriteLine($"ERROR: car {carIdx} not found in session driver list");
                     continue;
                 }
 
                 cars[carIdx].TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value);
-
-                carIdx++;
-                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
             }
         }
 
@@ -976,6 +982,7 @@
             DataRow newRow = incidentsDataTable.NewRow();
             newRow[Properties.Resources.IncidentsTable_LocalTime] = newInc.TimeStamp.ToShortTimeString();
             newRow[Properties.Resources.IncidentsTable_SessionTime] = MakeTimeString(newInc.SessionTime);
+            newRow[Properties.Resources.IncidentsTable_CarClass] = cars[newInc.CarIdx].CarClassShortName;
             newRow[Properties.Resources.IncidentsTable_CarNumber] = cars[newInc.CarIdx].CarNumber;
             if (teamRacing != 0)
             {
@@ -1005,6 +1012,12 @@
 
         private void ApplyIncidentTableColorHighlighting(DataGridViewRow cautionRow)
 		{
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => ApplyIncidentTableColorHighlighting(cautionRow)));
+                return;
+            }
+
             if (highlight4xIncidents)
             {
                 foreach (DataGridViewRow row in incidentsView.Rows)
@@ -1081,10 +1094,16 @@
         /// <param name="e">Session string changed event. Object that conatains info from session string that can be queried.</param>
         private void AddNewDrivers(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
-            int carIdx = 0;
-            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            while (query.TryGetValue(out string fullName))
-            {
+            YamlQuery query;
+            for(int carIdx = 0; carIdx < MAX_DRIVERS; carIdx++)
+			{
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+
+                if (!query.TryGetValue(out string fullName))
+                {
+                    continue;
+                }
+
                 if (fullName != null)
                 {
                     if (!drivers.ContainsKey(fullName))
@@ -1103,11 +1122,8 @@
                         Console.WriteLine($"Adding driver {fullName}");
                         drivers.Add(fullName, driver);
                     }
-
-                    carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
                 }
-            }
+			}
         }
 
         /// <summary>
@@ -1116,10 +1132,16 @@
         /// <param name="e">Session string changed event. Object that conatains info from session string that can be queried.</param>
         private void AddNewCars(SdkWrapper.SessionInfoUpdatedEventArgs e)
 		{
-            int carIdx = 0;
-            YamlQuery query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
-            while (query.TryGetValue(out string fullName))
+            YamlQuery query;
+            for(int carIdx = 0; carIdx < MAX_DRIVERS; carIdx++)
             {
+                query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
+
+                if(!query.TryGetValue(out string fullName))
+				{
+                    continue;
+				}
+
                 if (fullName != null)
                 {
                     if (!cars.ContainsKey(carIdx))
@@ -1143,9 +1165,6 @@
 						AddNewCarDebugTable(car);
 #endif
                     }
-
-                    carIdx++;
-                    query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
                 }
             }
         }
