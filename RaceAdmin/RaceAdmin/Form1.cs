@@ -28,7 +28,12 @@
         /// </summary>
         public const int DefaultSessionUniqueID = 1;
 
-        private const int MAX_DRIVERS = 65;
+        /// <summary>
+        /// Used as an upper bounds for looping through all CarIdx in a session.
+        /// Can be greater than max drivers because of unique people coming and going. 
+        /// Each driver has a unique CarIdx.
+        /// </summary>
+        private const int MAX_CARIDX = 75;
 
         /// <summary>
         /// Tracks the current caution state on track.
@@ -70,8 +75,15 @@
         /// </summary>
         private int incsRequiredForCaution = 0;
 
+        /// <summary>
+        /// User setting to highlight 4x incidents or not. Set by user in Settings dialog.
+        /// </summary>
         private bool highlight4xIncidents;
 
+        /// <summary>
+        /// User setting to highlight the incident that triggered the incident threshold or not.
+        /// Set by user in Settings dialog.
+        /// </summary>
         private bool highlightIncidentThatTriggeredCaution;
 
         /// <summary>
@@ -152,11 +164,34 @@
         private bool raceSession;
 
         /// <summary>
-        /// Backing data source for the main incidents table. Shown on UI as a DataView based on user filters.
+        /// Backing data source for the main incidents table. Shown on UI as an AdvancedDataGridView based on user filters.
         /// </summary>
         private DataTable incidentsDataTable;
 
+        /// <summary>
+        /// Binding source for the incidents table.
+        /// </summary>
         private BindingSource incidentsBindingSource;
+
+        /// <summary>
+        /// Backing data source for the live standings table. Shown on UI as an AdvancedDataGridView based on user filters.
+        /// </summary>
+        private DataTable liveStandingsDataTable;
+
+        /// <summary>
+        /// Binding source for the live standings table.
+        /// </summary>
+        private BindingSource liveStandingsBindingSource;
+
+        /// <summary>
+        /// Backing data source for the debug table. Shown on UI as an AdvancedDataGridView based on user filters.
+        /// </summary>
+        private DataTable debugDataTable;
+
+        /// <summary>
+        /// Binding source for the debug table.
+        /// </summary>
+        private BindingSource debugBindingSource;
 
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
@@ -217,20 +252,20 @@
             incidentsView.SetDoubleBuffered();
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].HeaderText = "Local Time";
-            incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].Width = (int)IncidentTableColumnWidths.LocalTimeColumnWidth;
             incidentsView.DisableFilterChecklist(incidentsView.Columns["localTime"]);
             incidentsView.DisableFilterCustom(incidentsView.Columns["localTime"]);
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime].HeaderText = "Session Time";
-            incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime].Width = (int)IncidentTableColumnWidths.SessionTimeColumnWidth;
             incidentsView.DisableFilterChecklist(incidentsView.Columns["sessionTime"]);
             incidentsView.DisableFilterCustom(incidentsView.Columns["sessionTime"]);
 
-            incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].Width = (int)IncidentTableColumnWidths.CarClassColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].HeaderText = "Car Class";
-            
+
+            incidentsView.Columns[Properties.Resources.IncidentsTable_CarNumber].Width = (int)IncidentTableColumnWidths.CarNumberColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_CarNumber].HeaderText = "Car #";
-            incidentsView.Columns[Properties.Resources.IncidentsTable_CarNumber].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_TeamName].HeaderText = "Team Name";
             incidentsView.Columns[Properties.Resources.IncidentsTable_TeamName].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -238,16 +273,16 @@
             incidentsView.Columns[Properties.Resources.IncidentsTable_DriverName].HeaderText = "Driver Name";
             incidentsView.Columns[Properties.Resources.IncidentsTable_DriverName].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
+            incidentsView.Columns[Properties.Resources.IncidentsTable_IncidentValue].Width = (int)IncidentTableColumnWidths.IncidentValueColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_IncidentValue].HeaderText = "Incident";
-            incidentsView.Columns[Properties.Resources.IncidentsTable_IncidentValue].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
 
+            incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents].Width = (int)IncidentTableColumnWidths.TotalIncidentsColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents].HeaderText = "Total";
-            incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             incidentsView.DisableFilterChecklist(incidentsView.Columns["totalIncidents"]);
             incidentsView.DisableFilterCustom(incidentsView.Columns["totalIncidents"]);
 
+            incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].Width = (int)IncidentTableColumnWidths.DriverLapNumberColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].HeaderText = "Lap #";
-            incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
         }
 
         private void InitializeIncidentsDataTableColumns(DataColumnCollection columns)
@@ -505,7 +540,7 @@
         {
             int carIdx = 0;
             YamlQuery query;
-            for(; carIdx < MAX_DRIVERS; carIdx++)
+            for(; carIdx < MAX_CARIDX; carIdx++)
             {
                 query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
 
@@ -556,7 +591,7 @@
         private void UpdateDriverLapCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             YamlQuery query;
-            for(int position = 1; position < MAX_DRIVERS; position++)
+            for(int position = 1; position < MAX_CARIDX; position++)
             {
                 query = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", this.sessionNum]["ResultsPositions"]["Position", position]["CarIdx"];
 
@@ -587,7 +622,7 @@
         private void UpdateCarTeamIncidentCounts(SdkWrapper.SessionInfoUpdatedEventArgs e)
 		{
             YamlQuery query;
-            for(int carIdx = 0; carIdx < MAX_DRIVERS; carIdx++)
+            for(int carIdx = 0; carIdx < MAX_CARIDX; carIdx++)
             {
                 query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
 
@@ -916,57 +951,6 @@
             newRow.Cells["trackSurfaceMaterial"].Value = newCar.TrackSurfaceMaterial;
         }
 
-		///// <summary>
-		///// Inserts new row in incident log.
-		///// </summary>
-		///// <param name="newInc"><see cref="Incident"/> object containing information about the latest incident.</param>
-		//private void LogNewIncident(Incident newInc)
-		//{
-		//	if (InvokeRequired)
-		//	{
-		//		Invoke(new Action(() => LogNewIncident(newInc)));
-		//		return;
-		//	}
-
-		//	int rowId = incidentsTableView.Rows.Add();
-		//	DataGridViewRow newRow = incidentsTableView.Rows[rowId];
-		//	newRow.Cells["oldTime"].Value = MakeTimeString(newInc.SessionTime);
-		//	newRow.Cells["oldCarNum"].Value = cars[newInc.CarIdx].CarNumber;
-		//	if (teamRacing)
-		//	{
-		//		newRow.Cells["oldTeam"].Value = cars[newInc.CarIdx].TeamName;
-		//	}
-		//	newRow.Cells["oldDrivername"].Value = cars[newInc.CarIdx].CurrentDriver;
-		//	newRow.Cells["oldIncident"].Value = $"{newInc.Value}x";
-		//	string total;
-		//	if (teamRacing)
-		//	{
-		//		// iracing-style team incidents
-		//		total = $"{cars[newInc.CarIdx].TeamIncidentCount},{drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs}";
-		//	}
-		//	else
-		//	{
-		//		total = drivers[cars[newInc.CarIdx].CurrentDriver].NewIncs.ToString();
-		//	}
-		//	newRow.Cells["oldTotal"].Value = total;
-		//	newRow.Cells["oldDriverLapNum"].Value = cars[newInc.CarIdx].CurrentLap;
-		//	this.totalIncCount += newInc.Value;
-		//	this.incCountSinceCaution += newInc.Value;
-		//	totalIncidentCountNum.Text = this.totalIncCount.ToString();
-		//	incidentsSinceCautionNum.Text = this.incCountSinceCaution.ToString();
-		//	if (newInc.Value == 4)
-		//	{
-		//		newRow.DefaultCellStyle.BackColor = System.Drawing.Color.FromName(Properties.Resources.ColorName_IndianRed);
-		//	}
-
-		//	if (incidentsTableView.RowCount > 0)
-		//	{
-		//		incidentsTableView.FirstDisplayedScrollingRowIndex = incidentsTableView.RowCount - 1;
-		//	}
-
-		//	Console.WriteLine("{0}; driver = {1}", newRow.Cells["oldIncident"].Value, drivers[cars[newInc.CarIdx].CurrentDriver].FullName);
-		//}
-
 		/// <summary>
 		/// Inserts new row into the incident data table.
 		/// </summary>
@@ -1018,23 +1002,31 @@
                 return;
             }
 
-            if (highlight4xIncidents)
-            {
-                foreach (DataGridViewRow row in incidentsView.Rows)
+            try
+			{
+                if (highlight4xIncidents)
                 {
-                    if(row.Cells[Properties.Resources.IncidentsTable_IncidentValue].Value.ToString() == "4x")
-					{
-                        row.DefaultCellStyle.BackColor = Color.IndianRed;
-					}
+                    foreach (DataGridViewRow row in incidentsView.Rows)
+                    {
+                        if (row.Cells[Properties.Resources.IncidentsTable_IncidentValue].Value.ToString() == "4x")
+                        {
+                            row.DefaultCellStyle.BackColor = Color.IndianRed;
+                        }
+                    }
+                }
+
+                if (highlightIncidentThatTriggeredCaution)
+                {
+                    if (cautionRow != null)
+                    {
+                        cautionRow.DefaultCellStyle.BackColor = Color.LightYellow;
+                    }
                 }
             }
-
-            if(highlightIncidentThatTriggeredCaution)
+            catch(DataException ex)
 			{
-                if (cautionRow != null)
-                {
-                    cautionRow.DefaultCellStyle.BackColor = Color.LightYellow;
-                }
+                Console.WriteLine($"Data Exception in ApplyIncidentTableColorHighlighting().");
+                return;
             }
 		}
 
@@ -1095,7 +1087,7 @@
         private void AddNewDrivers(SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
             YamlQuery query;
-            for(int carIdx = 0; carIdx < MAX_DRIVERS; carIdx++)
+            for(int carIdx = 0; carIdx < MAX_CARIDX; carIdx++)
 			{
                 query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
 
@@ -1133,7 +1125,7 @@
         private void AddNewCars(SdkWrapper.SessionInfoUpdatedEventArgs e)
 		{
             YamlQuery query;
-            for(int carIdx = 0; carIdx < MAX_DRIVERS; carIdx++)
+            for(int carIdx = 0; carIdx < MAX_CARIDX; carIdx++)
             {
                 query = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["UserName"];
 
