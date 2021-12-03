@@ -73,6 +73,16 @@ namespace RaceAdmin.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ColorPickerIcon {
+            get {
+                object obj = ResourceManager.GetObject("ColorPickerIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ConeEmpty {
             get {
                 object obj = ResourceManager.GetObject("ConeEmpty", resourceCulture);
