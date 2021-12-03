@@ -43,9 +43,6 @@
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -89,7 +86,6 @@
 			this.lapsCompleted = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.trackSurface = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.trackSurfaceMaterial = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.liveStandingsTab = new System.Windows.Forms.TabPage();
 			this.mainTab = new System.Windows.Forms.TabPage();
 			this.incidentsSinceCautionNum = new System.Windows.Forms.Label();
 			this.incidentsSinceCautionLabel = new System.Windows.Forms.Label();
@@ -99,18 +95,15 @@
 			this.cautionPanel = new System.Windows.Forms.Panel();
 			this.sessionLabel = new System.Windows.Forms.Label();
 			this.tabControl = new System.Windows.Forms.TabControl();
-			this.liveStandingsView = new Zuby.ADGV.AdvancedDataGridView();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.menuStrip.SuspendLayout();
 			this.debugTab.SuspendLayout();
 			this.debugSettingsGroupbox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.debugTable)).BeginInit();
-			this.liveStandingsTab.SuspendLayout();
 			this.mainTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.incidentsView)).BeginInit();
 			this.cautionPanel.SuspendLayout();
 			this.tabControl.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.liveStandingsView)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// incidentsRequiredForCautionLabel
@@ -645,17 +638,6 @@
 			this.trackSurfaceMaterial.ReadOnly = true;
 			this.trackSurfaceMaterial.ToolTipText = "Current track surface material value";
 			// 
-			// liveStandingsTab
-			// 
-			this.liveStandingsTab.BackColor = System.Drawing.SystemColors.Control;
-			this.liveStandingsTab.Controls.Add(this.liveStandingsView);
-			this.liveStandingsTab.Location = new System.Drawing.Point(4, 22);
-			this.liveStandingsTab.Name = "liveStandingsTab";
-			this.liveStandingsTab.Padding = new System.Windows.Forms.Padding(3);
-			this.liveStandingsTab.Size = new System.Drawing.Size(1256, 631);
-			this.liveStandingsTab.TabIndex = 2;
-			this.liveStandingsTab.Text = "Live Standings";
-			// 
 			// mainTab
 			// 
 			this.mainTab.BackColor = System.Drawing.SystemColors.Control;
@@ -730,37 +712,37 @@
 			this.incidentsView.AllowUserToAddRows = false;
 			this.incidentsView.AllowUserToDeleteRows = false;
 			this.incidentsView.AllowUserToResizeRows = false;
-			dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			dataGridViewCellStyle18.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle18.ForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.incidentsView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle18;
+			dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.ControlLightLight;
+			dataGridViewCellStyle15.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.incidentsView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle15;
 			this.incidentsView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.incidentsView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleVertical;
 			this.incidentsView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-			dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle19.BackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle19.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle19.ForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle19.SelectionBackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle19.SelectionForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.incidentsView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle19;
+			dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle16.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.incidentsView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
 			this.incidentsView.ColumnHeadersHeight = 25;
 			this.incidentsView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-			dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle20.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle20.ForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle20.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle20.SelectionForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.incidentsView.DefaultCellStyle = dataGridViewCellStyle20;
+			dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.ControlLight;
+			dataGridViewCellStyle17.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+			dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.incidentsView.DefaultCellStyle = dataGridViewCellStyle17;
 			this.incidentsView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
 			this.incidentsView.FilterAndSortEnabled = true;
 			this.incidentsView.Location = new System.Drawing.Point(1, 78);
@@ -810,7 +792,6 @@
 			// tabControl
 			// 
 			this.tabControl.Controls.Add(this.mainTab);
-			this.tabControl.Controls.Add(this.liveStandingsTab);
 			this.tabControl.Controls.Add(this.debugTab);
 			this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tabControl.Location = new System.Drawing.Point(0, 24);
@@ -819,60 +800,6 @@
 			this.tabControl.SelectedIndex = 0;
 			this.tabControl.Size = new System.Drawing.Size(1264, 657);
 			this.tabControl.TabIndex = 1;
-			// 
-			// liveStandingsView
-			// 
-			this.liveStandingsView.AllowUserToAddRows = false;
-			this.liveStandingsView.AllowUserToDeleteRows = false;
-			this.liveStandingsView.AllowUserToResizeRows = false;
-			dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			dataGridViewCellStyle15.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.liveStandingsView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle15;
-			this.liveStandingsView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleVertical;
-			this.liveStandingsView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
-			dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle16.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle16.ForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Control;
-			dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.liveStandingsView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle16;
-			this.liveStandingsView.ColumnHeadersHeight = 25;
-			this.liveStandingsView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-			dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.ControlLight;
-			dataGridViewCellStyle17.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-			dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.WindowText;
-			dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.liveStandingsView.DefaultCellStyle = dataGridViewCellStyle17;
-			this.liveStandingsView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.liveStandingsView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-			this.liveStandingsView.FilterAndSortEnabled = true;
-			this.liveStandingsView.Location = new System.Drawing.Point(3, 3);
-			this.liveStandingsView.Margin = new System.Windows.Forms.Padding(1);
-			this.liveStandingsView.MinimumSize = new System.Drawing.Size(1254, 270);
-			this.liveStandingsView.Name = "liveStandingsView";
-			this.liveStandingsView.ReadOnly = true;
-			this.liveStandingsView.RightToLeft = System.Windows.Forms.RightToLeft.No;
-			this.liveStandingsView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-			this.liveStandingsView.RowHeadersVisible = false;
-			this.liveStandingsView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-			this.liveStandingsView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-			this.liveStandingsView.ShowCellErrors = false;
-			this.liveStandingsView.ShowCellToolTips = false;
-			this.liveStandingsView.ShowEditingIcon = false;
-			this.liveStandingsView.ShowRowErrors = false;
-			this.liveStandingsView.Size = new System.Drawing.Size(1254, 625);
-			this.liveStandingsView.TabIndex = 0;
-			this.liveStandingsView.TabStop = false;
 			// 
 			// RaceAdminMain
 			// 
@@ -899,13 +826,11 @@
 			this.debugSettingsGroupbox.ResumeLayout(false);
 			this.debugSettingsGroupbox.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.debugTable)).EndInit();
-			this.liveStandingsTab.ResumeLayout(false);
 			this.mainTab.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.incidentsView)).EndInit();
 			this.cautionPanel.ResumeLayout(false);
 			this.cautionPanel.PerformLayout();
 			this.tabControl.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.liveStandingsView)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -952,7 +877,6 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn lapsCompleted;
 		private System.Windows.Forms.DataGridViewTextBoxColumn trackSurface;
 		private System.Windows.Forms.DataGridViewTextBoxColumn trackSurfaceMaterial;
-		private System.Windows.Forms.TabPage liveStandingsTab;
 		private System.Windows.Forms.TabPage mainTab;
 		private System.Windows.Forms.Label incidentsSinceCautionNum;
 		private System.Windows.Forms.Label incidentsSinceCautionLabel;
@@ -962,7 +886,6 @@
 		private System.Windows.Forms.Panel cautionPanel;
 		private System.Windows.Forms.Label sessionLabel;
 		private System.Windows.Forms.TabControl tabControl;
-		private Zuby.ADGV.AdvancedDataGridView liveStandingsView;
 	}
 }
 

@@ -174,16 +174,6 @@
         private BindingSource incidentsBindingSource;
 
         /// <summary>
-        /// Backing data source for the live standings table. Shown on UI as an AdvancedDataGridView based on user filters.
-        /// </summary>
-        private DataTable liveStandingsDataTable;
-
-        /// <summary>
-        /// Binding source for the live standings table.
-        /// </summary>
-        private BindingSource liveStandingsBindingSource;
-
-        /// <summary>
         /// Backing data source for the debug table. Shown on UI as an AdvancedDataGridView based on user filters.
         /// </summary>
         private DataTable debugDataTable;
@@ -244,6 +234,19 @@
             InitializeIncidentsDataTableColumns(incidentsDataTable.Columns);
             incidentsBindingSource.DataSource = incidentsDataTable;
         }
+
+        private void InitializeDebugDataSource()
+		{
+            debugDataTable = new DataTable("debugDataTable");
+            debugBindingSource = new BindingSource();
+            InitializeDebugDataTableColumns(debugDataTable.Columns);
+            debugBindingSource.DataSource = debugDataTable;
+        }
+
+        private void InitializeDebugDataTableColumns(DataColumnCollection columns)
+		{
+
+		}
 
         private void InitializeIncidentsGridView()
 		{
