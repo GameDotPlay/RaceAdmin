@@ -245,6 +245,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GreenCheckeredFlags.ico" />
+    <None Include="Resources\ColorPickerIcon.bmp" />
+    <None Include="Resources\ColorPickerIconBW.bmp" />
+    <None Include="Resources\ColorPickerIcon.png" />
     <Content Include="Resources\ConeEmpty.bmp" />
     <Content Include="Resources\ConeFull.bmp" />
     <None Include="Resources\2021 vApex Flag Logo4-RG-Black.png" />

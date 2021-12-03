@@ -31,7 +31,6 @@ namespace RaceAdmin
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.incidentsRequiredForCaution = new System.Windows.Forms.NumericUpDown();
 			this.autoThrowCaution = new System.Windows.Forms.CheckBox();
 			this.lastMinutes = new System.Windows.Forms.NumericUpDown();
 			this.lastLaps = new System.Windows.Forms.NumericUpDown();
@@ -42,25 +41,35 @@ namespace RaceAdmin
 			this.useTotalIncidentsForCautionCheckBox = new System.Windows.Forms.CheckBox();
 			this.detectTowForCautionCheckBox = new System.Windows.Forms.CheckBox();
 			this.audioNotification = new System.Windows.Forms.CheckBox();
-			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
+			this.incidentsRequiredForCautionNumericSelector = new System.Windows.Forms.NumericUpDown();
+			this.driverIncidentThresholdLabel = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.highlightCautionIncidentColorPanel = new System.Windows.Forms.Panel();
+			this.highlight4xIncidentsColorPanel = new System.Windows.Forms.Panel();
+			this.driverIncidentThresholdSelectedColorPanel = new System.Windows.Forms.Panel();
+			this.highlightDriverIfIncidentThresholdCheckBox = new System.Windows.Forms.CheckBox();
 			this.highlightIncidentThatTriggeredCautionCheckBox = new System.Windows.Forms.CheckBox();
 			this.highlight4xIncidentsCheckBox = new System.Windows.Forms.CheckBox();
 			this.hideIncidentsCheckBox = new System.Windows.Forms.CheckBox();
+			this.driverIncidentThresholdColorDialog = new System.Windows.Forms.ColorDialog();
+			this.highlight4xIncidentsColorDialog = new System.Windows.Forms.ColorDialog();
+			this.highlightCautionIncidentColorDialog = new System.Windows.Forms.ColorDialog();
+			this.driverIncidentThresholdNumericSelector = new System.Windows.Forms.NumericUpDown();
 			this.groupBox1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.incidentsRequiredForCaution)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lastMinutes)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lastLaps)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.incidentsRequiredForCautionNumericSelector)).BeginInit();
 			this.groupBox2.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.driverIncidentThresholdNumericSelector)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.incidentsRequiredForCaution);
 			this.groupBox1.Controls.Add(this.autoThrowCaution);
 			this.groupBox1.Controls.Add(this.lastMinutes);
 			this.groupBox1.Controls.Add(this.lastLaps);
+			this.groupBox1.Controls.Add(this.incidentsRequiredForCautionNumericSelector);
 			this.groupBox1.Controls.Add(this.incidentsRequiredForCautionLabel);
 			this.groupBox1.Controls.Add(this.label5);
 			this.groupBox1.Controls.Add(this.label6);
@@ -68,29 +77,14 @@ namespace RaceAdmin
 			this.groupBox1.Controls.Add(this.useTotalIncidentsForCautionCheckBox);
 			this.groupBox1.Controls.Add(this.detectTowForCautionCheckBox);
 			this.groupBox1.Controls.Add(this.audioNotification);
-			this.groupBox1.Controls.Add(this.label2);
 			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.groupBox1.Location = new System.Drawing.Point(274, 12);
+			this.groupBox1.Location = new System.Drawing.Point(422, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(355, 257);
+			this.groupBox1.Size = new System.Drawing.Size(331, 257);
 			this.groupBox1.TabIndex = 8;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Full Course Cautions";
-			// 
-			// incidentsRequiredForCaution
-			// 
-			this.incidentsRequiredForCaution.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.incidentsRequiredForCaution.Location = new System.Drawing.Point(11, 125);
-			this.incidentsRequiredForCaution.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-			this.incidentsRequiredForCaution.Name = "incidentsRequiredForCaution";
-			this.incidentsRequiredForCaution.Size = new System.Drawing.Size(48, 22);
-			this.incidentsRequiredForCaution.TabIndex = 0;
-			this.incidentsRequiredForCaution.ValueChanged += new System.EventHandler(this.IncidentsRequired_ValueChanged);
 			// 
 			// autoThrowCaution
 			// 
@@ -215,15 +209,6 @@ namespace RaceAdmin
 			this.audioNotification.UseVisualStyleBackColor = true;
 			this.audioNotification.CheckedChanged += new System.EventHandler(this.AudioNotification_CheckedChanged);
 			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(26, 181);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(70, 16);
-			this.label2.TabIndex = 5;
-			this.label2.Text = "During last";
-			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
@@ -233,18 +218,105 @@ namespace RaceAdmin
 			this.label1.TabIndex = 4;
 			this.label1.Text = "No cautions:";
 			// 
+			// incidentsRequiredForCautionNumericSelector
+			// 
+			this.incidentsRequiredForCautionNumericSelector.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.incidentsRequiredForCautionNumericSelector.Location = new System.Drawing.Point(234, 126);
+			this.incidentsRequiredForCautionNumericSelector.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+			this.incidentsRequiredForCautionNumericSelector.Name = "incidentsRequiredForCautionNumericSelector";
+			this.incidentsRequiredForCautionNumericSelector.Size = new System.Drawing.Size(48, 22);
+			this.incidentsRequiredForCautionNumericSelector.TabIndex = 0;
+			this.incidentsRequiredForCautionNumericSelector.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.incidentsRequiredForCautionNumericSelector.ValueChanged += new System.EventHandler(this.IncidentsRequired_ValueChanged);
+			// 
+			// driverIncidentThresholdLabel
+			// 
+			this.driverIncidentThresholdLabel.AutoSize = true;
+			this.driverIncidentThresholdLabel.Location = new System.Drawing.Point(28, 132);
+			this.driverIncidentThresholdLabel.Name = "driverIncidentThresholdLabel";
+			this.driverIncidentThresholdLabel.Size = new System.Drawing.Size(64, 16);
+			this.driverIncidentThresholdLabel.TabIndex = 5;
+			this.driverIncidentThresholdLabel.Text = "Incidents:";
+			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.highlightCautionIncidentColorPanel);
+			this.groupBox2.Controls.Add(this.highlight4xIncidentsColorPanel);
+			this.groupBox2.Controls.Add(this.driverIncidentThresholdSelectedColorPanel);
+			this.groupBox2.Controls.Add(this.driverIncidentThresholdNumericSelector);
+			this.groupBox2.Controls.Add(this.highlightDriverIfIncidentThresholdCheckBox);
 			this.groupBox2.Controls.Add(this.highlightIncidentThatTriggeredCautionCheckBox);
 			this.groupBox2.Controls.Add(this.highlight4xIncidentsCheckBox);
 			this.groupBox2.Controls.Add(this.hideIncidentsCheckBox);
+			this.groupBox2.Controls.Add(this.driverIncidentThresholdLabel);
 			this.groupBox2.Font = new System.Drawing.Font("Arial", 9.75F);
 			this.groupBox2.Location = new System.Drawing.Point(12, 12);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(256, 119);
+			this.groupBox2.Size = new System.Drawing.Size(404, 201);
 			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "General";
+			// 
+			// highlightCautionIncidentColorPanel
+			// 
+			this.highlightCautionIncidentColorPanel.BackgroundImage = global::RaceAdmin.Properties.Resources.ColorPickerIcon;
+			this.highlightCautionIncidentColorPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+			this.highlightCautionIncidentColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.highlightCautionIncidentColorPanel.Location = new System.Drawing.Point(254, 71);
+			this.highlightCautionIncidentColorPanel.Name = "highlightCautionIncidentColorPanel";
+			this.highlightCautionIncidentColorPanel.Size = new System.Drawing.Size(48, 22);
+			this.highlightCautionIncidentColorPanel.TabIndex = 7;
+			this.highlightCautionIncidentColorPanel.Click += new System.EventHandler(this.highlightCautionIncidentColorPanel_Click);
+			this.highlightCautionIncidentColorPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.highlightCautionIncidentColorPanel_MouseDown);
+			this.highlightCautionIncidentColorPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.highlightCautionIncidentColorPanel_MouseUp);
+			// 
+			// highlight4xIncidentsColorPanel
+			// 
+			this.highlight4xIncidentsColorPanel.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("highlight4xIncidentsColorPanel.BackgroundImage")));
+			this.highlight4xIncidentsColorPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+			this.highlight4xIncidentsColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.highlight4xIncidentsColorPanel.Location = new System.Drawing.Point(154, 45);
+			this.highlight4xIncidentsColorPanel.Name = "highlight4xIncidentsColorPanel";
+			this.highlight4xIncidentsColorPanel.Size = new System.Drawing.Size(48, 22);
+			this.highlight4xIncidentsColorPanel.TabIndex = 7;
+			this.highlight4xIncidentsColorPanel.Click += new System.EventHandler(this.highlight4xIncidentsColorPanel_Click);
+			this.highlight4xIncidentsColorPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.highlight4xIncidentsColorPanel_MouseDown);
+			this.highlight4xIncidentsColorPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.highlight4xIncidentsColorPanel_MouseUp);
+			// 
+			// driverIncidentThresholdSelectedColorPanel
+			// 
+			this.driverIncidentThresholdSelectedColorPanel.BackgroundImage = global::RaceAdmin.Properties.Resources.ColorPickerIcon;
+			this.driverIncidentThresholdSelectedColorPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+			this.driverIncidentThresholdSelectedColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.driverIncidentThresholdSelectedColorPanel.Location = new System.Drawing.Point(335, 97);
+			this.driverIncidentThresholdSelectedColorPanel.Name = "driverIncidentThresholdSelectedColorPanel";
+			this.driverIncidentThresholdSelectedColorPanel.Size = new System.Drawing.Size(48, 22);
+			this.driverIncidentThresholdSelectedColorPanel.TabIndex = 7;
+			this.driverIncidentThresholdSelectedColorPanel.Click += new System.EventHandler(this.driverIncidentThresholdSelectedColorPanel_Click);
+			this.driverIncidentThresholdSelectedColorPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.driverIncidentThresholdSelectedColorPanel_MouseDown);
+			this.driverIncidentThresholdSelectedColorPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.driverIncidentThresholdSelectedColorPanel_MouseUp);
+			// 
+			// highlightDriverIfIncidentThresholdCheckBox
+			// 
+			this.highlightDriverIfIncidentThresholdCheckBox.AutoSize = true;
+			this.highlightDriverIfIncidentThresholdCheckBox.Checked = true;
+			this.highlightDriverIfIncidentThresholdCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.highlightDriverIfIncidentThresholdCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.highlightDriverIfIncidentThresholdCheckBox.Location = new System.Drawing.Point(6, 99);
+			this.highlightDriverIfIncidentThresholdCheckBox.Name = "highlightDriverIfIncidentThresholdCheckBox";
+			this.highlightDriverIfIncidentThresholdCheckBox.Size = new System.Drawing.Size(333, 20);
+			this.highlightDriverIfIncidentThresholdCheckBox.TabIndex = 0;
+			this.highlightDriverIfIncidentThresholdCheckBox.Text = "Highlight driver if individual incident threshold reached";
+			this.highlightDriverIfIncidentThresholdCheckBox.UseVisualStyleBackColor = true;
+			this.highlightDriverIfIncidentThresholdCheckBox.CheckedChanged += new System.EventHandler(this.highlightDriverIfIncidentThresholdCheckBox_CheckedChanged);
 			// 
 			// highlightIncidentThatTriggeredCautionCheckBox
 			// 
@@ -261,6 +333,8 @@ namespace RaceAdmin
 			// highlight4xIncidentsCheckBox
 			// 
 			this.highlight4xIncidentsCheckBox.AutoSize = true;
+			this.highlight4xIncidentsCheckBox.Checked = true;
+			this.highlight4xIncidentsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.highlight4xIncidentsCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
 			this.highlight4xIncidentsCheckBox.Location = new System.Drawing.Point(6, 47);
 			this.highlight4xIncidentsCheckBox.Name = "highlight4xIncidentsCheckBox";
@@ -282,11 +356,43 @@ namespace RaceAdmin
 			this.hideIncidentsCheckBox.UseVisualStyleBackColor = true;
 			this.hideIncidentsCheckBox.CheckedChanged += new System.EventHandler(this.hideIncidentsCheckBox_CheckedChanged);
 			// 
+			// driverIncidentThresholdColorDialog
+			// 
+			this.driverIncidentThresholdColorDialog.AnyColor = true;
+			this.driverIncidentThresholdColorDialog.Color = System.Drawing.Color.White;
+			this.driverIncidentThresholdColorDialog.FullOpen = true;
+			// 
+			// highlight4xIncidentsColorDialog
+			// 
+			this.highlight4xIncidentsColorDialog.AnyColor = true;
+			this.highlight4xIncidentsColorDialog.Color = System.Drawing.Color.IndianRed;
+			this.highlight4xIncidentsColorDialog.FullOpen = true;
+			// 
+			// highlightCautionIncidentColorDialog
+			// 
+			this.highlightCautionIncidentColorDialog.AnyColor = true;
+			this.highlightCautionIncidentColorDialog.Color = System.Drawing.Color.LemonChiffon;
+			this.highlightCautionIncidentColorDialog.FullOpen = true;
+			// 
+			// driverIncidentThresholdNumericSelector
+			// 
+			this.driverIncidentThresholdNumericSelector.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.driverIncidentThresholdNumericSelector.Location = new System.Drawing.Point(88, 130);
+			this.driverIncidentThresholdNumericSelector.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+			this.driverIncidentThresholdNumericSelector.Name = "driverIncidentThresholdNumericSelector";
+			this.driverIncidentThresholdNumericSelector.Size = new System.Drawing.Size(48, 22);
+			this.driverIncidentThresholdNumericSelector.TabIndex = 0;
+			this.driverIncidentThresholdNumericSelector.ValueChanged += new System.EventHandler(this.driverIncidentThresholdNumericSelector_ValueChanged);
+			// 
 			// SettingsDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(644, 327);
+			this.ClientSize = new System.Drawing.Size(765, 327);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -301,11 +407,12 @@ namespace RaceAdmin
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsDialog_FormClosing);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.incidentsRequiredForCaution)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.lastMinutes)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.lastLaps)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.incidentsRequiredForCautionNumericSelector)).EndInit();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.driverIncidentThresholdNumericSelector)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -313,7 +420,7 @@ namespace RaceAdmin
 		#endregion
 
 		public System.Windows.Forms.GroupBox groupBox1;
-		public System.Windows.Forms.NumericUpDown incidentsRequiredForCaution;
+		public System.Windows.Forms.NumericUpDown incidentsRequiredForCautionNumericSelector;
 		public System.Windows.Forms.CheckBox autoThrowCaution;
 		public System.Windows.Forms.NumericUpDown lastMinutes;
 		public System.Windows.Forms.NumericUpDown lastLaps;
@@ -323,12 +430,20 @@ namespace RaceAdmin
 		public System.Windows.Forms.CheckBox useTotalIncidentsForCautionCheckBox;
 		public System.Windows.Forms.CheckBox detectTowForCautionCheckBox;
 		public System.Windows.Forms.CheckBox audioNotification;
-		public System.Windows.Forms.Label label2;
+		public System.Windows.Forms.Label driverIncidentThresholdLabel;
 		public System.Windows.Forms.Label label1;
 		public System.Windows.Forms.Label incidentsRequiredForCautionLabel;
 		public System.Windows.Forms.GroupBox groupBox2;
 		public System.Windows.Forms.CheckBox hideIncidentsCheckBox;
 		public System.Windows.Forms.CheckBox highlightIncidentThatTriggeredCautionCheckBox;
 		public System.Windows.Forms.CheckBox highlight4xIncidentsCheckBox;
+		public System.Windows.Forms.CheckBox highlightDriverIfIncidentThresholdCheckBox;
+		private System.Windows.Forms.ColorDialog driverIncidentThresholdColorDialog;
+		private System.Windows.Forms.Panel driverIncidentThresholdSelectedColorPanel;
+		private System.Windows.Forms.Panel highlightCautionIncidentColorPanel;
+		private System.Windows.Forms.Panel highlight4xIncidentsColorPanel;
+		private System.Windows.Forms.ColorDialog highlight4xIncidentsColorDialog;
+		private System.Windows.Forms.ColorDialog highlightCautionIncidentColorDialog;
+		public System.Windows.Forms.NumericUpDown driverIncidentThresholdNumericSelector;
 	}
 }

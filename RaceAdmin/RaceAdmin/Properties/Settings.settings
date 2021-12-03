@@ -50,5 +50,20 @@
     <Setting Name="highlightIncidentThatTriggeredCaution" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="driverIncidentThresholdSelectedColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">255, 192, 192</Value>
+    </Setting>
+    <Setting Name="highlightDriverIfIncidentThreshold" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="highlightDriverIncidentThreshold" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="highlight4xIncidentsSelectedColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">IndianRed</Value>
+    </Setting>
+    <Setting Name="highlightCautionIncidentSelectedColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">LemonChiffon</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -214,5 +214,65 @@ namespace RaceAdmin.Properties {
                 this["highlightIncidentThatTriggeredCaution"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255, 192, 192")]
+        public global::System.Drawing.Color driverIncidentThresholdSelectedColor {
+            get {
+                return ((global::System.Drawing.Color)(this["driverIncidentThresholdSelectedColor"]));
+            }
+            set {
+                this["driverIncidentThresholdSelectedColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool highlightDriverIfIncidentThreshold {
+            get {
+                return ((bool)(this["highlightDriverIfIncidentThreshold"]));
+            }
+            set {
+                this["highlightDriverIfIncidentThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int highlightDriverIncidentThreshold {
+            get {
+                return ((int)(this["highlightDriverIncidentThreshold"]));
+            }
+            set {
+                this["highlightDriverIncidentThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("IndianRed")]
+        public global::System.Drawing.Color highlight4xIncidentsSelectedColor {
+            get {
+                return ((global::System.Drawing.Color)(this["highlight4xIncidentsSelectedColor"]));
+            }
+            set {
+                this["highlight4xIncidentsSelectedColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LemonChiffon")]
+        public global::System.Drawing.Color highlightCautionIncidentSelectedColor {
+            get {
+                return ((global::System.Drawing.Color)(this["highlightCautionIncidentSelectedColor"]));
+            }
+            set {
+                this["highlightCautionIncidentSelectedColor"] = value;
+            }
+        }
     }
 }
