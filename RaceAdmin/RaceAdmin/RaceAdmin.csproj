@@ -169,6 +169,7 @@
     </Compile>
     <Compile Include="ICautionHandler.cs" />
     <Compile Include="Incident.cs" />
+    <Compile Include="IncidentTableColumnWidths.cs" />
     <Compile Include="ISdkWrapper.cs" />
     <Compile Include="ISoundPlayer.cs" />
     <Compile Include="ITelemetryInfo.cs" />
