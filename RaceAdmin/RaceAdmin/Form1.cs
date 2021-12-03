@@ -76,17 +76,6 @@
         private int incsRequiredForCaution = 0;
 
         /// <summary>
-        /// User setting to highlight 4x incidents or not. Set by user in Settings dialog.
-        /// </summary>
-        private bool highlight4xIncidents;
-
-        /// <summary>
-        /// User setting to highlight the incident that triggered the incident threshold or not.
-        /// Set by user in Settings dialog.
-        /// </summary>
-        private bool highlightIncidentThatTriggeredCaution;
-
-        /// <summary>
         /// The current session number obtained from the live telemetry.
         /// Seems to be a 0-indexed value that can be used to index into the sessions
         /// listed in the SessionInfo.Sessions section of the SessionInfoUpdate YAML.
@@ -183,6 +172,10 @@
         /// </summary>
         private BindingSource debugBindingSource;
 
+        private double timeFrameFilterBegin = 0.0;
+
+        private double timeFrameFilterEnd = 0.0;
+
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
         /// </summary>
@@ -193,6 +186,7 @@
 
 #if !DEBUG
             tabControl.TabPages.Remove(debugTab);
+            addTestRowButton.Visible = false;
 #endif
 
             string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
@@ -203,6 +197,7 @@
             {
                 { "default", new DefaultCautionHandler(this.cautionPanel) }
             };
+            CautionHandlers = cautionHandlers;
 
             // Initialize variables and starting state.
             drivers = new Dictionary<string, Driver>();
@@ -211,10 +206,9 @@
             telemetryPollRate = Properties.Settings.Default.telemetryPollRate;
             telemetryPollRateTextBox.Text = telemetryPollRate.ToString();
             incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
-            highlight4xIncidents = Properties.Settings.Default.highlight4xIncidents;
-            highlightIncidentThatTriggeredCaution = Properties.Settings.Default.highlightIncidentThatTriggeredCaution;
             InitializeIncidentsDataSource();
             InitializeIncidentsGridView();
+            incidentsTimeFilterComboBox.SelectedIndex = 0;
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -967,7 +961,7 @@
             }
 
             DataRow newRow = incidentsDataTable.NewRow();
-            newRow[Properties.Resources.IncidentsTable_LocalTime] = newInc.TimeStamp.ToShortTimeString();
+            newRow[Properties.Resources.IncidentsTable_LocalTime] = newInc.TimeStamp.ToLongTimeString();
             newRow[Properties.Resources.IncidentsTable_SessionTime] = MakeTimeString(newInc.SessionTime);
             newRow[Properties.Resources.IncidentsTable_CarClass] = cars[newInc.CarIdx].CarClassShortName;
             newRow[Properties.Resources.IncidentsTable_CarNumber] = cars[newInc.CarIdx].CarNumber;
@@ -994,10 +988,19 @@
 
             incidentsView.FirstDisplayedScrollingRowIndex = incidentsView.RowCount - 1;
 
+            UpdateVisibleRows();
+
             Console.WriteLine($"{newRow[Properties.Resources.IncidentsTable_IncidentValue]}; driver = {drivers[cars[newInc.CarIdx].CurrentDriver].FullName}");
         }
 
-        private void ApplyIncidentTableColorHighlighting(DataGridViewRow cautionRow)
+        private void UpdateVisibleRows()
+		{
+            int visibleRowCount = incidentsView.Rows.GetRowCount(DataGridViewElementStates.Visible);
+            int totalRowCount = incidentsDataTable.Rows.Count;
+            visibleRowsNum.Text = $"{visibleRowCount} of {totalRowCount}";
+        }
+
+        internal void ApplyIncidentTableColorHighlighting(DataGridViewRow cautionRow)
 		{
             if (InvokeRequired)
             {
@@ -1007,31 +1010,110 @@
 
             try
 			{
-                if (highlight4xIncidents)
+
+                foreach (DataGridViewRow row in incidentsView.Rows)
+                {
+                    if (row.Index % 2 == 0)
+                    {
+                        row.DefaultCellStyle.BackColor = incidentsView.DefaultCellStyle.BackColor;
+                    }
+                    else
+                    {
+                        row.DefaultCellStyle.BackColor = incidentsView.AlternatingRowsDefaultCellStyle.BackColor;
+                    }
+                }
+
+                if (Properties.Settings.Default.highlightDriverIfIncidentThreshold)
+                {
+                    int driverIncidentCount = 0;
+                    foreach (DataGridViewRow row in incidentsView.Rows)
+                    {
+                        if (teamRacing != 0)
+                        {
+                            var splitString = row.Cells[Properties.Resources.IncidentsTable_TotalIncidents].Value.ToString().Split(',');
+                            int.TryParse(splitString.Last(), out driverIncidentCount);
+                        }
+                        else
+                        {
+                            int.TryParse(row.Cells[Properties.Resources.IncidentsTable_TotalIncidents].Value.ToString(), out driverIncidentCount);
+                        }
+
+                        if (driverIncidentCount >= Properties.Settings.Default.highlightDriverIncidentThreshold)
+                        {
+                            row.DefaultCellStyle.BackColor = Properties.Settings.Default.driverIncidentThresholdSelectedColor;
+                        }
+                    }
+                }
+                
+                if (Properties.Settings.Default.highlight4xIncidents)
                 {
                     foreach (DataGridViewRow row in incidentsView.Rows)
                     {
                         if (row.Cells[Properties.Resources.IncidentsTable_IncidentValue].Value.ToString() == "4x")
                         {
-                            row.DefaultCellStyle.BackColor = Color.IndianRed;
+                            row.DefaultCellStyle.BackColor = Properties.Settings.Default.highlight4xIncidentsSelectedColor;
                         }
                     }
                 }
-
-                if (highlightIncidentThatTriggeredCaution)
+                
+                if (Properties.Settings.Default.highlightIncidentThatTriggeredCaution)
                 {
                     if (cautionRow != null)
                     {
-                        cautionRow.DefaultCellStyle.BackColor = Color.LightYellow;
+                        cautionRow.DefaultCellStyle.BackColor = Properties.Settings.Default.highlightCautionIncidentSelectedColor;
                     }
                 }
             }
             catch(DataException ex)
 			{
-                Console.WriteLine($"Data Exception in ApplyIncidentTableColorHighlighting().");
+                Console.WriteLine($"Data Exception in ApplyIncidentTableColorHighlighting():");
+                Console.WriteLine(ex.Message);
                 return;
             }
 		}
+
+        /// <summary>
+        /// Applys filtering to the incidents table based on what the user has set.
+        /// </summary>
+        /// <param name="selectedIndiex">The selected index number of the incidentsTimeFilterComboBox.</param>
+        private void ApplyIncidentsTableTimeFilter(int selectedIndiex)
+		{
+            DateTime filter;
+
+            switch (selectedIndiex)
+			{
+                case 0:
+                    incidentsDataTable.DefaultView.RowFilter = $"";
+                    break;
+
+                case 1:
+                    filter = DateTime.Now.AddMinutes(-30).ToLocalTime();
+                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    break;
+
+                case 2:
+                    filter = DateTime.Now.AddMinutes(-60).ToLocalTime();
+                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    break;
+
+                case 3:
+                    filter = DateTime.Now.AddMinutes(-90).ToLocalTime();
+                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    break;
+
+                case 4:
+                    filter = DateTime.Now.AddMinutes(-120).ToLocalTime();
+                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    break;
+
+                case 5:
+                    filter = DateTime.Now.AddMinutes(-180).ToLocalTime();
+                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    break;
+            }
+
+            UpdateVisibleRows();
+        }
 
         /// <summary>
         /// Takes a session time value from iRacing and returns a formatted time string: hh:mm:ss
@@ -1170,8 +1252,6 @@
         public void SettingsChanged()
         {
             incsRequiredForCaution = Properties.Settings.Default.incidentsRequired;
-            highlight4xIncidents = Properties.Settings.Default.highlight4xIncidents;
-            highlightIncidentThatTriggeredCaution = Properties.Settings.Default.highlightIncidentThatTriggeredCaution;
         }
 
         /// <summary>
@@ -1385,10 +1465,18 @@
             if (viewIncidentTableMenuItem.Checked)
             {
                 incidentsView.Visible = true;
+                incidentsTimeFilterComboBox.Visible = true;
+                incidentsTimeFilterLabel.Visible = true;
+                visibleRowsLabel.Visible = true;
+                visibleRowsNum.Visible = true;
             }
             else
             {
                 incidentsView.Visible = false;
+                incidentsTimeFilterComboBox.Visible = false;
+                incidentsTimeFilterLabel.Visible = false;
+                visibleRowsLabel.Visible = false;
+                visibleRowsNum.Visible = false;
             }
         }
 
@@ -1512,13 +1600,113 @@
             wrapper.Stop();
             Environment.Exit(0);
         }
+
+        /// <summary>
+        /// User changed the time filter value.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
+        private void incidentsTimeFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ApplyIncidentsTableTimeFilter(incidentsTimeFilterComboBox.SelectedIndex);
+            ApplyIncidentTableColorHighlighting(null);
+        }
+
+        private void timeFrameFilterComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            timeFrameFilterErrorText.Visible = false;
+            timeFrameFilterErrorText.Text = "NONE";
+            timeFrameFilterComboBox1.BackColor = Color.White;
+
+            var timeStringSplit = timeFrameFilterComboBox1.SelectedItem.ToString().Split(':');
+
+            if (timeStringSplit.Length != 2)
+            {
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
+                timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+            }
+
+            if (!int.TryParse(timeStringSplit[0], out int hours))
+            {
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
+                timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+            }
+
+            if (!int.TryParse(timeStringSplit[1], out int minutes))
+            {
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
+                timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+            }
+
+            timeFrameFilterBegin = (hours * 3600) + (minutes * 60);
+
+            CalculateTimeFrameDelta();
+        }
+
+		private void timeFrameFilterComboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            timeFrameFilterErrorText.Visible = false;
+            timeFrameFilterErrorText.Text = "NONE";
+            timeFrameFilterComboBox2.BackColor = Color.White;
+
+            var timeStringSplit = timeFrameFilterComboBox2.SelectedItem.ToString().Split(':');
+
+            if(timeStringSplit.Length != 2)
+			{
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
+                timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+            }
+
+            if(!int.TryParse(timeStringSplit[0], out int hours))
+			{
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
+                timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+            }
+
+            if (!int.TryParse(timeStringSplit[1], out int minutes))
+            {
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
+                timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+            }
+
+            timeFrameFilterEnd = (hours * 3600) + (minutes * 60);
+
+            CalculateTimeFrameDelta();
+        }
+
+        private void CalculateTimeFrameDelta()
+		{
+            double timeFrameDelta = timeFrameFilterEnd - timeFrameFilterBegin;
+
+            if(timeFrameDelta <= 0)
+			{
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Negative or zero time frame value";
+                timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+            }
+            else
+			{
+                timeFrameFilterErrorText.Visible = false;
+                timeFrameFilterErrorText.Text = "NONE";
+                timeFrameFilterComboBox1.BackColor = Color.White;
+                timeFrameFilterComboBox2.BackColor = Color.White;
+            }
+		}
+
         #endregion EVENT_HANDLERS
 
         #region PUBLIC_PROPERTIES
         /// <summary>
         /// Gets or sets the cautionHandlers field.
         /// </summary>
-        public Dictionary<string, ICautionHandler> CautionHandlers;
+        public Dictionary<string, ICautionHandler> CautionHandlers { get; set; }
 #endregion PUBLIC_PROPERTIES
 
         // Code in the region below is used to generate test data or to simulate behavior 
@@ -1537,16 +1725,41 @@
         public CautionState CautionState { get => cautionState; }
         public Dictionary<string, Driver> Drivers { get => drivers; }
         private int testCurrentLap = 1;
-        private void Test_AddIncidentRow(object sender, EventArgs e)
+        private int testMinutes = 0;
+        private double testSessionTime = 0.0;
+        private int testCarIdx = 0;
+
+        private void addTestRowButton_Click(object sender, EventArgs e)
+        {
+            PopulateIncidentsToPresent(-12, 7);
+        }
+
+        private void AddTestRow(int addHours, int minuteInterval)
+		{
+            testMinutes += minuteInterval;
+            testSessionTime += minuteInterval * 60.0;
+            DateTime timeStamp = DateTime.Now.AddHours(addHours).AddMinutes(testMinutes);
+            Test_AddIncidentRow(timeStamp, testSessionTime);
+        }
+
+        private void PopulateIncidentsToPresent(int addHours, int minuteInterval)
+		{
+            while(DateTime.Now > DateTime.Now.AddHours(addHours).AddMinutes(testMinutes))
+			{
+                AddTestRow(addHours, minuteInterval);
+            }
+        }
+
+        private void Test_AddIncidentRow(DateTime timeStamp, double sessionTime)
         {
             testCurrentLap = MakeRandomLap();
-
+            testCarIdx++;
             var rng = new Random();
             var newIncidents = (int)Math.Pow(2, rng.Next(3));
 
             Driver driver = new Driver()
             {
-                CarIdx = 0,
+                CarIdx = testCarIdx,
                 FullName = MakeRandomName(),
                 CarNum = MakeRandomCarNumber(),
                 IRating = "",
@@ -1555,10 +1768,40 @@
                 CurrentLap = testCurrentLap
             };
 
-            Incident newInc = new Incident(0.0, DateTime.Now, driver.NewIncs, driver.CarIdx);
+            try
+			{
+                drivers.Add(driver.FullName, driver);
+            }
+            catch(Exception ex)
+			{
+                driver.FullName += testCarIdx.ToString();
+                drivers.Add(driver.FullName, driver);
+            }
+            
+            MakeTestCar(testCarIdx, driver.CarNum, driver.FullName, driver.TeamName, driver.CurrentLap);
+
+            Incident newInc = new Incident(sessionTime, timeStamp, driver.NewIncs, driver.CarIdx);
 
             LogNewIncident(newInc);
+
+            ApplyIncidentTableColorHighlighting(null);
         }
+
+        private void MakeTestCar(int carIdx, string carNum, string driverName, string teamName, int currentLap)
+		{
+            Car car = new Car()
+            {
+                CarIdx = carIdx,
+                CarClassShortName = "GTE",
+                CarNumber = carNum,
+                CurrentDriver = driverName,
+                TeamName = teamName,
+                CurrentLap = currentLap
+            };
+
+            cars.Add(car.CarIdx, car);
+		}
+
         private static string MakeRandomName()
         {
             var rng = new Random();
