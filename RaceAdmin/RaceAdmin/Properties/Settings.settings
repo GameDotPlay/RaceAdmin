@@ -65,5 +65,8 @@
     <Setting Name="highlightCautionIncidentSelectedColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">LemonChiffon</Value>
     </Setting>
+    <Setting Name="driverIncidentThresholdAudioNotification" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
