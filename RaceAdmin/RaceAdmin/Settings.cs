@@ -12,6 +12,9 @@ namespace RaceAdmin
 		{
 			InitializeComponent();
             this.parent = parent;
+#if !DEBUG
+            driverIncidentThresholdAudioToneCheckBox.Visible = false;
+#endif
 
             // Full course yellow settings
             detectTowForCautionCheckBox.Checked = Properties.Settings.Default.detectTowForCaution;
@@ -32,6 +35,7 @@ namespace RaceAdmin
             highlightIncidentThatTriggeredCautionCheckBox_CheckedChanged(null, null);
             highlightDriverIfIncidentThresholdCheckBox_CheckedChanged(null, null);
             driverIncidentThresholdNumericSelector.Value = Properties.Settings.Default.highlightDriverIncidentThreshold;
+            driverIncidentThresholdAudioToneCheckBox.Checked = Properties.Settings.Default.driverIncidentThresholdAudioNotification;
         }
 
         private void DetectTowForCaution_CheckChanged(object sender, System.EventArgs e)
@@ -169,6 +173,7 @@ namespace RaceAdmin
                 driverIncidentThresholdNumericSelector.Enabled = true;
                 driverIncidentThresholdSelectedColorPanel.Enabled = true;
                 driverIncidentThresholdSelectedColorPanel.BackColor = Properties.Settings.Default.driverIncidentThresholdSelectedColor;
+                driverIncidentThresholdAudioToneCheckBox.Enabled = true;
             }
             else
 			{
@@ -176,6 +181,7 @@ namespace RaceAdmin
                 driverIncidentThresholdLabel.Enabled = false;
                 driverIncidentThresholdNumericSelector.Enabled = false;
                 driverIncidentThresholdSelectedColorPanel.Enabled = false;
+                driverIncidentThresholdAudioToneCheckBox.Enabled = false;
             }
 
             Properties.Settings.Default.highlightDriverIfIncidentThreshold = highlightDriverIfIncidentThresholdCheckBox.Checked;
@@ -240,6 +246,12 @@ namespace RaceAdmin
 		private void highlightCautionIncidentColorPanel_MouseUp(object sender, MouseEventArgs e)
 		{
             highlightCautionIncidentColorPanel.BorderStyle = BorderStyle.FixedSingle;
+        }
+
+		private void driverIncidentThresholdAudioToneCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+            Properties.Settings.Default.driverIncidentThresholdAudioNotification = driverIncidentThresholdAudioToneCheckBox.Checked;
+            Properties.Settings.Default.Save();
         }
 	}
 }

@@ -34,6 +34,7 @@ namespace RaceAdmin
 			this.autoThrowCaution = new System.Windows.Forms.CheckBox();
 			this.lastMinutes = new System.Windows.Forms.NumericUpDown();
 			this.lastLaps = new System.Windows.Forms.NumericUpDown();
+			this.incidentsRequiredForCautionNumericSelector = new System.Windows.Forms.NumericUpDown();
 			this.incidentsRequiredForCautionLabel = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
@@ -42,12 +43,12 @@ namespace RaceAdmin
 			this.detectTowForCautionCheckBox = new System.Windows.Forms.CheckBox();
 			this.audioNotification = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.incidentsRequiredForCautionNumericSelector = new System.Windows.Forms.NumericUpDown();
 			this.driverIncidentThresholdLabel = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.highlightCautionIncidentColorPanel = new System.Windows.Forms.Panel();
 			this.highlight4xIncidentsColorPanel = new System.Windows.Forms.Panel();
 			this.driverIncidentThresholdSelectedColorPanel = new System.Windows.Forms.Panel();
+			this.driverIncidentThresholdNumericSelector = new System.Windows.Forms.NumericUpDown();
 			this.highlightDriverIfIncidentThresholdCheckBox = new System.Windows.Forms.CheckBox();
 			this.highlightIncidentThatTriggeredCautionCheckBox = new System.Windows.Forms.CheckBox();
 			this.highlight4xIncidentsCheckBox = new System.Windows.Forms.CheckBox();
@@ -55,7 +56,7 @@ namespace RaceAdmin
 			this.driverIncidentThresholdColorDialog = new System.Windows.Forms.ColorDialog();
 			this.highlight4xIncidentsColorDialog = new System.Windows.Forms.ColorDialog();
 			this.highlightCautionIncidentColorDialog = new System.Windows.Forms.ColorDialog();
-			this.driverIncidentThresholdNumericSelector = new System.Windows.Forms.NumericUpDown();
+			this.driverIncidentThresholdAudioToneCheckBox = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.lastMinutes)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.lastLaps)).BeginInit();
@@ -81,7 +82,7 @@ namespace RaceAdmin
 			this.groupBox1.Font = new System.Drawing.Font("Arial", 9.75F);
 			this.groupBox1.Location = new System.Drawing.Point(422, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(331, 257);
+			this.groupBox1.Size = new System.Drawing.Size(331, 244);
 			this.groupBox1.TabIndex = 8;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Full Course Cautions";
@@ -101,7 +102,7 @@ namespace RaceAdmin
 			// lastMinutes
 			// 
 			this.lastMinutes.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.lastMinutes.Location = new System.Drawing.Point(102, 207);
+			this.lastMinutes.Location = new System.Drawing.Point(91, 208);
 			this.lastMinutes.Maximum = new decimal(new int[] {
             9999,
             0,
@@ -119,7 +120,7 @@ namespace RaceAdmin
 			// 
 			// lastLaps
 			// 
-			this.lastLaps.Location = new System.Drawing.Point(102, 179);
+			this.lastLaps.Location = new System.Drawing.Point(91, 180);
 			this.lastLaps.Maximum = new decimal(new int[] {
             9999,
             0,
@@ -135,6 +136,25 @@ namespace RaceAdmin
             0});
 			this.lastLaps.ValueChanged += new System.EventHandler(this.LastLaps_ValueChanged);
 			// 
+			// incidentsRequiredForCautionNumericSelector
+			// 
+			this.incidentsRequiredForCautionNumericSelector.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.incidentsRequiredForCautionNumericSelector.Location = new System.Drawing.Point(11, 126);
+			this.incidentsRequiredForCautionNumericSelector.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+			this.incidentsRequiredForCautionNumericSelector.Name = "incidentsRequiredForCautionNumericSelector";
+			this.incidentsRequiredForCautionNumericSelector.Size = new System.Drawing.Size(48, 22);
+			this.incidentsRequiredForCautionNumericSelector.TabIndex = 0;
+			this.incidentsRequiredForCautionNumericSelector.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.incidentsRequiredForCautionNumericSelector.ValueChanged += new System.EventHandler(this.IncidentsRequired_ValueChanged);
+			// 
 			// incidentsRequiredForCautionLabel
 			// 
 			this.incidentsRequiredForCautionLabel.Font = new System.Drawing.Font("Arial", 9.75F);
@@ -149,7 +169,7 @@ namespace RaceAdmin
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(156, 209);
+			this.label5.Location = new System.Drawing.Point(145, 210);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(162, 16);
 			this.label5.TabIndex = 10;
@@ -158,7 +178,7 @@ namespace RaceAdmin
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(26, 209);
+			this.label6.Location = new System.Drawing.Point(21, 196);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(70, 16);
 			this.label6.TabIndex = 8;
@@ -167,7 +187,7 @@ namespace RaceAdmin
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(156, 181);
+			this.label3.Location = new System.Drawing.Point(145, 182);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(161, 16);
 			this.label3.TabIndex = 7;
@@ -203,9 +223,9 @@ namespace RaceAdmin
 			this.audioNotification.Font = new System.Drawing.Font("Arial", 9.75F);
 			this.audioNotification.Location = new System.Drawing.Point(11, 99);
 			this.audioNotification.Name = "audioNotification";
-			this.audioNotification.Size = new System.Drawing.Size(151, 20);
+			this.audioNotification.Size = new System.Drawing.Size(126, 20);
 			this.audioNotification.TabIndex = 2;
-			this.audioNotification.Text = "Use audio notification";
+			this.audioNotification.Text = "Audio notification";
 			this.audioNotification.UseVisualStyleBackColor = true;
 			this.audioNotification.CheckedChanged += new System.EventHandler(this.AudioNotification_CheckedChanged);
 			// 
@@ -217,25 +237,6 @@ namespace RaceAdmin
 			this.label1.Size = new System.Drawing.Size(81, 16);
 			this.label1.TabIndex = 4;
 			this.label1.Text = "No cautions:";
-			// 
-			// incidentsRequiredForCautionNumericSelector
-			// 
-			this.incidentsRequiredForCautionNumericSelector.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.incidentsRequiredForCautionNumericSelector.Location = new System.Drawing.Point(234, 126);
-			this.incidentsRequiredForCautionNumericSelector.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-			this.incidentsRequiredForCautionNumericSelector.Name = "incidentsRequiredForCautionNumericSelector";
-			this.incidentsRequiredForCautionNumericSelector.Size = new System.Drawing.Size(48, 22);
-			this.incidentsRequiredForCautionNumericSelector.TabIndex = 0;
-			this.incidentsRequiredForCautionNumericSelector.Value = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-			this.incidentsRequiredForCautionNumericSelector.ValueChanged += new System.EventHandler(this.IncidentsRequired_ValueChanged);
 			// 
 			// driverIncidentThresholdLabel
 			// 
@@ -255,6 +256,7 @@ namespace RaceAdmin
 			this.groupBox2.Controls.Add(this.highlightDriverIfIncidentThresholdCheckBox);
 			this.groupBox2.Controls.Add(this.highlightIncidentThatTriggeredCautionCheckBox);
 			this.groupBox2.Controls.Add(this.highlight4xIncidentsCheckBox);
+			this.groupBox2.Controls.Add(this.driverIncidentThresholdAudioToneCheckBox);
 			this.groupBox2.Controls.Add(this.hideIncidentsCheckBox);
 			this.groupBox2.Controls.Add(this.driverIncidentThresholdLabel);
 			this.groupBox2.Font = new System.Drawing.Font("Arial", 9.75F);
@@ -303,6 +305,20 @@ namespace RaceAdmin
 			this.driverIncidentThresholdSelectedColorPanel.Click += new System.EventHandler(this.driverIncidentThresholdSelectedColorPanel_Click);
 			this.driverIncidentThresholdSelectedColorPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.driverIncidentThresholdSelectedColorPanel_MouseDown);
 			this.driverIncidentThresholdSelectedColorPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.driverIncidentThresholdSelectedColorPanel_MouseUp);
+			// 
+			// driverIncidentThresholdNumericSelector
+			// 
+			this.driverIncidentThresholdNumericSelector.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.driverIncidentThresholdNumericSelector.Location = new System.Drawing.Point(88, 130);
+			this.driverIncidentThresholdNumericSelector.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+			this.driverIncidentThresholdNumericSelector.Name = "driverIncidentThresholdNumericSelector";
+			this.driverIncidentThresholdNumericSelector.Size = new System.Drawing.Size(48, 22);
+			this.driverIncidentThresholdNumericSelector.TabIndex = 0;
+			this.driverIncidentThresholdNumericSelector.ValueChanged += new System.EventHandler(this.driverIncidentThresholdNumericSelector_ValueChanged);
 			// 
 			// highlightDriverIfIncidentThresholdCheckBox
 			// 
@@ -374,19 +390,17 @@ namespace RaceAdmin
 			this.highlightCautionIncidentColorDialog.Color = System.Drawing.Color.LemonChiffon;
 			this.highlightCautionIncidentColorDialog.FullOpen = true;
 			// 
-			// driverIncidentThresholdNumericSelector
+			// driverIncidentThresholdAudioToneCheckBox
 			// 
-			this.driverIncidentThresholdNumericSelector.Font = new System.Drawing.Font("Arial", 9.75F);
-			this.driverIncidentThresholdNumericSelector.Location = new System.Drawing.Point(88, 130);
-			this.driverIncidentThresholdNumericSelector.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-			this.driverIncidentThresholdNumericSelector.Name = "driverIncidentThresholdNumericSelector";
-			this.driverIncidentThresholdNumericSelector.Size = new System.Drawing.Size(48, 22);
-			this.driverIncidentThresholdNumericSelector.TabIndex = 0;
-			this.driverIncidentThresholdNumericSelector.ValueChanged += new System.EventHandler(this.driverIncidentThresholdNumericSelector_ValueChanged);
+			this.driverIncidentThresholdAudioToneCheckBox.AutoSize = true;
+			this.driverIncidentThresholdAudioToneCheckBox.Font = new System.Drawing.Font("Arial", 9.75F);
+			this.driverIncidentThresholdAudioToneCheckBox.Location = new System.Drawing.Point(142, 131);
+			this.driverIncidentThresholdAudioToneCheckBox.Name = "driverIncidentThresholdAudioToneCheckBox";
+			this.driverIncidentThresholdAudioToneCheckBox.Size = new System.Drawing.Size(126, 20);
+			this.driverIncidentThresholdAudioToneCheckBox.TabIndex = 0;
+			this.driverIncidentThresholdAudioToneCheckBox.Text = "Audio notification";
+			this.driverIncidentThresholdAudioToneCheckBox.UseVisualStyleBackColor = true;
+			this.driverIncidentThresholdAudioToneCheckBox.CheckedChanged += new System.EventHandler(this.driverIncidentThresholdAudioToneCheckBox_CheckedChanged);
 			// 
 			// SettingsDialog
 			// 
@@ -445,5 +459,6 @@ namespace RaceAdmin
 		private System.Windows.Forms.ColorDialog highlight4xIncidentsColorDialog;
 		private System.Windows.Forms.ColorDialog highlightCautionIncidentColorDialog;
 		public System.Windows.Forms.NumericUpDown driverIncidentThresholdNumericSelector;
+		public System.Windows.Forms.CheckBox driverIncidentThresholdAudioToneCheckBox;
 	}
 }
