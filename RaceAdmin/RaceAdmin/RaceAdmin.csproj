@@ -23,8 +23,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>2</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>2.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -151,6 +151,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="About.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="About.Designer.cs">
+      <DependentUpon>About.cs</DependentUpon>
+    </Compile>
     <Compile Include="AudioCautionHandler.cs" />
     <Compile Include="Car.cs" />
     <Compile Include="CautionState.cs" />
@@ -195,6 +201,9 @@
     <Compile Include="TelemetryUpdatedEventProxy.cs" />
     <Compile Include="TelemetryValueProxy.cs" />
     <Compile Include="ThrowCautionHandler.cs" />
+    <EmbeddedResource Include="About.resx">
+      <DependentUpon>About.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -245,8 +254,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GreenCheckeredFlags.ico" />
-    <None Include="Resources\ColorPickerIcon.bmp" />
-    <None Include="Resources\ColorPickerIconBW.bmp" />
     <None Include="Resources\ColorPickerIcon.png" />
     <Content Include="Resources\ConeEmpty.bmp" />
     <Content Include="Resources\ConeFull.bmp" />
