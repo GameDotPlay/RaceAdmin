@@ -172,9 +172,9 @@
         /// </summary>
         private BindingSource debugBindingSource;
 
-        private double timeFrameFilterBegin = 0.0;
+        private double? timeFrameFilterBegin = null;
 
-        private double timeFrameFilterEnd = 0.0;
+        private double? timeFrameFilterEnd = null;
 
         /// <summary>
         /// Constructor for RaceAdminMain form. Initialization of WinForm, SdkWrapper, start wrapper object.
@@ -209,6 +209,8 @@
             InitializeIncidentsDataSource();
             InitializeIncidentsGridView();
             incidentsTimeFilterComboBox.SelectedIndex = 0;
+            timeFrameFilterErrorText.Visible = false;
+            timeFrameFilterComboBox1.SelectedIndex = 0;
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -248,6 +250,8 @@
             incidentsView.DataSource = incidentsBindingSource;
             incidentsView.SetDoubleBuffered();
 
+            incidentsView.Columns[Properties.Resources.IncidentsTable_HiddenTimeStamp].Visible = false;
+
             incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].HeaderText = "Local Time";
             incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].Width = (int)IncidentTableColumnWidths.LocalTimeColumnWidth;
             incidentsView.DisableFilterChecklist(incidentsView.Columns["localTime"]);
@@ -284,6 +288,10 @@
 
         private void InitializeIncidentsDataTableColumns(DataColumnCollection columns)
 		{
+            DataColumn hiddenTimeStampColumn = new DataColumn("hiddenTimeStamp", Type.GetType("System.DateTime"));
+            hiddenTimeStampColumn.ReadOnly = true;
+            columns.Add(hiddenTimeStampColumn);
+
             DataColumn localTimeColumn = new DataColumn("localTime", Type.GetType("System.String"));
             localTimeColumn.ReadOnly = true;
             columns.Add(localTimeColumn);
@@ -961,6 +969,7 @@
             }
 
             DataRow newRow = incidentsDataTable.NewRow();
+            newRow[Properties.Resources.IncidentsTable_HiddenTimeStamp] = newInc.TimeStamp;
             newRow[Properties.Resources.IncidentsTable_LocalTime] = newInc.TimeStamp.ToLongTimeString();
             newRow[Properties.Resources.IncidentsTable_SessionTime] = MakeTimeString(newInc.SessionTime);
             newRow[Properties.Resources.IncidentsTable_CarClass] = cars[newInc.CarIdx].CarClassShortName;
@@ -986,9 +995,13 @@
 
             incidentsDataTable.Rows.Add(newRow);
 
-            incidentsView.FirstDisplayedScrollingRowIndex = incidentsView.RowCount - 1;
-
+            if(incidentsView.RowCount > 0)
+			{
+                incidentsView.FirstDisplayedScrollingRowIndex = incidentsView.RowCount - 1;
+            }
+            
             UpdateVisibleRows();
+            UpdateVisibleIncidents();
 
             Console.WriteLine($"{newRow[Properties.Resources.IncidentsTable_IncidentValue]}; driver = {drivers[cars[newInc.CarIdx].CurrentDriver].FullName}");
         }
@@ -998,6 +1011,20 @@
             int visibleRowCount = incidentsView.Rows.GetRowCount(DataGridViewElementStates.Visible);
             int totalRowCount = incidentsDataTable.Rows.Count;
             visibleRowsNum.Text = $"{visibleRowCount} of {totalRowCount}";
+        }
+
+        private void UpdateVisibleIncidents()
+		{
+            int visibleIncidentCount = 0;
+            int visibleRowCount = incidentsView.Rows.GetRowCount(DataGridViewElementStates.Visible);
+
+            for (int i = 0; i < visibleRowCount; i++)
+			{
+                int.TryParse(incidentsView.Rows[i].Cells["incidentValue"].Value.ToString().TrimEnd('x'), out int incidentValue);
+                visibleIncidentCount += incidentValue;
+			}
+
+            visibleIncidentsNum.Text = $"{visibleIncidentCount} of {totalIncCount}";
         }
 
         internal void ApplyIncidentTableColorHighlighting(DataGridViewRow cautionRow)
@@ -1076,11 +1103,11 @@
         /// Applys filtering to the incidents table based on what the user has set.
         /// </summary>
         /// <param name="selectedIndiex">The selected index number of the incidentsTimeFilterComboBox.</param>
-        private void ApplyIncidentsTableTimeFilter(int selectedIndiex)
+        private void ApplyIncidentsTableTimeFilter(int selectedIndex)
 		{
             DateTime filter;
 
-            switch (selectedIndiex)
+            switch (selectedIndex)
 			{
                 case 0:
                     incidentsDataTable.DefaultView.RowFilter = $"";
@@ -1088,31 +1115,73 @@
 
                 case 1:
                     filter = DateTime.Now.AddMinutes(-30).ToLocalTime();
-                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    incidentsDataTable.DefaultView.RowFilter = $"hiddenTimeStamp >= #{filter}#";
                     break;
 
                 case 2:
                     filter = DateTime.Now.AddMinutes(-60).ToLocalTime();
-                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    incidentsDataTable.DefaultView.RowFilter = $"hiddenTimeStamp >= #{filter}#";
                     break;
 
                 case 3:
                     filter = DateTime.Now.AddMinutes(-90).ToLocalTime();
-                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    incidentsDataTable.DefaultView.RowFilter = $"hiddenTimeStamp >= #{filter}#";
                     break;
 
                 case 4:
                     filter = DateTime.Now.AddMinutes(-120).ToLocalTime();
-                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    incidentsDataTable.DefaultView.RowFilter = $"hiddenTimeStamp >= #{filter}#";
                     break;
 
                 case 5:
                     filter = DateTime.Now.AddMinutes(-180).ToLocalTime();
-                    incidentsDataTable.DefaultView.RowFilter = $"localTime >= #{filter}#";
+                    incidentsDataTable.DefaultView.RowFilter = $"hiddenTimeStamp >= #{filter}#";
                     break;
             }
 
             UpdateVisibleRows();
+            UpdateVisibleIncidents();
+        }
+
+        private void ApplyTimeFrameFilter()
+        {
+            if(timeFrameFilterBegin == null || timeFrameFilterEnd == null)
+			{
+                incidentsDataTable.DefaultView.RowFilter = $"";
+                ApplyIncidentsTableTimeFilter(incidentsTimeFilterComboBox.SelectedIndex);
+                ApplyIncidentTableColorHighlighting(null);
+                return;
+			}
+
+            string filterBegin = MakeTimeString((double)timeFrameFilterBegin);
+            string filterEnd = MakeTimeString((double)timeFrameFilterEnd);
+            incidentsDataTable.DefaultView.RowFilter = $"sessionTime >= #{filterBegin}# AND sessionTime <= #{filterEnd}#";
+
+            ApplyIncidentTableColorHighlighting(null);
+            UpdateVisibleRows();
+            UpdateVisibleIncidents();
+        }
+
+        private void CalculateTimeFrameDelta()
+        {
+            double? timeFrameDelta = timeFrameFilterEnd - timeFrameFilterBegin;
+
+            if (timeFrameDelta <= 0)
+            {
+                timeFrameFilterErrorText.Visible = true;
+                timeFrameFilterErrorText.Text = "Negative or zero time frame value";
+                timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+            }
+            else
+            {
+                timeFrameFilterErrorText.Visible = false;
+                timeFrameFilterErrorText.Text = "NONE";
+                timeFrameFilterComboBox1.BackColor = Color.White;
+                timeFrameFilterComboBox2.BackColor = Color.White;
+            }
+
+            ApplyTimeFrameFilter();
         }
 
         /// <summary>
@@ -1608,6 +1677,7 @@
         /// <param name="e">Event args.</param>
         private void incidentsTimeFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            timeFrameFilterComboBox1.SelectedIndex = 0;
             ApplyIncidentsTableTimeFilter(incidentsTimeFilterComboBox.SelectedIndex);
             ApplyIncidentTableColorHighlighting(null);
         }
@@ -1618,32 +1688,53 @@
             timeFrameFilterErrorText.Text = "NONE";
             timeFrameFilterComboBox1.BackColor = Color.White;
 
-            var timeStringSplit = timeFrameFilterComboBox1.SelectedItem.ToString().Split(':');
+            if(timeFrameFilterComboBox1.SelectedIndex == 0)
+			{
+                timeFrameFilterBegin = null;
+                timeFrameFilterComboBox2.SelectedIndex = 0;
+                ApplyTimeFrameFilter();
+                return;
+			}
+
+            string[] timeStringSplit = timeFrameFilterComboBox1.SelectedItem.ToString().Split(':');
 
             if (timeStringSplit.Length != 2)
             {
+                timeFrameFilterErrorText.Text = "Error while parsing value";
                 timeFrameFilterErrorText.Visible = true;
-                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
                 timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox1.SelectedIndex = 0;
+                timeFrameFilterBegin = null;
+                return;
             }
 
             if (!int.TryParse(timeStringSplit[0], out int hours))
             {
+                timeFrameFilterErrorText.Text = "Error while parsing value";
                 timeFrameFilterErrorText.Visible = true;
-                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
                 timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox1.SelectedIndex = 0;
+                timeFrameFilterBegin = null;
+                return;
             }
 
             if (!int.TryParse(timeStringSplit[1], out int minutes))
             {
+                timeFrameFilterErrorText.Text = "Error while parsing value";
                 timeFrameFilterErrorText.Visible = true;
-                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
                 timeFrameFilterComboBox1.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox1.SelectedIndex = 0;
+                timeFrameFilterBegin = null;
+                return;
             }
 
             timeFrameFilterBegin = (hours * 3600) + (minutes * 60);
 
-            CalculateTimeFrameDelta();
+            if (timeFrameFilterEnd != null && timeFrameFilterBegin != null)
+            {
+                incidentsTimeFilterComboBox.SelectedIndex = 0;
+                CalculateTimeFrameDelta();
+            }
         }
 
 		private void timeFrameFilterComboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -1652,54 +1743,54 @@
             timeFrameFilterErrorText.Text = "NONE";
             timeFrameFilterComboBox2.BackColor = Color.White;
 
-            var timeStringSplit = timeFrameFilterComboBox2.SelectedItem.ToString().Split(':');
+            if(timeFrameFilterComboBox2.SelectedIndex == 0)
+			{
+                timeFrameFilterEnd = null;
+                timeFrameFilterComboBox1.SelectedIndex = 0;
+                ApplyTimeFrameFilter();
+                return;
+            }
+
+            string[] timeStringSplit = timeFrameFilterComboBox2.SelectedItem.ToString().Split(':');
 
             if(timeStringSplit.Length != 2)
 			{
+                timeFrameFilterErrorText.Text = "Error while parsing value";
                 timeFrameFilterErrorText.Visible = true;
-                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
                 timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox2.SelectedIndex = 0;
+                timeFrameFilterEnd = null;
+                return;
             }
 
             if(!int.TryParse(timeStringSplit[0], out int hours))
 			{
+                timeFrameFilterErrorText.Text = "Error while parsing value";
                 timeFrameFilterErrorText.Visible = true;
-                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
                 timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox2.SelectedIndex = 0;
+                timeFrameFilterEnd = null;
+                return;
             }
 
             if (!int.TryParse(timeStringSplit[1], out int minutes))
             {
+                timeFrameFilterErrorText.Text = "Error while parsing value";
                 timeFrameFilterErrorText.Visible = true;
-                timeFrameFilterErrorText.Text = "Invalid entry. Usage: HH:MM";
                 timeFrameFilterComboBox2.BackColor = Color.MistyRose;
+                timeFrameFilterComboBox2.SelectedIndex = 0;
+                timeFrameFilterEnd = null;
+                return;
             }
 
             timeFrameFilterEnd = (hours * 3600) + (minutes * 60);
 
-            CalculateTimeFrameDelta();
+            if (timeFrameFilterEnd != null && timeFrameFilterBegin != null)
+			{
+                incidentsTimeFilterComboBox.SelectedIndex = 0;
+                CalculateTimeFrameDelta();
+            }
         }
-
-        private void CalculateTimeFrameDelta()
-		{
-            double timeFrameDelta = timeFrameFilterEnd - timeFrameFilterBegin;
-
-            if(timeFrameDelta <= 0)
-			{
-                timeFrameFilterErrorText.Visible = true;
-                timeFrameFilterErrorText.Text = "Negative or zero time frame value";
-                timeFrameFilterComboBox1.BackColor = Color.MistyRose;
-                timeFrameFilterComboBox2.BackColor = Color.MistyRose;
-            }
-            else
-			{
-                timeFrameFilterErrorText.Visible = false;
-                timeFrameFilterErrorText.Text = "NONE";
-                timeFrameFilterComboBox1.BackColor = Color.White;
-                timeFrameFilterComboBox2.BackColor = Color.White;
-            }
-		}
-
         #endregion EVENT_HANDLERS
 
         #region PUBLIC_PROPERTIES
@@ -1728,26 +1819,35 @@
         private int testMinutes = 0;
         private double testSessionTime = 0.0;
         private int testCarIdx = 0;
+        private string[] testCarClasses =
+        {
+            "LMP1",
+            "LMP2",
+            "GTEPro",
+            "GTEAm",
+        };
 
         private void addTestRowButton_Click(object sender, EventArgs e)
         {
-            PopulateIncidentsToPresent(-12, 7);
-        }
-
-        private void AddTestRow(int addHours, int minuteInterval)
-		{
-            testMinutes += minuteInterval;
-            testSessionTime += minuteInterval * 60.0;
-            DateTime timeStamp = DateTime.Now.AddHours(addHours).AddMinutes(testMinutes);
-            Test_AddIncidentRow(timeStamp, testSessionTime);
+            // If you give a -1 as the second parameter then random minute intervals will be used.
+            // Else give the number of minutes between incidents.
+            PopulateIncidentsToPresent(-24, -1);
         }
 
         private void PopulateIncidentsToPresent(int addHours, int minuteInterval)
 		{
-            while(DateTime.Now > DateTime.Now.AddHours(addHours).AddMinutes(testMinutes))
-			{
-                AddTestRow(addHours, minuteInterval);
-            }
+            var rng = new Random();
+            DateTime timeStamp;
+
+            do
+            {
+                int interval = minuteInterval > 0 ? minuteInterval : rng.Next(1, 16);
+                testMinutes += interval;
+                testSessionTime += interval * 60.0;
+                timeStamp = DateTime.Now.AddHours(addHours).AddMinutes(testMinutes);
+                Test_AddIncidentRow(timeStamp, testSessionTime);
+
+            } while (DateTime.Now > timeStamp);
         }
 
         private void Test_AddIncidentRow(DateTime timeStamp, double sessionTime)
@@ -1762,7 +1862,7 @@
                 CarIdx = testCarIdx,
                 FullName = MakeRandomName(),
                 CarNum = MakeRandomCarNumber(),
-                IRating = "",
+                IRating = rng.Next(500, 4501).ToString(),
                 OldIncs = 0,
                 NewIncs = newIncidents,
                 CurrentLap = testCurrentLap
@@ -1781,7 +1881,7 @@
             MakeTestCar(testCarIdx, driver.CarNum, driver.FullName, driver.TeamName, driver.CurrentLap);
 
             Incident newInc = new Incident(sessionTime, timeStamp, driver.NewIncs, driver.CarIdx);
-
+            totalIncCount += newIncidents;
             LogNewIncident(newInc);
 
             ApplyIncidentTableColorHighlighting(null);
@@ -1789,10 +1889,11 @@
 
         private void MakeTestCar(int carIdx, string carNum, string driverName, string teamName, int currentLap)
 		{
+            var rng = new Random();
             Car car = new Car()
             {
                 CarIdx = carIdx,
-                CarClassShortName = "GTE",
+                CarClassShortName = testCarClasses[rng.Next(4)],
                 CarNumber = carNum,
                 CurrentDriver = driverName,
                 TeamName = teamName,
