@@ -18,6 +18,8 @@
 
     public partial class RaceAdminMain : Form
     {
+        About aboutForm;
+
         /// <summary>
         /// Default session number. 1.
         /// </summary>
@@ -189,9 +191,6 @@
             addTestRowButton.Visible = false;
 #endif
 
-            string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
-            this.versionLabel.Text = String.Format("v{0}", version);
-
             this.wrapper = wrapper;
             cautionHandlers = new Dictionary<string, ICautionHandler>
             {
@@ -211,6 +210,10 @@
             incidentsTimeFilterComboBox.SelectedIndex = 0;
             timeFrameFilterErrorText.Visible = false;
             timeFrameFilterComboBox1.SelectedIndex = 0;
+            aboutForm = new About(this);
+
+            string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
+            aboutForm.versionLabel.Text = String.Format("v{0}", version);
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -1438,6 +1441,12 @@
         /// <param name="e">Event args.</param>
         private void ExportButton_Click(object sender, EventArgs e)
         {
+            if(incidentsView.RowCount == 0)
+			{
+                MessageBox.Show("Nothing to Export!", "Empty table");
+                return;
+			}
+
             Thread t = new Thread((ThreadStart)(() =>
             {
                 var saveFileDialog = new SaveFileDialog
@@ -1790,6 +1799,13 @@
                 incidentsTimeFilterComboBox.SelectedIndex = 0;
                 CalculateTimeFrameDelta();
             }
+        }
+
+        private void aboutRaceAdministratorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            aboutForm.StartPosition = FormStartPosition.CenterScreen;
+            aboutForm.Show();
+            
         }
         #endregion EVENT_HANDLERS
 
