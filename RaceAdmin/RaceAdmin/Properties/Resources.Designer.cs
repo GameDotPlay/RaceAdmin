@@ -146,6 +146,15 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to hiddenTimeStamp.
+        /// </summary>
+        internal static string IncidentsTable_HiddenTimeStamp {
+            get {
+                return ResourceManager.GetString("IncidentsTable_HiddenTimeStamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to incidentValue.
         /// </summary>
         internal static string IncidentsTable_IncidentValue {
