@@ -15,7 +15,6 @@
 		public string TeamID { get; set; }
 		public int TeamIncidentCount { get; set; }
 		public string CarNumber { get; set; }
-		public string CarClassID { get; set; }
 		public string CarScreenName { get; set; }
 		public string CarClassShortName { get; set; }
 		
@@ -37,7 +36,6 @@
 				   $"Team ID: {TeamID}{Environment.NewLine}" +
 				   $"Team Incident Count: {TeamIncidentCount}{Environment.NewLine}" +
 				   $"Car Number: {CarNumber}{Environment.NewLine}" +
-				   $"Car Class ID: {CarClassID}{Environment.NewLine}" +
 				   $"Car Class: {CarClassShortName}{Environment.NewLine}" +
 
 				   $"Live variables: {Environment.NewLine}" +
