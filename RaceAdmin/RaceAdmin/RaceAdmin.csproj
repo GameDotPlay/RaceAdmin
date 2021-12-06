@@ -162,6 +162,7 @@
     <Compile Include="CautionState.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DateUtil.cs" />
+    <Compile Include="DebugTableColumnWidths.cs" />
     <Compile Include="DefaultCautionHandler.cs" />
     <Compile Include="Driver.cs" />
     <Compile Include="FakeTelemetryInfo.cs" />
