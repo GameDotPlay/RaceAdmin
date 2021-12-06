@@ -101,6 +101,114 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to carBetweenPitCones.
+        /// </summary>
+        internal static string DebugTable_CarBetweenPitCones {
+            get {
+                return ResourceManager.GetString("DebugTable_CarBetweenPitCones", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carClassPosition.
+        /// </summary>
+        internal static string DebugTable_CarClassPosition {
+            get {
+                return ResourceManager.GetString("DebugTable_CarClassPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carClassShortName.
+        /// </summary>
+        internal static string DebugTable_CarClassShortName {
+            get {
+                return ResourceManager.GetString("DebugTable_CarClassShortName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carCurrentLap.
+        /// </summary>
+        internal static string DebugTable_CarCurrentLap {
+            get {
+                return ResourceManager.GetString("DebugTable_CarCurrentLap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carIdx.
+        /// </summary>
+        internal static string DebugTable_CarIdx {
+            get {
+                return ResourceManager.GetString("DebugTable_CarIdx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carLapsCompleted.
+        /// </summary>
+        internal static string DebugTable_CarLapsCompleted {
+            get {
+                return ResourceManager.GetString("DebugTable_CarLapsCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carNumber.
+        /// </summary>
+        internal static string DebugTable_CarNumber {
+            get {
+                return ResourceManager.GetString("DebugTable_CarNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carOverallPosition.
+        /// </summary>
+        internal static string DebugTable_CarOverallPosition {
+            get {
+                return ResourceManager.GetString("DebugTable_CarOverallPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carPercentAroundTrack.
+        /// </summary>
+        internal static string DebugTable_CarPercentAroundTrack {
+            get {
+                return ResourceManager.GetString("DebugTable_CarPercentAroundTrack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carTrackSurface.
+        /// </summary>
+        internal static string DebugTable_CarTrackSurface {
+            get {
+                return ResourceManager.GetString("DebugTable_CarTrackSurface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carTrackSurfaceMatrerial.
+        /// </summary>
+        internal static string DebugTable_CarTrackSurfaceMaterial {
+            get {
+                return ResourceManager.GetString("DebugTable_CarTrackSurfaceMaterial", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to driverName.
+        /// </summary>
+        internal static string DebugTable_DriverName {
+            get {
+                return ResourceManager.GetString("DebugTable_DriverName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A valid number was not entered..
         /// </summary>
         internal static string ErrorMessage_ValidNumberNotEntered {
