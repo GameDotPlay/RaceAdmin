@@ -2,7 +2,6 @@
 A tool for tracking iRacing incidents and recommending/throwing full course cautions.
 
 ## Quick Hints
-* Any of the numeric input fields can be set to zero to completely disable the related functionality.
 * You must be a session admin in order for this tool to function as intended since incidents for all
 cars are only reported at the end of a race to non-admins.
 
@@ -10,20 +9,49 @@ cars are only reported at the end of a race to non-admins.
 
 ![race admin screenshot](/images/race-admin.png)
 
-### Session/Caution Indicator Panel
+### 1. Main menu strip
+This area allows access to the export table functionality, the settings page, and turning on/off various components of the UI.
+
+### 2. Session/Caution Indicator Panel
 This panel displays the name of the current session and will flash yellow when the caution conditions
 have been met. Once the caution flag has been thrown in will remain solid yellow until the race resumes
 under green flag conditions.
+This panel also contains the total incident count and number of incidents since last caution count. See #3.
 
-### Incident Table
-Displays any incidents reported by iRacing.
-* Time - the time the incident occurred referenced from the beginning of the current session
-* Car # - the number of the car incurring the incident
-* Team - (team races only) the name of the team incurring the incident
-* Driver - the name of the driver incurring the incident
-* Inc. - the type of incident incurred: 1x, 2x, 4x generally (see below)
-* Total - the total number of incidents incurred by the car/driver (more below)
-* Car Lap # - the lap the car was on when the incident occurred
+### 3. Total Incident Count
+The total incidents count tracks the total number of incidents reported during the current session.
+This will get reset to 0 when iRacing moves to the next "session". From practice to qualifying, for example.
+
+### 4. Since Last Caution Count.
+The number of incidents since last caution tracks the number of incidents reported since the last full course caution.
+This number will be reset to 0 in the case of a full course caution being thrown and then returned back to green flag racing.
+
+### 5. Filter Incidents Based on Last X Minutes
+This drop down allows to to only see incidents that have occurred over the past X minutes of this session. Set to Forever for no filtering.
+
+### 6. Time Frame Filtering
+These drop downs allow you to only see incidents that occurred between a set period of time in the session.
+The time periods are shown in session time. HH:MM
+Set the first drop down to the beginning of the time period. Set the second drop down as the end of the time period.
+Ex: 2:00 - 7:00 will only show incidents that occurreded between 2:00 and 7:00 of session time (the second column) of the incidents table.
+
+### 7. Visible Rows	
+This text informs you of how many rows of the incident table are currently visible due to current filtering settings out of the total number of rows in the table.
+
+### 8. Visible Incidents
+This text informs you of how many incident points are currently visible in the incident table due to current filtering settings out of the total number of incident points.
+
+### 9. Incident Table
+Displays incidents incurred by drivers as one row per incident.
+* Local Time - The local time of day on your computer that the incident occurred.
+* Session Time - The time the incident occurred referenced from the beginning of the current session.
+* Car Class - (Multiclass only) The class of car that the driver is participating in.
+* Car # - The number of the car incurring the incident.
+* Team - (Team racing only) The name of the team incurring the incident.
+* Driver Name - The name of the driver incurring the incident.
+* Incident - The value of the new incident incurred: 1x, 2x, 4x generally. (see below)
+* Total - The total number of incidents incurred by the car/driver. (see below)
+* Lap # - The lap the car was on when the incident occurred.
 
 Note that due to the way incidents are reported by iRacing, incidents promoted from a 1x to
 a 2x or 4x may be reported as two separate 1x incidents or a 1x and a 3x. This may be addressed
@@ -36,12 +64,6 @@ column would contain "4,2".
 
 ### Export
 Allows the incidents to be exported to a CSV file.
-
-### Total Incidents
-Tracks the total number of incidents reported during the current session.
-
-### Since Last Caution
-Tracks the number of incidents reported since the last full course caution.
 
 ### Full Course Cautions
 Options for controlling how the app determines when a full course caution should be thrown and
