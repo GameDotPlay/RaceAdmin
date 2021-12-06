@@ -190,6 +190,10 @@
             tabControl.TabPages.Remove(debugTab);
             addTestRowButton.Visible = false;
 #endif
+#if DEBUG
+            InitializeDebugDataSource();
+            InitializeDebugGridView();
+#endif
 
             this.wrapper = wrapper;
             cautionHandlers = new Dictionary<string, ICautionHandler>
@@ -244,8 +248,97 @@
 
         private void InitializeDebugDataTableColumns(DataColumnCollection columns)
 		{
+            DataColumn carIdxColumn = new DataColumn(Properties.Resources.DebugTable_CarIdx, Type.GetType("System.String"));
+            carIdxColumn.ReadOnly = true;
+            columns.Add(carIdxColumn);
 
-		}
+            DataColumn carNumberColumn = new DataColumn(Properties.Resources.DebugTable_CarNumber, Type.GetType("System.String"));
+            carNumberColumn.ReadOnly = true;
+            columns.Add(carNumberColumn);
+
+            DataColumn carOverallPositionColumn = new DataColumn(Properties.Resources.DebugTable_CarOverallPosition, Type.GetType("System.String"));
+            carOverallPositionColumn.ReadOnly = true;
+            columns.Add(carOverallPositionColumn);
+
+            DataColumn carClassPositionColumn = new DataColumn(Properties.Resources.DebugTable_CarClassPosition, Type.GetType("System.String"));
+            carClassPositionColumn.ReadOnly = true;
+            columns.Add(carClassPositionColumn);
+
+            DataColumn carClassShortNameColumn = new DataColumn(Properties.Resources.DebugTable_CarClassShortName, Type.GetType("System.String"));
+            carClassShortNameColumn.ReadOnly = true;
+            columns.Add(carClassShortNameColumn);
+
+            DataColumn driverNameColumn = new DataColumn(Properties.Resources.DebugTable_DriverName, Type.GetType("System.String"));
+            driverNameColumn.ReadOnly = true;
+            columns.Add(driverNameColumn);
+
+            DataColumn carPercentAroudTrackColumn = new DataColumn(Properties.Resources.DebugTable_CarPercentAroundTrack, Type.GetType("System.String"));
+            carPercentAroudTrackColumn.ReadOnly = true;
+            columns.Add(carPercentAroudTrackColumn);
+
+            DataColumn carBetweenPitConesColumn = new DataColumn(Properties.Resources.DebugTable_CarBetweenPitCones, Type.GetType("System.String"));
+            carBetweenPitConesColumn.ReadOnly = true;
+            columns.Add(carBetweenPitConesColumn);
+
+            DataColumn carCurrentLapColumn = new DataColumn(Properties.Resources.DebugTable_CarCurrentLap, Type.GetType("System.String"));
+            carCurrentLapColumn.ReadOnly = true;
+            columns.Add(carCurrentLapColumn);
+
+            DataColumn carLapsCompletedColumn = new DataColumn(Properties.Resources.DebugTable_CarLapsCompleted, Type.GetType("System.String"));
+            carLapsCompletedColumn.ReadOnly = true;
+            columns.Add(carLapsCompletedColumn);
+
+            DataColumn carTrackSurfaceColumn = new DataColumn(Properties.Resources.DebugTable_CarTrackSurface, Type.GetType("System.String"));
+            carTrackSurfaceColumn.ReadOnly = true;
+            columns.Add(carTrackSurfaceColumn);
+
+            DataColumn carTrackSurfaceMaterialColumn = new DataColumn(Properties.Resources.DebugTable_CarTrackSurfaceMaterial, Type.GetType("System.String"));
+            carTrackSurfaceMaterialColumn.ReadOnly = true;
+            columns.Add(carTrackSurfaceMaterialColumn);
+        }
+
+        private void InitializeDebugGridView()
+		{
+            debugTable.AutoGenerateColumns = true;
+            debugTable.DataSource = debugBindingSource;
+            debugTable.SetDoubleBuffered();
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarIdx].HeaderText = "CarIdx";
+            debugTable.Columns[Properties.Resources.DebugTable_CarIdx].Width = (int)DebugTableColumnWidths.CarIdxColumnWidth;
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarNumber].HeaderText = "Car #";
+            debugTable.Columns[Properties.Resources.DebugTable_CarNumber].Width = (int)DebugTableColumnWidths.CarNumberColumnWidth;
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarOverallPosition].Width = (int)DebugTableColumnWidths.CarOverallPositionColumnWidth;
+            debugTable.Columns[Properties.Resources.DebugTable_CarOverallPosition].HeaderText = "Position";
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarClassPosition].Width = (int)DebugTableColumnWidths.CarClassPositionColumnWidth;
+            debugTable.Columns[Properties.Resources.DebugTable_CarClassPosition].HeaderText = "Class Position";
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarClassShortName].Width = (int)DebugTableColumnWidths.CarClassShortNameColumnWidth;
+            debugTable.Columns[Properties.Resources.DebugTable_CarClassShortName].HeaderText = "Class";
+
+            debugTable.Columns[Properties.Resources.DebugTable_DriverName].HeaderText = "Driver Name";
+            debugTable.Columns[Properties.Resources.DebugTable_DriverName].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarPercentAroundTrack].Width = (int)DebugTableColumnWidths.CarPercentAroundTrackColumnWidth;
+            debugTable.Columns[Properties.Resources.DebugTable_CarPercentAroundTrack].HeaderText = "% Around Track";
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarBetweenPitCones].Width = (int)DebugTableColumnWidths.CarBetweenPitConesColumnWidth;
+            debugTable.Columns[Properties.Resources.DebugTable_CarBetweenPitCones].HeaderText = "Pit Cones";
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarCurrentLap].Width = (int)DebugTableColumnWidths.CarCurrentLapColumnWidth;
+            debugTable.Columns[Properties.Resources.DebugTable_CarCurrentLap].HeaderText = "Current Lap";
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarLapsCompleted].Width = (int)DebugTableColumnWidths.CarLapsCompletedColumnWidth;
+            debugTable.Columns[Properties.Resources.DebugTable_CarLapsCompleted].HeaderText = "Laps Completed";
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarTrackSurface].HeaderText = "Track Surface";
+            debugTable.Columns[Properties.Resources.DebugTable_CarTrackSurface].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            debugTable.Columns[Properties.Resources.DebugTable_CarTrackSurfaceMaterial].HeaderText = "Surface Material";
+            debugTable.Columns[Properties.Resources.DebugTable_CarTrackSurfaceMaterial].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        }
 
         private void InitializeIncidentsGridView()
 		{
@@ -257,13 +350,13 @@
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].HeaderText = "Local Time";
             incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime].Width = (int)IncidentTableColumnWidths.LocalTimeColumnWidth;
-            incidentsView.DisableFilterChecklist(incidentsView.Columns["localTime"]);
-            incidentsView.DisableFilterCustom(incidentsView.Columns["localTime"]);
+            incidentsView.DisableFilterChecklist(incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime]);
+            incidentsView.DisableFilterCustom(incidentsView.Columns[Properties.Resources.IncidentsTable_LocalTime]);
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime].HeaderText = "Session Time";
             incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime].Width = (int)IncidentTableColumnWidths.SessionTimeColumnWidth;
-            incidentsView.DisableFilterChecklist(incidentsView.Columns["sessionTime"]);
-            incidentsView.DisableFilterCustom(incidentsView.Columns["sessionTime"]);
+            incidentsView.DisableFilterChecklist(incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime]);
+            incidentsView.DisableFilterCustom(incidentsView.Columns[Properties.Resources.IncidentsTable_SessionTime]);
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].Width = (int)IncidentTableColumnWidths.CarClassColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].HeaderText = "Car Class";
@@ -282,8 +375,8 @@
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents].Width = (int)IncidentTableColumnWidths.TotalIncidentsColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents].HeaderText = "Total";
-            incidentsView.DisableFilterChecklist(incidentsView.Columns["totalIncidents"]);
-            incidentsView.DisableFilterCustom(incidentsView.Columns["totalIncidents"]);
+            incidentsView.DisableFilterChecklist(incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents]);
+            incidentsView.DisableFilterCustom(incidentsView.Columns[Properties.Resources.IncidentsTable_TotalIncidents]);
 
             incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].Width = (int)IncidentTableColumnWidths.DriverLapNumberColumnWidth;
             incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].HeaderText = "Lap #";
@@ -291,43 +384,43 @@
 
         private void InitializeIncidentsDataTableColumns(DataColumnCollection columns)
 		{
-            DataColumn hiddenTimeStampColumn = new DataColumn("hiddenTimeStamp", Type.GetType("System.DateTime"));
+            DataColumn hiddenTimeStampColumn = new DataColumn(Properties.Resources.IncidentsTable_HiddenTimeStamp, Type.GetType("System.DateTime"));
             hiddenTimeStampColumn.ReadOnly = true;
             columns.Add(hiddenTimeStampColumn);
 
-            DataColumn localTimeColumn = new DataColumn("localTime", Type.GetType("System.String"));
+            DataColumn localTimeColumn = new DataColumn(Properties.Resources.IncidentsTable_LocalTime, Type.GetType("System.String"));
             localTimeColumn.ReadOnly = true;
             columns.Add(localTimeColumn);
 
-            DataColumn sessionTimeColumn = new DataColumn("sessionTime", Type.GetType("System.String"));
+            DataColumn sessionTimeColumn = new DataColumn(Properties.Resources.IncidentsTable_SessionTime, Type.GetType("System.String"));
             sessionTimeColumn.ReadOnly = true;
             columns.Add(sessionTimeColumn);
 
-            DataColumn carClassColumn = new DataColumn("carClass", Type.GetType("System.String"));
+            DataColumn carClassColumn = new DataColumn(Properties.Resources.IncidentsTable_CarClass, Type.GetType("System.String"));
             carClassColumn.ReadOnly = true;
             columns.Add(carClassColumn);
 
-            DataColumn carNumberColumn = new DataColumn("carNumber", Type.GetType("System.String"));
+            DataColumn carNumberColumn = new DataColumn(Properties.Resources.IncidentsTable_CarNumber, Type.GetType("System.String"));
             carNumberColumn.ReadOnly = true;
             columns.Add(carNumberColumn);
 
-            DataColumn teamNameColumn = new DataColumn("teamName", Type.GetType("System.String"));
+            DataColumn teamNameColumn = new DataColumn(Properties.Resources.IncidentsTable_TeamName, Type.GetType("System.String"));
             teamNameColumn.ReadOnly = true;
             columns.Add(teamNameColumn);
 
-            DataColumn driverNameColumn = new DataColumn("driverName", Type.GetType("System.String"));
+            DataColumn driverNameColumn = new DataColumn(Properties.Resources.IncidentsTable_DriverName, Type.GetType("System.String"));
             driverNameColumn.ReadOnly = true;
             columns.Add(driverNameColumn);
 
-            DataColumn incidentValueColumn = new DataColumn("incidentValue", Type.GetType("System.String"));
+            DataColumn incidentValueColumn = new DataColumn(Properties.Resources.IncidentsTable_IncidentValue, Type.GetType("System.String"));
             incidentValueColumn.ReadOnly = true;
             columns.Add(incidentValueColumn);
 
-            DataColumn totalIncidentsColumn = new DataColumn("totalIncidents", Type.GetType("System.String"));
+            DataColumn totalIncidentsColumn = new DataColumn(Properties.Resources.IncidentsTable_TotalIncidents, Type.GetType("System.String"));
             totalIncidentsColumn.ReadOnly = true;
             columns.Add(totalIncidentsColumn);
 
-            DataColumn driverLapNumberColumn = new DataColumn("driverLapNumber", Type.GetType("System.String"));
+            DataColumn driverLapNumberColumn = new DataColumn(Properties.Resources.IncidentsTable_DriverLapNumber, Type.GetType("System.String"));
             driverLapNumberColumn.ReadOnly = true;
             columns.Add(driverLapNumberColumn);
 		}
@@ -874,7 +967,7 @@
                 return;
             }
 
-            debugTable.Rows.Clear();
+            oldDebugTable.Rows.Clear();
 
             foreach (var car in cars.Values)
             {
@@ -893,7 +986,7 @@
                 return;
             }
 
-            foreach(DataGridViewRow row in debugTable.Rows)
+            foreach(DataGridViewRow row in oldDebugTable.Rows)
 			{
                 if (cars[(int)row.Cells["debugCarID"].Value].TrackSurface == TrackSurfaces.NotInWorld && filterNotInWorldCheckBox.Checked)
                 {
@@ -935,8 +1028,8 @@
                 return;
             }
 
-            int rowId = debugTable.Rows.Add();
-            DataGridViewRow newRow = debugTable.Rows[rowId];
+            int rowId = oldDebugTable.Rows.Add();
+            DataGridViewRow newRow = oldDebugTable.Rows[rowId];
             newRow.Cells["debugCarID"].Value = newCar.CarIdx;
             newRow.Cells["debugCarNum"].Value = newCar.CarNumber;
             newRow.Cells["overallPositionInRace"].Value = newCar.OverallPositionInRace;
@@ -1303,7 +1396,6 @@
                             TeamID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamID"].Value,
                             TeamIncidentCount = SafeInt(e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["TeamIncidentCount"].Value),
                             CarNumber = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarNumber"].Value,
-                            CarClassID = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassID"].Value,
                             CarScreenName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarScreenName"].Value,
                             CarClassShortName = e.SessionInfo["DriverInfo"]["Drivers"]["CarIdx", carIdx]["CarClassShortName"].Value,
                         };
