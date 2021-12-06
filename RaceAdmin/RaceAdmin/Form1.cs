@@ -1,27 +1,24 @@
 ﻿namespace RaceAdmin
 {
-    using iRacingSdkWrapper;
-    using iRacingSdkWrapper.Bitfields;
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Diagnostics;
-    using System.Drawing;
-    using System.IO;
-    using System.Linq;
-    using System.Media;
-    using System.Reflection;
-    using System.Text;
-    using System.Threading;
-    using System.Windows.Forms;
-    using SessionFlags = iRacingSdkWrapper.Bitfields.SessionFlags;
+	using iRacingSdkWrapper;
+	using iRacingSdkWrapper.Bitfields;
+	using System;
+	using System.Collections.Generic;
+	using System.Data;
+	using System.Diagnostics;
+	using System.Drawing;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
+	using System.Text;
+	using System.Threading;
+	using System.Windows.Forms;
+	using SessionFlags = iRacingSdkWrapper.Bitfields.SessionFlags;
 
-    public partial class RaceAdminMain : Form
+	public partial class RaceAdminMain : Form
     {
-        About aboutForm;
-
         /// <summary>
-        /// Default session number. 1.
+        /// Default session number. 0.
         /// </summary>
         public const int DefaultSessionNum = 0;
 
@@ -38,12 +35,17 @@
         private const int MAX_CARIDX = 75;
 
         /// <summary>
+        /// The About form window.
+        /// </summary>
+        private About aboutForm;
+
+        /// <summary>
         /// Tracks the current caution state on track.
         /// </summary>
         private CautionState cautionState = CautionState.None;
 
         /// <summary>
-        /// The rate at which to poll the live telemetry. Can be changed by the user at runtime on the Debug tab of the UI. Persists on app close.
+        /// The rate at which to poll the live telemetry. Can be changed by the user at runtime on the Debug tab of the UI. Persists on app close. Default = 4.
         /// </summary>
         private int telemetryPollRate = 4;
 
@@ -174,8 +176,14 @@
         /// </summary>
         private BindingSource debugBindingSource;
 
+        /// <summary>
+        /// Gets parsed from the time string value of the incident row. 
+        /// </summary>
         private double? timeFrameFilterBegin = null;
 
+        /// <summary>
+        /// Gets parsed from the time string value of the incident row. 
+        /// </summary>
         private double? timeFrameFilterEnd = null;
 
         /// <summary>
@@ -188,8 +196,9 @@
 
 #if !DEBUG
             tabControl.TabPages.Remove(debugTab);
-            addTestRowButton.Visible = false;
+            tabControl.TabPages[0].Controls.Remove(addTestRowButton);
 #endif
+
 #if DEBUG
             InitializeDebugDataSource();
             InitializeDebugGridView();
@@ -214,10 +223,6 @@
             incidentsTimeFilterComboBox.SelectedIndex = 0;
             timeFrameFilterErrorText.Visible = false;
             timeFrameFilterComboBox1.SelectedIndex = 0;
-            aboutForm = new About(this);
-
-            string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
-            aboutForm.versionLabel.Text = String.Format("v{0}", version);
 
             // Listen to events
             wrapper.AddTelemetryUpdateHandler(OnTelemetryUpdated);
@@ -230,6 +235,9 @@
             wrapper.Start();
         }
 
+        /// <summary>
+        /// Initializes the incidents data table datasource and initializes the column types.
+        /// </summary>
         private void InitializeIncidentsDataSource()
 		{
             incidentsDataTable = new DataTable("incidentsDataTable");
@@ -238,6 +246,9 @@
             incidentsBindingSource.DataSource = incidentsDataTable;
         }
 
+        /// <summary>
+        /// Initializes the debug data table datasource and initializes the column types.
+        /// </summary>
         private void InitializeDebugDataSource()
 		{
             debugDataTable = new DataTable("debugDataTable");
@@ -246,57 +257,52 @@
             debugBindingSource.DataSource = debugDataTable;
         }
 
+        /// <summary>
+        /// Sets up column properties for the debug table.
+        /// </summary>
+        /// <param name="columns"><see cref="DataColumnCollection"/> of the debug columns.</param>
         private void InitializeDebugDataTableColumns(DataColumnCollection columns)
 		{
-            DataColumn carIdxColumn = new DataColumn(Properties.Resources.DebugTable_CarIdx, Type.GetType("System.String"));
-            carIdxColumn.ReadOnly = true;
+            DataColumn carIdxColumn = new DataColumn(Properties.Resources.DebugTable_CarIdx, typeof(int));
             columns.Add(carIdxColumn);
 
-            DataColumn carNumberColumn = new DataColumn(Properties.Resources.DebugTable_CarNumber, Type.GetType("System.String"));
-            carNumberColumn.ReadOnly = true;
+            DataColumn carNumberColumn = new DataColumn(Properties.Resources.DebugTable_CarNumber, typeof(string));
             columns.Add(carNumberColumn);
 
-            DataColumn carOverallPositionColumn = new DataColumn(Properties.Resources.DebugTable_CarOverallPosition, Type.GetType("System.String"));
-            carOverallPositionColumn.ReadOnly = true;
+            DataColumn carOverallPositionColumn = new DataColumn(Properties.Resources.DebugTable_CarOverallPosition, typeof(int));
             columns.Add(carOverallPositionColumn);
 
-            DataColumn carClassPositionColumn = new DataColumn(Properties.Resources.DebugTable_CarClassPosition, Type.GetType("System.String"));
-            carClassPositionColumn.ReadOnly = true;
+            DataColumn carClassPositionColumn = new DataColumn(Properties.Resources.DebugTable_CarClassPosition, typeof(int));
             columns.Add(carClassPositionColumn);
 
-            DataColumn carClassShortNameColumn = new DataColumn(Properties.Resources.DebugTable_CarClassShortName, Type.GetType("System.String"));
-            carClassShortNameColumn.ReadOnly = true;
+            DataColumn carClassShortNameColumn = new DataColumn(Properties.Resources.DebugTable_CarClassShortName, typeof(string));
             columns.Add(carClassShortNameColumn);
 
-            DataColumn driverNameColumn = new DataColumn(Properties.Resources.DebugTable_DriverName, Type.GetType("System.String"));
-            driverNameColumn.ReadOnly = true;
+            DataColumn driverNameColumn = new DataColumn(Properties.Resources.DebugTable_DriverName, typeof(string));
             columns.Add(driverNameColumn);
 
-            DataColumn carPercentAroudTrackColumn = new DataColumn(Properties.Resources.DebugTable_CarPercentAroundTrack, Type.GetType("System.String"));
-            carPercentAroudTrackColumn.ReadOnly = true;
+            DataColumn carPercentAroudTrackColumn = new DataColumn(Properties.Resources.DebugTable_CarPercentAroundTrack, typeof(string));
             columns.Add(carPercentAroudTrackColumn);
 
-            DataColumn carBetweenPitConesColumn = new DataColumn(Properties.Resources.DebugTable_CarBetweenPitCones, Type.GetType("System.String"));
-            carBetweenPitConesColumn.ReadOnly = true;
+            DataColumn carBetweenPitConesColumn = new DataColumn(Properties.Resources.DebugTable_CarBetweenPitCones, typeof(Image));
             columns.Add(carBetweenPitConesColumn);
 
-            DataColumn carCurrentLapColumn = new DataColumn(Properties.Resources.DebugTable_CarCurrentLap, Type.GetType("System.String"));
-            carCurrentLapColumn.ReadOnly = true;
+            DataColumn carCurrentLapColumn = new DataColumn(Properties.Resources.DebugTable_CarCurrentLap, typeof(int));
             columns.Add(carCurrentLapColumn);
 
-            DataColumn carLapsCompletedColumn = new DataColumn(Properties.Resources.DebugTable_CarLapsCompleted, Type.GetType("System.String"));
-            carLapsCompletedColumn.ReadOnly = true;
+            DataColumn carLapsCompletedColumn = new DataColumn(Properties.Resources.DebugTable_CarLapsCompleted, typeof(int));
             columns.Add(carLapsCompletedColumn);
 
-            DataColumn carTrackSurfaceColumn = new DataColumn(Properties.Resources.DebugTable_CarTrackSurface, Type.GetType("System.String"));
-            carTrackSurfaceColumn.ReadOnly = true;
+            DataColumn carTrackSurfaceColumn = new DataColumn(Properties.Resources.DebugTable_CarTrackSurface, typeof(TrackSurfaces));
             columns.Add(carTrackSurfaceColumn);
 
-            DataColumn carTrackSurfaceMaterialColumn = new DataColumn(Properties.Resources.DebugTable_CarTrackSurfaceMaterial, Type.GetType("System.String"));
-            carTrackSurfaceMaterialColumn.ReadOnly = true;
+            DataColumn carTrackSurfaceMaterialColumn = new DataColumn(Properties.Resources.DebugTable_CarTrackSurfaceMaterial, typeof(TrackSurfaceMaterials));
             columns.Add(carTrackSurfaceMaterialColumn);
         }
 
+        /// <summary>
+        /// Initializes the DataGridView properties of the debug table columns.
+        /// </summary>
         private void InitializeDebugGridView()
 		{
             debugTable.AutoGenerateColumns = true;
@@ -340,6 +346,9 @@
             debugTable.Columns[Properties.Resources.DebugTable_CarTrackSurfaceMaterial].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
         }
 
+        /// <summary>
+        /// Initializes the DataGridView properties of the incident table columns.
+        /// </summary>
         private void InitializeIncidentsGridView()
 		{
             incidentsView.AutoGenerateColumns = true;
@@ -382,45 +391,49 @@
             incidentsView.Columns[Properties.Resources.IncidentsTable_DriverLapNumber].HeaderText = "Lap #";
         }
 
+        /// <summary>
+        /// Sets up column properties for the incidents table.
+        /// </summary>
+        /// <param name="columns"><see cref="DataColumnCollection"/> of the incident columns.</param>
         private void InitializeIncidentsDataTableColumns(DataColumnCollection columns)
 		{
-            DataColumn hiddenTimeStampColumn = new DataColumn(Properties.Resources.IncidentsTable_HiddenTimeStamp, Type.GetType("System.DateTime"));
+            DataColumn hiddenTimeStampColumn = new DataColumn(Properties.Resources.IncidentsTable_HiddenTimeStamp, typeof(DateTime));
             hiddenTimeStampColumn.ReadOnly = true;
             columns.Add(hiddenTimeStampColumn);
 
-            DataColumn localTimeColumn = new DataColumn(Properties.Resources.IncidentsTable_LocalTime, Type.GetType("System.String"));
+            DataColumn localTimeColumn = new DataColumn(Properties.Resources.IncidentsTable_LocalTime, typeof(string));
             localTimeColumn.ReadOnly = true;
             columns.Add(localTimeColumn);
 
-            DataColumn sessionTimeColumn = new DataColumn(Properties.Resources.IncidentsTable_SessionTime, Type.GetType("System.String"));
+            DataColumn sessionTimeColumn = new DataColumn(Properties.Resources.IncidentsTable_SessionTime, typeof(string));
             sessionTimeColumn.ReadOnly = true;
             columns.Add(sessionTimeColumn);
 
-            DataColumn carClassColumn = new DataColumn(Properties.Resources.IncidentsTable_CarClass, Type.GetType("System.String"));
+            DataColumn carClassColumn = new DataColumn(Properties.Resources.IncidentsTable_CarClass, typeof(string));
             carClassColumn.ReadOnly = true;
             columns.Add(carClassColumn);
 
-            DataColumn carNumberColumn = new DataColumn(Properties.Resources.IncidentsTable_CarNumber, Type.GetType("System.String"));
+            DataColumn carNumberColumn = new DataColumn(Properties.Resources.IncidentsTable_CarNumber, typeof(string));
             carNumberColumn.ReadOnly = true;
             columns.Add(carNumberColumn);
 
-            DataColumn teamNameColumn = new DataColumn(Properties.Resources.IncidentsTable_TeamName, Type.GetType("System.String"));
+            DataColumn teamNameColumn = new DataColumn(Properties.Resources.IncidentsTable_TeamName, typeof(string));
             teamNameColumn.ReadOnly = true;
             columns.Add(teamNameColumn);
 
-            DataColumn driverNameColumn = new DataColumn(Properties.Resources.IncidentsTable_DriverName, Type.GetType("System.String"));
+            DataColumn driverNameColumn = new DataColumn(Properties.Resources.IncidentsTable_DriverName, typeof(string));
             driverNameColumn.ReadOnly = true;
             columns.Add(driverNameColumn);
 
-            DataColumn incidentValueColumn = new DataColumn(Properties.Resources.IncidentsTable_IncidentValue, Type.GetType("System.String"));
+            DataColumn incidentValueColumn = new DataColumn(Properties.Resources.IncidentsTable_IncidentValue, typeof(string));
             incidentValueColumn.ReadOnly = true;
             columns.Add(incidentValueColumn);
 
-            DataColumn totalIncidentsColumn = new DataColumn(Properties.Resources.IncidentsTable_TotalIncidents, Type.GetType("System.String"));
+            DataColumn totalIncidentsColumn = new DataColumn(Properties.Resources.IncidentsTable_TotalIncidents, typeof(string));
             totalIncidentsColumn.ReadOnly = true;
             columns.Add(totalIncidentsColumn);
 
-            DataColumn driverLapNumberColumn = new DataColumn(Properties.Resources.IncidentsTable_DriverLapNumber, Type.GetType("System.String"));
+            DataColumn driverLapNumberColumn = new DataColumn(Properties.Resources.IncidentsTable_DriverLapNumber, typeof(string));
             driverLapNumberColumn.ReadOnly = true;
             columns.Add(driverLapNumberColumn);
 		}
@@ -432,6 +445,8 @@
         /// Checks each driver for a change in incidents, logs new incident to the table if so.
         /// Updates laps completed for each driver.
         /// Updates car team incident counts for each car.
+        /// Applies color highlighting to the incidents table.
+        /// Updates the incident counts display.
         /// </summary>
         /// <param name="sender">Sender of the event.</param>
         /// <param name="e">Session string changed event. Contains info from session string that can be queried.</param>
@@ -614,6 +629,8 @@
             totalIncidentCountNum.Visible = false;
             incidentsSinceCautionLabel.Visible = false;
             incidentsSinceCautionNum.Visible = false;
+            visibleIncidentsLabel.Visible = false;
+            visibleIncidentsNum.Visible = false;
         }
 
         /// <summary>
@@ -631,6 +648,8 @@
             totalIncidentCountNum.Visible = true;
             incidentsSinceCautionLabel.Visible = true;
             incidentsSinceCautionNum.Visible = true;
+            visibleIncidentsLabel.Visible = true;
+            visibleIncidentsNum.Visible = true;
         }
 
         /// <summary>
@@ -967,7 +986,7 @@
                 return;
             }
 
-            oldDebugTable.Rows.Clear();
+            debugDataTable.Rows.Clear();
 
             foreach (var car in cars.Values)
             {
@@ -986,34 +1005,28 @@
                 return;
             }
 
-            foreach(DataGridViewRow row in oldDebugTable.Rows)
+            foreach(DataRow row in debugDataTable.Rows)
 			{
-                if (cars[(int)row.Cells["debugCarID"].Value].TrackSurface == TrackSurfaces.NotInWorld && filterNotInWorldCheckBox.Checked)
+                row[2] = cars[(int)row[0]].OverallPositionInRace;
+                row[3] = cars[(int)row[0]].ClassPositionInRace;
+                row[5] = cars[(int)row[0]].CurrentDriver;
+                row[6] = (cars[(int)row[0]].PercentAroundTrack * 100).ToString("0.00");
+                if (cars[(int)row[0]].BetweenPitCones)
                 {
-                    row.Visible = false;
+                    row[7] = Properties.Resources.ConeFull;
                 }
                 else
-				{
-                    row.Visible = true;
-                    row.Cells["overallPositionInRace"].Value = cars[(int)row.Cells["debugCarID"].Value].OverallPositionInRace;
-                    row.Cells["classPosition"].Value = cars[(int)row.Cells["debugCarID"].Value].ClassPositionInRace;
-                    row.Cells["currentDriver"].Value = cars[(int)row.Cells["debugCarID"].Value].CurrentDriver;
-                    row.Cells["percentAroundTrack"].Value = cars[(int)row.Cells["debugCarID"].Value].PercentAroundTrack;
-                    if (cars[(int)row.Cells["debugCarID"].Value].BetweenPitCones)
-                    {
-                        row.Cells["betweenPitCones"].Value = Properties.Resources.ConeFull;
-                    }
-                    else
-                    {
-                        row.Cells["betweenPitCones"].Value = Properties.Resources.ConeEmpty;
-                    }
-
-                    row.Cells["currentLap"].Value = cars[(int)row.Cells["debugCarID"].Value].CurrentLap;
-                    row.Cells["lapsCompleted"].Value = cars[(int)row.Cells["debugCarID"].Value].LapsCompleted;
-                    row.Cells["trackSurface"].Value = cars[(int)row.Cells["debugCarID"].Value].TrackSurface;
-                    row.Cells["trackSurfaceMaterial"].Value = cars[(int)row.Cells["debugCarID"].Value].TrackSurfaceMaterial;
+                {
+                    row[7] = Properties.Resources.ConeEmpty;
                 }
+
+                row[8] = cars[(int)row[0]].CurrentLap;
+                row[9] = cars[(int)row[0]].LapsCompleted;
+                row[10] = cars[(int)row[0]].TrackSurface;
+                row[11] = cars[(int)row[0]].TrackSurfaceMaterial;
             }
+
+            //debugTable.DataSource = debugBindingSource;
         }
 
         /// <summary>
@@ -1028,28 +1041,29 @@
                 return;
             }
 
-            int rowId = oldDebugTable.Rows.Add();
-            DataGridViewRow newRow = oldDebugTable.Rows[rowId];
-            newRow.Cells["debugCarID"].Value = newCar.CarIdx;
-            newRow.Cells["debugCarNum"].Value = newCar.CarNumber;
-            newRow.Cells["overallPositionInRace"].Value = newCar.OverallPositionInRace;
-            newRow.Cells["classPosition"].Value = newCar.ClassPositionInRace;
-            newRow.Cells["carClassName"].Value = newCar.CarClassShortName;
-            newRow.Cells["currentDriver"].Value = newCar.CurrentDriver;
-            newRow.Cells["percentAroundTrack"].Value = newCar.PercentAroundTrack;
+            DataRow newRow = debugDataTable.NewRow();
+            newRow[0] = newCar.CarIdx;
+            newRow[1] = newCar.CarNumber;
+            newRow[2] = newCar.OverallPositionInRace;
+            newRow[3] = newCar.ClassPositionInRace;
+            newRow[4] = newCar.CarClassShortName;
+            newRow[5] = newCar.CurrentDriver;
+            newRow[6] = newCar.PercentAroundTrack;
             if (newCar.BetweenPitCones)
             {
-                newRow.Cells["betweenPitCones"].Value = Properties.Resources.ConeFull;
+                newRow[7] = Properties.Resources.ConeFull;
             }
             else
             {
-                newRow.Cells["betweenPitCones"].Value = Properties.Resources.ConeEmpty;
+                newRow[7] = Properties.Resources.ConeEmpty;
             }
 
-            newRow.Cells["currentLap"].Value = newCar.CurrentLap;
-            newRow.Cells["lapsCompleted"].Value = newCar.LapsCompleted;
-            newRow.Cells["trackSurface"].Value = newCar.TrackSurface;
-            newRow.Cells["trackSurfaceMaterial"].Value = newCar.TrackSurfaceMaterial;
+            newRow[8] = newCar.CurrentLap;
+            newRow[9] = newCar.LapsCompleted;
+            newRow[10] = newCar.TrackSurface;
+            newRow[11] = newCar.TrackSurfaceMaterial;
+
+            debugDataTable.Rows.Add(newRow);
         }
 
 		/// <summary>
@@ -1097,11 +1111,13 @@
             }
             
             UpdateVisibleRows();
-            UpdateVisibleIncidents();
 
             Console.WriteLine($"{newRow[Properties.Resources.IncidentsTable_IncidentValue]}; driver = {drivers[cars[newInc.CarIdx].CurrentDriver].FullName}");
         }
 
+        /// <summary>
+        /// Informs the user of how many rows are currently visible in the incident table due to current filtering out of how many rows total.
+        /// </summary>
         private void UpdateVisibleRows()
 		{
             int visibleRowCount = incidentsView.Rows.GetRowCount(DataGridViewElementStates.Visible);
@@ -1109,6 +1125,9 @@
             visibleRowsNum.Text = $"{visibleRowCount} of {totalRowCount}";
         }
 
+        /// <summary>
+        /// Informs the user of how many incident points are currently visible due to current filtering out of how many incident points total.
+        /// </summary>
         private void UpdateVisibleIncidents()
 		{
             int visibleIncidentCount = 0;
@@ -1123,6 +1142,10 @@
             visibleIncidentsNum.Text = $"{visibleIncidentCount} of {totalIncCount}";
         }
 
+        /// <summary>
+        /// Applies any color highlighting to the incidents table based on user settings.
+        /// </summary>
+        /// <param name="cautionRow">The incident that caused a caution. Passed as null for regular incidents.</param>
         internal void ApplyIncidentTableColorHighlighting(DataGridViewRow cautionRow)
 		{
             if (InvokeRequired)
@@ -1239,6 +1262,9 @@
             UpdateVisibleIncidents();
         }
 
+        /// <summary>
+        /// Applies time frame filtering to the incidents table from a starting session time to an ending session time.
+        /// </summary>
         private void ApplyTimeFrameFilter()
         {
             if(timeFrameFilterBegin == null || timeFrameFilterEnd == null)
@@ -1258,6 +1284,9 @@
             UpdateVisibleIncidents();
         }
 
+        /// <summary>
+        /// Calculates the time frame begin and time frame end values to be used for filtering incidents.
+        /// </summary>
         private void CalculateTimeFrameDelta()
         {
             double? timeFrameDelta = timeFrameFilterEnd - timeFrameFilterBegin;
@@ -1308,6 +1337,12 @@
             }
         }
 
+        /// <summary>
+        /// Parses car number strings as integers so the incidents table can be sorted by the car number column.
+        /// Currently not used since the table has been replaced.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
         public void IncidentsTableView_SortCompare(object sender, DataGridViewSortCompareEventArgs e)
         {
             if ("CarNum".Equals(e.Column.Name))
@@ -1455,7 +1490,16 @@
         /// <returns>Returns an integer parsed from string value.</returns>
         private int SafeInt(string s)
         {
-            return System.Int32.TryParse(s, out int x) ? x : 0;
+            return int.TryParse(s, out int x) ? x : 0;
+        }
+
+        /// <summary>
+        /// Sets the public CautionHandlers property.
+        /// </summary>
+        /// <param name="cautionHandlers"></param>
+        public void SetTestCautionHandlers(Dictionary<string, ICautionHandler> cautionHandlers)
+        {
+            CautionHandlers = cautionHandlers;
         }
 
         #region EVENT_HANDLERS
@@ -1639,6 +1683,13 @@
                 incidentsTimeFilterLabel.Visible = true;
                 visibleRowsLabel.Visible = true;
                 visibleRowsNum.Visible = true;
+                timeFrameFilterLabel1.Visible = true;
+                timeFrameFilterLabel2.Visible = true;
+                timeFrameFilterComboBox1.Visible = true;
+                timeFrameFilterComboBox2.Visible = true;
+                visibleIncidentsLabel.Visible = true;
+                visibleIncidentsNum.Visible = true;
+                addTestRowButton.Visible = true;
             }
             else
             {
@@ -1647,6 +1698,13 @@
                 incidentsTimeFilterLabel.Visible = false;
                 visibleRowsLabel.Visible = false;
                 visibleRowsNum.Visible = false;
+                timeFrameFilterLabel1.Visible = false;
+                timeFrameFilterLabel2.Visible = false;
+                timeFrameFilterComboBox1.Visible = false;
+                timeFrameFilterComboBox2.Visible = false;
+                visibleIncidentsLabel.Visible = false;
+                visibleIncidentsNum.Visible = false;
+                addTestRowButton.Visible = false;
             }
         }
 
@@ -1728,7 +1786,7 @@
         /// <param name="e">Event args.</param>
         private void telemetryPollRateTextBox_TextChanged(object sender, EventArgs e)
         {
-            if(System.Int32.TryParse(telemetryPollRateTextBox.Text, out int x))
+            if(int.TryParse(telemetryPollRateTextBox.Text, out int x))
 			{
                 if(x > 60)
 				{
@@ -1783,6 +1841,11 @@
             ApplyIncidentTableColorHighlighting(null);
         }
 
+        /// <summary>
+        /// Parses the time in the time frame filter box back into a double sessionTime and sets the internal timeFrameFilterBegin field.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
         private void timeFrameFilterComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             timeFrameFilterErrorText.Visible = false;
@@ -1838,6 +1901,11 @@
             }
         }
 
+        /// <summary>
+        /// Parses the time in the time frame filter box back into a double sessionTime and sets the internal timeFrameFilterEnd field.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
 		private void timeFrameFilterComboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             timeFrameFilterErrorText.Visible = false;
@@ -1893,11 +1961,37 @@
             }
         }
 
+        /// <summary>
+        /// Filters all drivers currently not in the world out of the debug table.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
+        private void filterNotInWorldCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if(filterNotInWorldCheckBox.Checked)
+			{
+                debugDataTable.DefaultView.RowFilter = $"carTrackSurface <> {(int)TrackSurfaces.NotInWorld}";
+			}
+            else
+			{
+                debugDataTable.DefaultView.RowFilter = $"";
+            }
+        }
+
+        /// <summary>
+        /// Initializes and shows the About window.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
         private void aboutRaceAdministratorToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            aboutForm = new About(this);
+
+            string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
+            aboutForm.versionLabel.Text = $"v{version}";
+
             aboutForm.StartPosition = FormStartPosition.CenterScreen;
             aboutForm.Show();
-            
         }
         #endregion EVENT_HANDLERS
 
@@ -1906,7 +2000,7 @@
         /// Gets or sets the cautionHandlers field.
         /// </summary>
         public Dictionary<string, ICautionHandler> CautionHandlers { get; set; }
-#endregion PUBLIC_PROPERTIES
+        #endregion PUBLIC_PROPERTIES
 
         // Code in the region below is used to generate test data or to simulate behavior 
         // for UI testing. To use, create buttons on the form and connect them to the various
@@ -1935,13 +2029,25 @@
             "GTEAm",
         };
 
+        /// <summary>
+        /// Simulates the incidents of a test session. Only visible in DEBUG mode and don't use if iRacing is running.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
         private void addTestRowButton_Click(object sender, EventArgs e)
         {
-            // If you give a -1 as the second parameter then random minute intervals will be used.
-            // Else give the number of minutes between incidents.
-            PopulateIncidentsToPresent(-24, -1);
+            // If iRacing is runnig then don't do anything.
+            if(sessionLabel.Text == "NO SESSION")
+			{
+                PopulateIncidentsToPresent(-24, -1);
+            }
         }
 
+        /// <summary>
+        /// Populates the incident table with incidents from a simulated session.
+        /// </summary>
+        /// <param name="addHours">Number of hours ago to begin the test session. Use a negative value of hours to go back in time. EX: -24 means a session will be simulated starting 24 hours ago, and ending now.</param>
+        /// <param name="minuteInterval">The number of simulated minutes between incidents. -1 means a random interval between 1-15 minutes will be used for each incident.</param>
         private void PopulateIncidentsToPresent(int addHours, int minuteInterval)
 		{
             var rng = new Random();
@@ -1958,6 +2064,11 @@
             } while (DateTime.Now > timeStamp);
         }
 
+        /// <summary>
+        /// Generates a random driver and car and uses them to populate a new row in the incident table.
+        /// </summary>
+        /// <param name="timeStamp">The <see cref="DateTime"/> timeStamp of the new incident to add.</param>
+        /// <param name="sessionTime">The number of seconds into the simulated session the incident occured.</param>
         private void Test_AddIncidentRow(DateTime timeStamp, double sessionTime)
         {
             testCurrentLap = MakeRandomLap();
@@ -1990,11 +2101,22 @@
 
             Incident newInc = new Incident(sessionTime, timeStamp, driver.NewIncs, driver.CarIdx);
             totalIncCount += newIncidents;
+            incCountSinceCaution += newIncidents;
             LogNewIncident(newInc);
+            UpdateIncidentCountDisplay();
+            UpdateVisibleIncidents();
 
             ApplyIncidentTableColorHighlighting(null);
         }
 
+        /// <summary>
+        /// Generates a new car with random values to use in a new incident row.
+        /// </summary>
+        /// <param name="carIdx">The carIdx of the new car.</param>
+        /// <param name="carNum">The car number of the new car.</param>
+        /// <param name="driverName">The name of the driver of the new car.</param>
+        /// <param name="teamName">The team name of the new car.</param>
+        /// <param name="currentLap">The current lap of the new car.</param>
         private void MakeTestCar(int carIdx, string carNum, string driverName, string teamName, int currentLap)
 		{
             var rng = new Random();
@@ -2011,6 +2133,10 @@
             cars.Add(car.CarIdx, car);
 		}
 
+        /// <summary>
+        /// Creates a random name of a new driver.
+        /// </summary>
+        /// <returns>A randomly generated driver name.</returns>
         private static string MakeRandomName()
         {
             var rng = new Random();
@@ -2043,6 +2169,11 @@
             }
             return name.ToString();
         }
+
+        /// <summary>
+        /// Creates a randomly generated car number.
+        /// </summary>
+        /// <returns>A randomly generated car number.</returns>
         private string MakeRandomCarNumber()
         {
             var rng = new Random();
@@ -2055,14 +2186,15 @@
             }
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Creates a random integer number to be used as a lap number.
+        /// </summary>
+        /// <returns>A randomly generated lap number.</returns>
         private int MakeRandomLap()
         {
             var rng = new Random();
             return testCurrentLap + rng.Next(2);
-        }
-        public void SetTestCautionHandlers(Dictionary<string, ICautionHandler> cautionHandlers)
-        {
-            CautionHandlers = cautionHandlers;
         }
 		#endregion TESTING
 		// Code in the region above is used to generate test data or to simulate behavior 
