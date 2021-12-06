@@ -16,7 +16,7 @@ This area allows access to the export table functionality, the settings page, an
 This panel displays the name of the current session and will flash yellow when the caution conditions
 have been met. Once the caution flag has been thrown in will remain solid yellow until the race resumes
 under green flag conditions.
-This panel also contains the total incident count and number of incidents since last caution count. See #3.
+This panel also contains the total incident count and number of incidents since last caution count. See below.
 
 ### 3. Total Incident Count
 The total incidents count tracks the total number of incidents reported during the current session.
@@ -62,26 +62,38 @@ driver's total incidents in the same fashion as iRacing does. For example if the
 of 4 incidents and the driver had contributed two incidents at the time of the incident, this 
 column would contain "4,2".
 
+## File Menu
+
 ### Export
-Allows the incidents to be exported to a CSV file.
+Allows the current view (with filtering applied) of the incidents table to be exported to a CSV file.
 
-### Full Course Cautions
-Options for controlling how the app determines when a full course caution should be thrown and
-how it reacts in this case.
+### Exit
+Closes the application.
 
-* Incidents required for caution - number of incidents after which a full course caution will be recommended; set to zero to totally disable full course cautions
-* Use audio notification - play an alert sound when full course caution conditions are met
-* Throw caution flag automatically (beta) - attempts to throw a full course caution by sending keypresses to iRacing using the Windows SendKeys functionality when full course caution conditions are met
-* No cautions during last laps - don't recommend or throw cautions during the last number of laps specified; set to zero to allow cautions up until the checkered flag
-* No cautions during last minutes - don't recommend or throw cautions during the last number of minutes specified; set to zero to allow cautions up until the checkered flag
+## Settings
 
-The app can only honor the last laps and last minutes settings when iRacing is reporting laps remaining and/or time remaining via telemetry. If a race is configured as a race to a set number of laps, then the time remaining is not reported by iRacing unless iRacing detects that the session time will expire before the race completes. Similarly when a race is configured as a timed race only, iRacing does not report the number of laps remaining.
+![race admin screenshot](/images/race-admin-settings.png)
 
 ### General
-General settings which don't fall into other categories.
+General configuration options for the application.
 
-* Hide incidents during race - obscures the incidents table, total incidents and incidents since last caution data during a race so that it will not distract a driver who is also using the app to assist with cautions.
+* Hide incidents during race: When enabled, will hide the incidents table and all incident counts on the main page during a "Race" session.
+* Highlight 4x incidents: When enabled, 4x incident rows in the table will be highlighted with the color selected by the user.
+* Highlight incident that triggered caution: When enabled: if app is configured to throw caution based on incident count, then the incident that caused the incident threshold to be reached will be highlighted with the color selected by the user.
+* Highlight driver if individual incident threshold reached: When enabled, allows the user to set an incident threshold that applies to all drivers individually. Any driver that exceeds that number will have their incidents highlighted with the color selected by the user.
 
+### Full Course Cautions
+Options for controlling how the app determines when a full course caution should be thrown and how it reacts in this case.
+
+* Detect tow for caution - (BETA) When enabled, the app will recommend a full course caution when a car has stopped and towed to pit road. This triggers if a car is not currently between the pit cones and not on a pit access road immediately before or after the pit lane.
+* Use total incidents to trigger caution - When enabled, a full course caution will be recommended if the total number of incidents since last caution exceeds the number given by the user in the setting below.
+* Throw caution flag automatically - (BETA) Attempts to throw a full course caution by sending keypresses to iRacing using the Windows SendKeys functionality when full course caution conditions are met.
+* Audio notification - Play an alert sound when full course caution conditions are met.
+* Incidents required for caution - The number of incident points required for the app to recommend/throw a full course caution.
+* No cautions during last laps - Don't recommend or throw cautions during the last number of laps specified; set to zero to allow cautions up until the checkered flag.
+* No cautions during last minutes - Don't recommend or throw cautions during the last number of minutes specified; set to zero to allow cautions up until the checkered flag.
+
+The app can only honor the last laps and last minutes settings when iRacing is reporting laps remaining and/or time remaining via telemetry. If a race is configured as a race to a set number of laps, then the time remaining is not reported by iRacing unless iRacing detects that the session time will expire before the race completes. Similarly when a race is configured as a timed race only, iRacing does not report the number of laps remaining.
 
 ## Command Line Options
 
