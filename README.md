@@ -147,7 +147,7 @@ There is now a Main tab, which funtions identically to the release version, and 
 * Hide NotInWorld: Enabling this check mark will hide all cars that have a Track Surface value of 'NotInWorld' which means that the car is not in the world and physics are not applying to this car. This value is very common for drivers that have not entered their cars yet, or drivers have exited their cars and gone into the garage to make changes and have not re-entered the world yet.
 	
 ### 3. Debug Table
-This table tracks any live/session info the app is tracking for all cars in the session. As cars join the session, cars are added to this table and are never removed, even if the driver disconnects.
+This table tracks any live/session info the app is tracking for all cars in the session. As cars join the session, cars are added to this table and are never removed, even if the driver disconnects. The columns are:
 
 * CarIdx: The CarIdx number assigned to this car by iRacing in the telemetry.
 * Car Number: The car number.
