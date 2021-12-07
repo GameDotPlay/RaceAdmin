@@ -118,10 +118,10 @@ First, only telemetry fields currently used in this codebase are recorded. While
 
 Additionally there are several interfaces and fakes introduced to facilitate unit test construction. While this goal is achieved, it does add more boilerplate and complication to the normal use case code. This layer may be encapsulated outside of the RaceAdmin codebase itself in the future.
 
-### Run in Debug Mode
+## Run in Debug Mode
 When the app is run in debug mode from Visual Studio, some helpful features are enabled that are not present in Release Mode.
 
-## Main Tab
+### Main Tab
 
 ![race admin screenshot](/images/race-admin-debugMain.png)
 
@@ -129,7 +129,7 @@ On the main screen you'll notice a few differences from the release version:
 1: There is now a Main tab, which funtions identically to the release version, and a debug tab which is shown below.
 2: Populate Incidents button. Pressing this button will simulate the incidents of a 24 hour race that began 24 hours ago and ended now. This can be used to populate the table with some test values and test filtering functionality, color highlighting, layout changes, etc. See code comments to see how to change the time frame of the simulated session.
 
-## Debug Tab
+### Debug Tab
 
 ![race admin screenshot](/images/race-admin-debugDebug.png)
 
