@@ -43,6 +43,8 @@ This text informs you of how many incident points are currently visible in the i
 
 ### 9. Incident Table
 Displays incidents incurred by drivers as one row per incident.
+Each column also has the ability to filter/sort on values by clicking the down arrow in the column header. (For columns that filtering/sorting would make sense.)
+
 * Local Time - The local time of day on your computer that the incident occurred.
 * Session Time - The time the incident occurred referenced from the beginning of the current session.
 * Car Class - (Multiclass only) The class of car that the driver is participating in.
