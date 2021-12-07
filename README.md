@@ -117,3 +117,25 @@ The output session log file is written into the current user's documents folder.
 First, only telemetry fields currently used in this codebase are recorded. While this is mainly to keep the output file size to a minimum, it is also a consequence of the libraries used to read the iRacing telemetry updates. The exact fields captured are those exposed as properties by `ITelemetryInfo`. The initial set of fields captured are: `SessionFlags`, `SessionLapsRemain`, `SessionNum`, `SessionTimeRemain` and `SessionUniqueID`. A second difference is that the playback speed is much higher than the capture data rate. 
 
 Additionally there are several interfaces and fakes introduced to facilitate unit test construction. While this goal is achieved, it does add more boilerplate and complication to the normal use case code. This layer may be encapsulated outside of the RaceAdmin codebase itself in the future.
+
+### Run in Debug Mode
+When the app is run in debug mode from Visual Studio, some helpful features are enabled that are not present in Release Mode.
+
+## Main Tab
+
+![race admin screenshot](/images/race-admin-debugMain.png)
+
+On the main screen you'll notice a few differences from the release version:
+1: There is now a Main tab, which funtions identically to the release version, and a debug tab which is shown below.
+2: Populate Incidents button. Pressing this button will simulate the incidents of a 24 hour race that began 24 hours ago and ended now. This can be used to populate the table with some test values and test filtering functionality, color highlighting, layout changes, etc. See code comments to see how to change the time frame of the simulated session.
+
+## Debug Tab
+
+![race admin screenshot](/images/race-admin-debugDebug.png)
+
+On the debug tab there is another table that displays live information on all cars in the session.
+
+1: There is now a Main tab, which funtions identically to the release version, and a Debug tab which is shown here.
+2: Settings applicable to the table on this tab.
+	* Telemetry Poll Rate: This changes the rate at which the app will poll the live telemetry and retrieve updated information. The default value is 4 (Hz) which means the app will update live information 4 times per second. This value can be set to anywhere in the range of 1-60. NOTE: Setting this value too high can adversely affect performance.
+	* Hide NotInWorld: Enabling this check mark will hide all cars that have a Track Surface value of 'NotInWorld' which means that the car is not in the world and physics are not applying to this car. This value is very common for drivers that have not entered their cars yet, or drivers have exited their cars and gone into the garage to make changes and have not re-entered the world yet.
