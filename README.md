@@ -7,7 +7,7 @@ cars are only reported at the end of a race to non-admins.
 
 ## Overview
 
-![race admin screenshot](/images/race-admin.png)
+![race admin screenshot](/images/race-admin-highlighted.png)
 
 ### 1. Main menu strip
 This area allows access to the export table functionality, the settings page, and turning on/off various components of the UI.
