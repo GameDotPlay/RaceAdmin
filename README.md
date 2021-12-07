@@ -72,7 +72,7 @@ Closes the application.
 
 ## Settings
 
-![race admin screenshot](/images/race-admin-settings.png)
+![race admin screenshot](/race-admin-settings.png)
 
 ### General
 General configuration options for the application.
