@@ -95,25 +95,7 @@ Options for controlling how the app determines when a full course caution should
 
 The app can only honor the last laps and last minutes settings when iRacing is reporting laps remaining and/or time remaining via telemetry. If a race is configured as a race to a set number of laps, then the time remaining is not reported by iRacing unless iRacing detects that the session time will expire before the race completes. Similarly when a race is configured as a timed race only, iRacing does not report the number of laps remaining.
 
-## Command Line Options
-
-While RaceAdmin normally runs as a simple form and processes live session and telemetry updates from iRacing, it also offers the ability to record and playback session data. This is a recent addition and is not fully mature. It's intended purpose is to allow users to record the session/telemetry data so that it can be used to debug program issues or to aid in new feature development. 
-
-Available command line options:
-```
-RaceAdmin [options] [command]
-
-Options:
-  --version         Show version information
-  -?, -h, --help    Show help and usage information
-
-Commands:
-  record                Record session updates and telemetry.
-  playback <logfile>    Play back only events from the indexed session within the session log.
-```
-The output session log file is written into the current user's documents folder. The session log filename when recording will be `race-admin-session-<iRacingSessionID>.bin`. When using the playback command, the full path to the session log should not be specified, only the filename itself.
-  
-### Developer Notes
+## Developer Notes
 First, only telemetry fields currently used in this codebase are recorded. While this is mainly to keep the output file size to a minimum, it is also a consequence of the libraries used to read the iRacing telemetry updates. The exact fields captured are those exposed as properties by `ITelemetryInfo`. The initial set of fields captured are: `SessionFlags`, `SessionLapsRemain`, `SessionNum`, `SessionTimeRemain` and `SessionUniqueID`. A second difference is that the playback speed is much higher than the capture data rate. 
 
 Additionally there are several interfaces and fakes introduced to facilitate unit test construction. While this goal is achieved, it does add more boilerplate and complication to the normal use case code. This layer may be encapsulated outside of the RaceAdmin codebase itself in the future.
@@ -162,3 +144,21 @@ This table tracks any live/session info the app is tracking for all cars in the 
 * Laps Completed: The number of completed laps of this car.
 * Track Surface: A TrackSurfaces enum value from telemetry that indicates the current general state/location of the car. Values can be OnPitRoad, NotInWorld, OnTrack, ApproachingPitRoad, etc.
 * Track Surface Material: A TrackSurfaceMaterials enum value from telemetry that indicates the current material that the car is in contact with. Values can be Asphalt1Material, Contrete1Material, Rumble1Material, AstroTurfMaterial, Grass3Material, etc.
+
+## Command Line Options
+
+While RaceAdmin normally runs as a simple form and processes live session and telemetry updates from iRacing, it also offers the ability to record and playback session data. This is a recent addition and is not fully mature. It's intended purpose is to allow users to record the session/telemetry data so that it can be used to debug program issues or to aid in new feature development. 
+
+Available command line options:
+```
+RaceAdmin [options] [command]
+
+Options:
+  --version         Show version information
+  -?, -h, --help    Show help and usage information
+
+Commands:
+  record                Record session updates and telemetry.
+  playback <logfile>    Play back only events from the indexed session within the session log.
+```
+The output session log file is written into the current user's documents folder. The session log filename when recording will be `race-admin-session-<iRacingSessionID>.bin`. When using the playback command, the full path to the session log should not be specified, only the filename itself.
