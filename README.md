@@ -126,8 +126,12 @@ When the app is run in debug mode from Visual Studio, some helpful features are 
 ![race admin screenshot](/images/race-admin-debugMain.png)
 
 On the main screen you'll notice a few differences from the release version:
-1: There is now a Main tab, which funtions identically to the release version, and a debug tab which is shown below.
-2: Populate Incidents button. Pressing this button will simulate the incidents of a 24 hour race that began 24 hours ago and ended now. This can be used to populate the table with some test values and test filtering functionality, color highlighting, layout changes, etc. See code comments to see how to change the time frame of the simulated session.
+
+### 1 Tab Control 
+There is now a Main tab, which funtions identically to the release version, and a debug tab which is shown below.
+
+### 2 Populate Incidents Button
+Pressing this button will simulate the incidents of a 24 hour race that began 24 hours ago and ended now. This can be used to populate the table with some test values and test filtering functionality, color highlighting, layout changes, etc. See code comments to see how to change the time frame of the simulated session.
 
 ### Debug Tab
 
@@ -135,7 +139,26 @@ On the main screen you'll notice a few differences from the release version:
 
 On the debug tab there is another table that displays live information on all cars in the session.
 
-1: There is now a Main tab, which funtions identically to the release version, and a Debug tab which is shown here.
-2: Settings applicable to the table on this tab.
+### 1 Tab Control 
+There is now a Main tab, which funtions identically to the release version, and a Debug tab which is shown here.
+
+### 2 Settings
 	* Telemetry Poll Rate: This changes the rate at which the app will poll the live telemetry and retrieve updated information. The default value is 4 (Hz) which means the app will update live information 4 times per second. This value can be set to anywhere in the range of 1-60. NOTE: Setting this value too high can adversely affect performance.
 	* Hide NotInWorld: Enabling this check mark will hide all cars that have a Track Surface value of 'NotInWorld' which means that the car is not in the world and physics are not applying to this car. This value is very common for drivers that have not entered their cars yet, or drivers have exited their cars and gone into the garage to make changes and have not re-entered the world yet.
+	
+### 3 Debug Table
+This table tracks any live/session info the app is tracking for all cars in the session. As cars join the session, cars are added to this table and are never removed, even if the driver disconnects.
+
+*CarIdx: The CarIdx number assigned to this car by iRacing in the telemetry.
+*Car Number: The car number.
+*Position: The overall position of this car.
+*Class Position: The in-class position of this car.
+*Class: The CarClassShortName of this car assigned by iRacing.
+*Driver Name: The name of the current driver of this car.
+*% Around Track: The progress of this car around the track given as a percent (0-100%). Crossing the start/finish line will reset this percentage to 0%.
+*Pit Cones: A pit cone image indicating if this car is currently between the pit cones on pit road. Pit cone image will be an orange color when true, pit cone will be grey when false.
+*Current Lap: The current lap in progress of this car.
+*Laps Completed: The number of completed laps of this car.
+*Track Surface: A TrackSurfaces enum from telemetry that indicates the current general state/location of the car. Values can be OnPitRoad, NotInWorld, OnTrack, etc.
+*Track Surface Material: A TrackSurfaceMaterials enum from telemetry that indicates the current material that the car is on. Values can be Asphalt1Material, Contrete1Material, Rumble1Material, AstroTurfMaterial, Grass3Material, etc.
+
