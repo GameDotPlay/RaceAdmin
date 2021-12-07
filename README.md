@@ -156,9 +156,9 @@ This table tracks any live/session info the app is tracking for all cars in the 
 * Class Position: The in-class position of this car.
 * Class: The CarClassShortName of this car assigned by iRacing.
 * Driver Name: The name of the current driver of this car.
-* % Around Track: The progress of this car around the track given as a percent (0-100%). Crossing the start/finish line will reset this percentage to 0%.
+* % Around Track: The progress of this car around the track given as a percent (0-100%). This value resets to 0% when the car crosses the start/finish line.
 * Pit Cones: A pit cone image indicating if this car is currently between the pit cones on pit road. Pit cone image will be an orange color when true, pit cone will be grey when false.
 * Current Lap: The current lap in progress of this car.
 * Laps Completed: The number of completed laps of this car.
-* Track Surface: A TrackSurfaces enum from telemetry that indicates the current general state/location of the car. Values can be OnPitRoad, NotInWorld, OnTrack, etc.
-* Track Surface Material: A TrackSurfaceMaterials enum from telemetry that indicates the current material that the car is on. Values can be Asphalt1Material, Contrete1Material, Rumble1Material, AstroTurfMaterial, Grass3Material, etc.
+* Track Surface: A TrackSurfaces enum value from telemetry that indicates the current general state/location of the car. Values can be OnPitRoad, NotInWorld, OnTrack, ApproachingPitRoad, etc.
+* Track Surface Material: A TrackSurfaceMaterials enum value from telemetry that indicates the current material that the car is in contact with. Values can be Asphalt1Material, Contrete1Material, Rumble1Material, AstroTurfMaterial, Grass3Material, etc.
