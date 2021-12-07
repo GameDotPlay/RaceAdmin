@@ -132,6 +132,7 @@ There is now a Main tab, which functions identically to the release version, and
 
 ### 2. Populate Incidents Button
 Pressing this button will simulate the incidents of a 24 hour race that began 24 hours ago and ended now. This can be used to populate the table with some test values and test filtering functionality, color highlighting, layout changes, etc. See code comments to see how to change the time frame of the simulated session.
+Do not use this button if a real iRacing session is in progress.
 
 ### Debug Tab
 
