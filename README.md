@@ -12,36 +12,43 @@ cars are only reported at the end of a race to non-admins.
 ### 1. Main menu strip
 This area allows access to the export table functionality, the settings page, and turning on/off various components of the UI.
 
-### 2. Session/Caution Indicator Panel
+### 2. Tab Control
+This area allows to switch between the two tabs of the application. Main & Cars Live.
+
+## Main Tab
+
+### 3. Session/Caution Indicator Panel
 This panel displays the name of the current session and will flash yellow when the caution conditions
 have been met. Once the caution flag has been thrown in will remain solid yellow until the race resumes
 under green flag conditions.
 This panel also contains the total incident count and number of incidents since last caution count. See below.
 
-### 3. Total Incident Count
+### 4. Total Incident Count
 The total incidents count tracks the total number of incidents reported during the current session.
 This will get reset to 0 when iRacing moves to the next "session". From practice to qualifying, for example.
+The arrow button to the left of the text will set the Total Incidents as well as Since Last Caution values to 0. However, it will not remove any incidents from the incidents table. 
 
-### 4. Since Last Caution Count.
+### 5. Since Last Caution Count.
 The number of incidents since last caution tracks the number of incidents reported since the last full course caution.
 This number will be reset to 0 in the case of a full course caution being thrown and then returned back to green flag racing.
+The arrow button to the left of the text will set the Since Last Caution value to 0. It will not reset Total Incidents. It will not remove any incidents from the incidents table. 
 
-### 5. Filter Incidents Based on Last X Minutes
+### 6. Filter Incidents Based on Last X Minutes
 This drop down allows to to only see incidents that have occurred over the past X minutes of this session. Set to Forever for no filtering.
 
-### 6. Time Frame Filtering
+### 7. Time Frame Filtering
 These drop downs allow you to only see incidents that occurred between a set period of time in the session.
 The time periods are shown in session time. HH:MM
 Set the first drop down to the beginning of the time period. Set the second drop down as the end of the time period.
 Ex: 2:00 - 7:00 will only show incidents that occurreded between 2:00 and 7:00 of session time (the second column) of the incidents table.
 
-### 7. Visible Rows	
+### 8. Visible Rows	
 This text informs you of how many rows of the incident table are currently visible due to current filtering settings out of the total number of rows in the table.
 
-### 8. Visible Incidents
-This text informs you of how many incident points are currently visible in the incident table due to current filtering settings out of the total number of incident points.
+### 9. Visible Incidents
+This text informs you of how many incident points are currently visible in the incident table due to current filtering settings out of the total number of incident points. Using the reset buttons will not effect these numbers. They reflect how many incidents are currently logged in the table.
 
-### 9. Incident Table
+### 10. Incident Table
 Displays incidents incurred by drivers as one row per incident.
 Each column also has the ability to filter/sort on values by clicking the down arrow in the column header. (For columns that filtering/sorting would make sense.)
 
@@ -63,6 +70,36 @@ During team racing, the Total column will display the team's total incidents fol
 driver's total incidents in the same fashion as iRacing does. For example if the team had a total
 of 4 incidents and the driver had contributed two incidents at the time of the incident, this 
 column would contain "4,2".
+
+## Cars Live Tab
+
+On the Cars Live tab there is another table that displays live information on all cars in the session.
+
+![race admin screenshot](/images/race-admin-carslive.png)
+
+### 1. Tab Control 
+Main tab switches back to the incident log table. Cars Live tab is described below.
+
+### 2. Settings
+* Telemetry Poll Rate: This changes the rate at which the app will poll the live telemetry and retrieve updated information. The default value is 4 (Hz) which means the app will update live information 4 times per second. This value can be set to anywhere in the range of 1-60. NOTE: Setting this value too high can adversely affect performance.
+* Hide NotInWorld: Enabling this check mark will hide all cars that have a Track Surface value of 'NotInWorld' which means that the car is not in the world and physics are not applying to this car. This value is very common for drivers that have not entered their cars yet, or drivers have exited their cars and gone into the garage to make changes and have not re-entered the world yet.
+	
+### 3. Live Cars Table
+This table tracks any live/session info the app is tracking for all cars in the session. As cars join the session, cars are added to this table and are never removed, even if the driver disconnects. All columns have filtering/sorting functionality.
+The columns are:
+
+* CarIdx: The CarIdx number assigned to this car by iRacing in the telemetry.
+* Car Number: The car number.
+* Position: The overall position of this car.
+* Class Position: The in-class position of this car.
+* Class: The CarClassShortName of this car assigned by iRacing.
+* Driver Name: The name of the current driver of this car.
+* % Around Track: The progress of this car around the track given as a percent (0-100%). This value resets to 0% when the car crosses the start/finish line.
+* Pit Cones: A pit cone image indicating if this car is currently between the pit cones on pit road. Pit cone image will be an orange color when true, pit cone will be grey when false.
+* Current Lap: The current lap in progress of this car.
+* Laps Completed: The number of completed laps of this car.
+* Track Surface: A TrackSurfaces enum value from telemetry that indicates the current general state/location of the car. Values can be OnPitRoad, NotInWorld, OnTrack, ApproachingPitRoad, etc.
+* Track Surface Material: A TrackSurfaceMaterials enum value from telemetry that indicates the current material that the car is in contact with. Values can be Asphalt1Material, Contrete1Material, Rumble1Material, AstroTurfMaterial, Grass3Material, etc.
 
 ## File Menu
 
@@ -107,45 +144,15 @@ When the app is run in debug mode from Visual Studio, some helpful features are 
 
 ### Main Tab
 
-On the main screen you'll notice a few differences from the release version:
+On the main tab you'll notice a few differences from the release version:
 
 ![race admin screenshot](/images/race-admin-debugMain.png)
 
-### 1. Tab Control 
-There is now a Main tab, which functions identically to the release version, and a debug tab which is shown below.
-
-### 2. Populate Incidents Button
+### 1. Populate Incidents Button
 Pressing this button will simulate the incidents of a 24 hour race that began 24 hours ago and ended now. This can be used to populate the table with some test values and test filtering functionality, color highlighting, layout changes, etc. See code comments to see how to change the time frame of the simulated session.
 Do not use this button if a real iRacing session is in progress.
 
-### Debug Tab
-
-On the debug tab there is another table that displays live information on all cars in the session.
-
-![race admin screenshot](/images/race-admin-debugDebug.png)
-
-### 1. Tab Control 
-There is now a Main tab, which funtions identically to the release version, and a Debug tab which is shown here.
-
-### 2. Settings
-* Telemetry Poll Rate: This changes the rate at which the app will poll the live telemetry and retrieve updated information. The default value is 4 (Hz) which means the app will update live information 4 times per second. This value can be set to anywhere in the range of 1-60. NOTE: Setting this value too high can adversely affect performance.
-* Hide NotInWorld: Enabling this check mark will hide all cars that have a Track Surface value of 'NotInWorld' which means that the car is not in the world and physics are not applying to this car. This value is very common for drivers that have not entered their cars yet, or drivers have exited their cars and gone into the garage to make changes and have not re-entered the world yet.
-	
-### 3. Debug Table
-This table tracks any live/session info the app is tracking for all cars in the session. As cars join the session, cars are added to this table and are never removed, even if the driver disconnects. The columns are:
-
-* CarIdx: The CarIdx number assigned to this car by iRacing in the telemetry.
-* Car Number: The car number.
-* Position: The overall position of this car.
-* Class Position: The in-class position of this car.
-* Class: The CarClassShortName of this car assigned by iRacing.
-* Driver Name: The name of the current driver of this car.
-* % Around Track: The progress of this car around the track given as a percent (0-100%). This value resets to 0% when the car crosses the start/finish line.
-* Pit Cones: A pit cone image indicating if this car is currently between the pit cones on pit road. Pit cone image will be an orange color when true, pit cone will be grey when false.
-* Current Lap: The current lap in progress of this car.
-* Laps Completed: The number of completed laps of this car.
-* Track Surface: A TrackSurfaces enum value from telemetry that indicates the current general state/location of the car. Values can be OnPitRoad, NotInWorld, OnTrack, ApproachingPitRoad, etc.
-* Track Surface Material: A TrackSurfaceMaterials enum value from telemetry that indicates the current material that the car is in contact with. Values can be Asphalt1Material, Contrete1Material, Rumble1Material, AstroTurfMaterial, Grass3Material, etc.
+The Cars Live tab is identical to Release mode.
 
 ## Command Line Options
 
