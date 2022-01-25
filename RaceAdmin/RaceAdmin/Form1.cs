@@ -55,6 +55,12 @@
         private int totalIncCount = 0;
 
         /// <summary>
+        /// The total number of incidents that have been logged since the creation of the table.
+        /// This is tracked separately since the totalIncCount can be reset to 0.
+        /// </summary>
+        private int totalIncidentCountOfTable = 0;
+
+        /// <summary>
         /// The number of incidents since the last caution.
         /// </summary>
         private int incCountSinceCaution = 0;
@@ -195,14 +201,10 @@
             InitializeComponent();
 
 #if !DEBUG
-            tabControl.TabPages.Remove(debugTab);
             tabControl.TabPages[0].Controls.Remove(addTestRowButton);
 #endif
-
-#if DEBUG
             InitializeDebugDataSource();
             InitializeDebugGridView();
-#endif
 
             this.wrapper = wrapper;
             cautionHandlers = new Dictionary<string, ICautionHandler>
@@ -535,10 +537,7 @@
             }
 
             UpdateLiveCarInfo(e);
-
-#if DEBUG
             UpdateDebugTable();
-#endif
 
             CheckFlagStateChanges(e);
 
@@ -607,11 +606,9 @@
             this.totalIncCount = 0;
             this.incCountSinceCaution = 0;
 
-#if DEBUG
             AddNewDrivers(e);
             AddNewCars(e);
             PopulateDebugTable();
-#endif
         }
 
         /// <summary>
@@ -697,6 +694,7 @@
                     drivers[name].NewIncs = newIncidentCount;
                     Incident newInc = new Incident(e.SessionInfo.UpdateTime, DateTime.Now, delta, carIdx);
                     totalIncCount += newInc.Value;
+                    totalIncidentCountOfTable += newInc.Value;
                     incCountSinceCaution += newInc.Value;
                     LogNewIncident(newInc);
                     drivers[name].OldIncs = drivers[name].NewIncs;
@@ -1139,7 +1137,7 @@
                 visibleIncidentCount += incidentValue;
 			}
 
-            visibleIncidentsNum.Text = $"{visibleIncidentCount} of {totalIncCount}";
+            visibleIncidentsNum.Text = $"{visibleIncidentCount} of {totalIncidentCountOfTable}";
         }
 
         /// <summary>
@@ -1437,9 +1435,7 @@
 
                         Console.WriteLine($"Adding car {carIdx}");
                         cars.Add(carIdx, car);
-#if DEBUG
 						AddNewCarDebugTable(car);
-#endif
                     }
                 }
             }
@@ -1993,6 +1989,29 @@
             aboutForm.StartPosition = FormStartPosition.CenterScreen;
             aboutForm.Show();
         }
+
+        /// <summary>
+        /// Resets the total and since last caution incident count to 0.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">Event args.</param>
+        private void resetTotalIncidentCountButton_Click(object sender, EventArgs e)
+        {
+            this.totalIncCount = 0;
+            this.incCountSinceCaution = 0;
+            UpdateIncidentCountDisplay();
+        }
+
+        /// <summary>
+        /// Resets the incidents since last caution count to 0.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e"></param>
+        private void resetIncidentsSinceLastCautionButton_Click(object sender, EventArgs e)
+        {
+            this.incCountSinceCaution = 0;
+            UpdateIncidentCountDisplay();
+        }
         #endregion EVENT_HANDLERS
 
         #region PUBLIC_PROPERTIES
@@ -2101,6 +2120,7 @@
 
             Incident newInc = new Incident(sessionTime, timeStamp, driver.NewIncs, driver.CarIdx);
             totalIncCount += newIncidents;
+            totalIncidentCountOfTable += newIncidents;
             incCountSinceCaution += newIncidents;
             LogNewIncident(newInc);
             UpdateIncidentCountDisplay();

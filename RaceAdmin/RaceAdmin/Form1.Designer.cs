@@ -79,8 +79,10 @@
 			this.totalIncidentCountNum = new System.Windows.Forms.Label();
 			this.incidentsView = new Zuby.ADGV.AdvancedDataGridView();
 			this.cautionPanel = new System.Windows.Forms.Panel();
+			this.resetTotalIncidentCountButton = new System.Windows.Forms.Button();
 			this.sessionLabel = new System.Windows.Forms.Label();
 			this.tabControl = new System.Windows.Forms.TabControl();
+			this.resetIncidentsSinceLastCautionButton = new System.Windows.Forms.Button();
 			this.menuStrip.SuspendLayout();
 			this.debugTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.debugTable)).BeginInit();
@@ -268,7 +270,7 @@
 			this.debugTab.Padding = new System.Windows.Forms.Padding(3);
 			this.debugTab.Size = new System.Drawing.Size(1256, 631);
 			this.debugTab.TabIndex = 3;
-			this.debugTab.Text = "Debug";
+			this.debugTab.Text = "Cars Live";
 			this.debugTab.UseVisualStyleBackColor = true;
 			// 
 			// debugTable
@@ -629,7 +631,7 @@
 			this.incidentsSinceCautionNum.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.incidentsSinceCautionNum.BackColor = System.Drawing.Color.Transparent;
 			this.incidentsSinceCautionNum.Font = new System.Drawing.Font("Arial", 48F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.incidentsSinceCautionNum.Location = new System.Drawing.Point(914, 2);
+			this.incidentsSinceCautionNum.Location = new System.Drawing.Point(953, 2);
 			this.incidentsSinceCautionNum.Margin = new System.Windows.Forms.Padding(1);
 			this.incidentsSinceCautionNum.Name = "incidentsSinceCautionNum";
 			this.incidentsSinceCautionNum.Size = new System.Drawing.Size(150, 73);
@@ -642,7 +644,7 @@
 			this.incidentsSinceCautionLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.incidentsSinceCautionLabel.BackColor = System.Drawing.Color.Transparent;
 			this.incidentsSinceCautionLabel.Font = new System.Drawing.Font("Arial", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.incidentsSinceCautionLabel.Location = new System.Drawing.Point(668, 2);
+			this.incidentsSinceCautionLabel.Location = new System.Drawing.Point(707, 2);
 			this.incidentsSinceCautionLabel.Margin = new System.Windows.Forms.Padding(1);
 			this.incidentsSinceCautionLabel.Name = "incidentsSinceCautionLabel";
 			this.incidentsSinceCautionLabel.Size = new System.Drawing.Size(253, 73);
@@ -738,6 +740,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.cautionPanel.BackColor = System.Drawing.SystemColors.Control;
 			this.cautionPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.cautionPanel.Controls.Add(this.resetIncidentsSinceLastCautionButton);
+			this.cautionPanel.Controls.Add(this.resetTotalIncidentCountButton);
 			this.cautionPanel.Controls.Add(this.sessionLabel);
 			this.cautionPanel.Location = new System.Drawing.Point(1, 1);
 			this.cautionPanel.Margin = new System.Windows.Forms.Padding(1);
@@ -747,6 +751,18 @@
 			this.cautionPanel.TabIndex = 0;
 			this.cautionPanel.BackColorChanged += new System.EventHandler(this.cautionPanel_BackColorChanged);
 			this.cautionPanel.VisibleChanged += new System.EventHandler(this.cautionPanel_VisibleChanged);
+			// 
+			// resetTotalIncidentCountButton
+			// 
+			this.resetTotalIncidentCountButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.resetTotalIncidentCountButton.BackgroundImage = global::RaceAdmin.Properties.Resources.ResetArrow;
+			this.resetTotalIncidentCountButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+			this.resetTotalIncidentCountButton.Location = new System.Drawing.Point(271, 22);
+			this.resetTotalIncidentCountButton.Name = "resetTotalIncidentCountButton";
+			this.resetTotalIncidentCountButton.Size = new System.Drawing.Size(30, 30);
+			this.resetTotalIncidentCountButton.TabIndex = 1;
+			this.resetTotalIncidentCountButton.UseVisualStyleBackColor = true;
+			this.resetTotalIncidentCountButton.Click += new System.EventHandler(this.resetTotalIncidentCountButton_Click);
 			// 
 			// sessionLabel
 			// 
@@ -769,6 +785,18 @@
 			this.tabControl.SelectedIndex = 0;
 			this.tabControl.Size = new System.Drawing.Size(1264, 657);
 			this.tabControl.TabIndex = 1;
+			// 
+			// resetIncidentsSinceLastCautionButton
+			// 
+			this.resetIncidentsSinceLastCautionButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.resetIncidentsSinceLastCautionButton.BackgroundImage = global::RaceAdmin.Properties.Resources.ResetArrow;
+			this.resetIncidentsSinceLastCautionButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+			this.resetIncidentsSinceLastCautionButton.Location = new System.Drawing.Point(671, 22);
+			this.resetIncidentsSinceLastCautionButton.Name = "resetIncidentsSinceLastCautionButton";
+			this.resetIncidentsSinceLastCautionButton.Size = new System.Drawing.Size(30, 30);
+			this.resetIncidentsSinceLastCautionButton.TabIndex = 1;
+			this.resetIncidentsSinceLastCautionButton.UseVisualStyleBackColor = true;
+			this.resetIncidentsSinceLastCautionButton.Click += new System.EventHandler(this.resetIncidentsSinceLastCautionButton_Click);
 			// 
 			// RaceAdminMain
 			// 
@@ -850,6 +878,8 @@
 		private System.Windows.Forms.Label visibleIncidentsLabel;
 		private System.Windows.Forms.Label visibleIncidentsNum;
 		private Zuby.ADGV.AdvancedDataGridView debugTable;
+		private System.Windows.Forms.Button resetTotalIncidentCountButton;
+		private System.Windows.Forms.Button resetIncidentsSinceLastCautionButton;
 	}
 }
 
