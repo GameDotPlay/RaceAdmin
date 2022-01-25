@@ -306,5 +306,15 @@ namespace RaceAdmin.Properties {
                 return ResourceManager.GetString("IncidentsTable_TotalIncidents", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ResetArrow {
+            get {
+                object obj = ResourceManager.GetObject("ResetArrow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
