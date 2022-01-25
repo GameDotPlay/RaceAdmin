@@ -46,7 +46,7 @@ Ex: 2:00 - 7:00 will only show incidents that occurreded between 2:00 and 7:00 o
 This text informs you of how many rows of the incident table are currently visible due to current filtering settings out of the total number of rows in the table.
 
 ### 9. Visible Incidents
-This text informs you of how many incident points are currently visible in the incident table due to current filtering settings out of the total number of incident points. Using the reset buttons will not effect these numbers. They reflect how many incidents are currently logged in the table.
+This text informs you of how many incident points are currently visible in the incident table due to current filtering settings out of the total number of incident points. Using the reset buttons will not affect these numbers. They reflect how many incidents are currently logged in the table.
 
 ### 10. Incident Table
 Displays incidents incurred by drivers as one row per incident.
