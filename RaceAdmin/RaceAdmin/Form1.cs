@@ -454,6 +454,12 @@
         /// <param name="e">Session string changed event. Contains info from session string that can be queried.</param>
         public void OnSessionInfoUpdated(object sender, SdkWrapper.SessionInfoUpdatedEventArgs e)
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => OnSessionInfoUpdated(sender, e)));
+                return;
+            }
+
             // Perform some initialization if this is the first time being called in this session...
             if (!sessionInitializationComplete)
             {
@@ -464,10 +470,13 @@
             AddNewDrivers(e);
             AddNewCars(e);
             UpdateDriverIncidentCounts(e);
-            ApplyIncidentTableColorHighlighting(null);
             UpdateDriverLapCounts(e);
             UpdateCarTeamIncidentCounts(e);
             UpdateIncidentCountDisplay();
+            UpdateVisibleIncidents();
+            ApplyIncidentTableColorHighlighting(null);
+            ApplyTimeFrameFilter();
+            ApplyIncidentsTableTimeFilter(incidentsTimeFilterComboBox.SelectedIndex);
 
             var resultsOfficial = e.SessionInfo["SessionInfo"]["Sessions"]["SessionNum", sessionNum]["ResultsOfficial"].Value;
             if (raceSession && resultsOfficial == "1")
@@ -599,11 +608,14 @@
                 if(numClasses < 2)
 				{
                     incidentsView.Columns[Properties.Resources.IncidentsTable_CarClass].Visible = false;
+                    debugTable.Columns[Properties.Resources.DebugTable_CarClassShortName].Visible = false;
+                    debugTable.Columns[Properties.Resources.DebugTable_CarClassPosition].Visible = false;
                 }
 			}
 
             ClearIncidents();
             this.totalIncCount = 0;
+            this.totalIncidentCountOfTable = 0;
             this.incCountSinceCaution = 0;
 
             AddNewDrivers(e);
@@ -698,6 +710,7 @@
                     incCountSinceCaution += newInc.Value;
                     LogNewIncident(newInc);
                     drivers[name].OldIncs = drivers[name].NewIncs;
+                    UpdateVisibleRows();
                 }
             }
         }
@@ -1107,8 +1120,6 @@
 			{
                 incidentsView.FirstDisplayedScrollingRowIndex = incidentsView.RowCount - 1;
             }
-            
-            UpdateVisibleRows();
 
             Console.WriteLine($"{newRow[Properties.Resources.IncidentsTable_IncidentValue]}; driver = {drivers[cars[newInc.CarIdx].CurrentDriver].FullName}");
         }
@@ -1118,6 +1129,12 @@
         /// </summary>
         private void UpdateVisibleRows()
 		{
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => UpdateVisibleRows()));
+                return;
+            }
+
             int visibleRowCount = incidentsView.Rows.GetRowCount(DataGridViewElementStates.Visible);
             int totalRowCount = incidentsDataTable.Rows.Count;
             visibleRowsNum.Text = $"{visibleRowCount} of {totalRowCount}";
@@ -1128,6 +1145,12 @@
         /// </summary>
         private void UpdateVisibleIncidents()
 		{
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => UpdateVisibleIncidents()));
+                return;
+            }
+
             int visibleIncidentCount = 0;
             int visibleRowCount = incidentsView.Rows.GetRowCount(DataGridViewElementStates.Visible);
 
@@ -1222,6 +1245,12 @@
         /// <param name="selectedIndiex">The selected index number of the incidentsTimeFilterComboBox.</param>
         private void ApplyIncidentsTableTimeFilter(int selectedIndex)
 		{
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => ApplyIncidentsTableTimeFilter(selectedIndex)));
+                return;
+            }
+
             DateTime filter;
 
             switch (selectedIndex)
@@ -1258,6 +1287,7 @@
 
             UpdateVisibleRows();
             UpdateVisibleIncidents();
+            ApplyIncidentTableColorHighlighting(null);
         }
 
         /// <summary>
@@ -1265,7 +1295,13 @@
         /// </summary>
         private void ApplyTimeFrameFilter()
         {
-            if(timeFrameFilterBegin == null || timeFrameFilterEnd == null)
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => ApplyTimeFrameFilter()));
+                return;
+            }
+
+            if (timeFrameFilterBegin == null || timeFrameFilterEnd == null)
 			{
                 incidentsDataTable.DefaultView.RowFilter = $"";
                 ApplyIncidentsTableTimeFilter(incidentsTimeFilterComboBox.SelectedIndex);
@@ -1277,9 +1313,9 @@
             string filterEnd = MakeTimeString((double)timeFrameFilterEnd);
             incidentsDataTable.DefaultView.RowFilter = $"sessionTime >= #{filterBegin}# AND sessionTime <= #{filterEnd}#";
 
-            ApplyIncidentTableColorHighlighting(null);
             UpdateVisibleRows();
             UpdateVisibleIncidents();
+            ApplyIncidentTableColorHighlighting(null);
         }
 
         /// <summary>
@@ -1717,6 +1753,8 @@
                 totalIncidentCountNum.Visible = true;
                 incidentsSinceCautionLabel.Visible = true;
                 incidentsSinceCautionNum.Visible = true;
+                resetIncidentsSinceLastCautionButton.Visible = true;
+                resetTotalIncidentCountButton.Visible = true;
             }
             else
             {
@@ -1724,6 +1762,8 @@
                 totalIncidentCountNum.Visible = false;
                 incidentsSinceCautionLabel.Visible = false;
                 incidentsSinceCautionNum.Visible = false;
+                resetIncidentsSinceLastCautionButton.Visible = false;
+                resetTotalIncidentCountButton.Visible = false;
             }
         }
 
@@ -1832,9 +1872,12 @@
         /// <param name="e">Event args.</param>
         private void incidentsTimeFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            timeFrameFilterComboBox1.SelectedIndex = 0;
-            ApplyIncidentsTableTimeFilter(incidentsTimeFilterComboBox.SelectedIndex);
-            ApplyIncidentTableColorHighlighting(null);
+            if (incidentsTimeFilterComboBox.SelectedIndex != 0)
+			{
+                timeFrameFilterComboBox1.SelectedIndex = 0;
+                ApplyIncidentsTableTimeFilter(incidentsTimeFilterComboBox.SelectedIndex);
+                ApplyIncidentTableColorHighlighting(null);
+            }
         }
 
         /// <summary>

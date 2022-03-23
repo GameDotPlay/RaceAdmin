@@ -79,10 +79,10 @@
 			this.totalIncidentCountNum = new System.Windows.Forms.Label();
 			this.incidentsView = new Zuby.ADGV.AdvancedDataGridView();
 			this.cautionPanel = new System.Windows.Forms.Panel();
+			this.resetIncidentsSinceLastCautionButton = new System.Windows.Forms.Button();
 			this.resetTotalIncidentCountButton = new System.Windows.Forms.Button();
 			this.sessionLabel = new System.Windows.Forms.Label();
 			this.tabControl = new System.Windows.Forms.TabControl();
-			this.resetIncidentsSinceLastCautionButton = new System.Windows.Forms.Button();
 			this.menuStrip.SuspendLayout();
 			this.debugTab.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.debugTable)).BeginInit();
@@ -396,6 +396,8 @@
 			// mainTab
 			// 
 			this.mainTab.BackColor = System.Drawing.SystemColors.Control;
+			this.mainTab.Controls.Add(this.resetIncidentsSinceLastCautionButton);
+			this.mainTab.Controls.Add(this.resetTotalIncidentCountButton);
 			this.mainTab.Controls.Add(this.visibleIncidentsLabel);
 			this.mainTab.Controls.Add(this.visibleIncidentsNum);
 			this.mainTab.Controls.Add(this.visibleRowsLabel);
@@ -740,8 +742,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.cautionPanel.BackColor = System.Drawing.SystemColors.Control;
 			this.cautionPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.cautionPanel.Controls.Add(this.resetIncidentsSinceLastCautionButton);
-			this.cautionPanel.Controls.Add(this.resetTotalIncidentCountButton);
 			this.cautionPanel.Controls.Add(this.sessionLabel);
 			this.cautionPanel.Location = new System.Drawing.Point(1, 1);
 			this.cautionPanel.Margin = new System.Windows.Forms.Padding(1);
@@ -752,9 +752,21 @@
 			this.cautionPanel.BackColorChanged += new System.EventHandler(this.cautionPanel_BackColorChanged);
 			this.cautionPanel.VisibleChanged += new System.EventHandler(this.cautionPanel_VisibleChanged);
 			// 
+			// resetIncidentsSinceLastCautionButton
+			// 
+			this.resetIncidentsSinceLastCautionButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.resetIncidentsSinceLastCautionButton.BackgroundImage = global::RaceAdmin.Properties.Resources.ResetArrow;
+			this.resetIncidentsSinceLastCautionButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+			this.resetIncidentsSinceLastCautionButton.Location = new System.Drawing.Point(671, 22);
+			this.resetIncidentsSinceLastCautionButton.Name = "resetIncidentsSinceLastCautionButton";
+			this.resetIncidentsSinceLastCautionButton.Size = new System.Drawing.Size(30, 30);
+			this.resetIncidentsSinceLastCautionButton.TabIndex = 1;
+			this.resetIncidentsSinceLastCautionButton.UseVisualStyleBackColor = true;
+			this.resetIncidentsSinceLastCautionButton.Click += new System.EventHandler(this.resetIncidentsSinceLastCautionButton_Click);
+			// 
 			// resetTotalIncidentCountButton
 			// 
-			this.resetTotalIncidentCountButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.resetTotalIncidentCountButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.resetTotalIncidentCountButton.BackgroundImage = global::RaceAdmin.Properties.Resources.ResetArrow;
 			this.resetTotalIncidentCountButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
 			this.resetTotalIncidentCountButton.Location = new System.Drawing.Point(271, 22);
@@ -785,18 +797,6 @@
 			this.tabControl.SelectedIndex = 0;
 			this.tabControl.Size = new System.Drawing.Size(1264, 657);
 			this.tabControl.TabIndex = 1;
-			// 
-			// resetIncidentsSinceLastCautionButton
-			// 
-			this.resetIncidentsSinceLastCautionButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.resetIncidentsSinceLastCautionButton.BackgroundImage = global::RaceAdmin.Properties.Resources.ResetArrow;
-			this.resetIncidentsSinceLastCautionButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-			this.resetIncidentsSinceLastCautionButton.Location = new System.Drawing.Point(671, 22);
-			this.resetIncidentsSinceLastCautionButton.Name = "resetIncidentsSinceLastCautionButton";
-			this.resetIncidentsSinceLastCautionButton.Size = new System.Drawing.Size(30, 30);
-			this.resetIncidentsSinceLastCautionButton.TabIndex = 1;
-			this.resetIncidentsSinceLastCautionButton.UseVisualStyleBackColor = true;
-			this.resetIncidentsSinceLastCautionButton.Click += new System.EventHandler(this.resetIncidentsSinceLastCautionButton_Click);
 			// 
 			// RaceAdminMain
 			// 
