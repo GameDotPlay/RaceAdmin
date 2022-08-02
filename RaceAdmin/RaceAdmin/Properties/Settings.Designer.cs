@@ -12,7 +12,7 @@ namespace RaceAdmin.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -140,6 +140,150 @@ namespace RaceAdmin.Properties {
             }
             set {
                 this["y"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool detectTowForCaution {
+            get {
+                return ((bool)(this["detectTowForCaution"]));
+            }
+            set {
+                this["detectTowForCaution"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useTotalIncidentsForCaution {
+            get {
+                return ((bool)(this["useTotalIncidentsForCaution"]));
+            }
+            set {
+                this["useTotalIncidentsForCaution"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("70")]
+        public float IgnorePitEntryPercentageThreshold {
+            get {
+                return ((float)(this["IgnorePitEntryPercentageThreshold"]));
+            }
+            set {
+                this["IgnorePitEntryPercentageThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int telemetryPollRate {
+            get {
+                return ((int)(this["telemetryPollRate"]));
+            }
+            set {
+                this["telemetryPollRate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool highlight4xIncidents {
+            get {
+                return ((bool)(this["highlight4xIncidents"]));
+            }
+            set {
+                this["highlight4xIncidents"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool highlightIncidentThatTriggeredCaution {
+            get {
+                return ((bool)(this["highlightIncidentThatTriggeredCaution"]));
+            }
+            set {
+                this["highlightIncidentThatTriggeredCaution"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255, 192, 192")]
+        public global::System.Drawing.Color driverIncidentThresholdSelectedColor {
+            get {
+                return ((global::System.Drawing.Color)(this["driverIncidentThresholdSelectedColor"]));
+            }
+            set {
+                this["driverIncidentThresholdSelectedColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool highlightDriverIfIncidentThreshold {
+            get {
+                return ((bool)(this["highlightDriverIfIncidentThreshold"]));
+            }
+            set {
+                this["highlightDriverIfIncidentThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int highlightDriverIncidentThreshold {
+            get {
+                return ((int)(this["highlightDriverIncidentThreshold"]));
+            }
+            set {
+                this["highlightDriverIncidentThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("IndianRed")]
+        public global::System.Drawing.Color highlight4xIncidentsSelectedColor {
+            get {
+                return ((global::System.Drawing.Color)(this["highlight4xIncidentsSelectedColor"]));
+            }
+            set {
+                this["highlight4xIncidentsSelectedColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LemonChiffon")]
+        public global::System.Drawing.Color highlightCautionIncidentSelectedColor {
+            get {
+                return ((global::System.Drawing.Color)(this["highlightCautionIncidentSelectedColor"]));
+            }
+            set {
+                this["highlightCautionIncidentSelectedColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool driverIncidentThresholdAudioNotification {
+            get {
+                return ((bool)(this["driverIncidentThresholdAudioNotification"]));
+            }
+            set {
+                this["driverIncidentThresholdAudioNotification"] = value;
             }
         }
     }

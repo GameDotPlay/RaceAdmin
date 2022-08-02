@@ -22,7 +22,7 @@ namespace RaceAdmin.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -71,29 +71,140 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Control.
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static string ColorName_Control {
+        internal static System.Drawing.Bitmap ColorPickerIcon {
             get {
-                return ResourceManager.GetString("ColorName_Control", resourceCulture);
+                object obj = ResourceManager.GetObject("ColorPickerIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Gold.
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static string ColorName_Gold {
+        internal static System.Drawing.Bitmap ConeEmpty {
             get {
-                return ResourceManager.GetString("ColorName_Gold", resourceCulture);
+                object obj = ResourceManager.GetObject("ConeEmpty", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IndianRed.
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static string ColorName_IndianRed {
+        internal static System.Drawing.Bitmap ConeFull {
             get {
-                return ResourceManager.GetString("ColorName_IndianRed", resourceCulture);
+                object obj = ResourceManager.GetObject("ConeFull", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carBetweenPitCones.
+        /// </summary>
+        internal static string DebugTable_CarBetweenPitCones {
+            get {
+                return ResourceManager.GetString("DebugTable_CarBetweenPitCones", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carClassPosition.
+        /// </summary>
+        internal static string DebugTable_CarClassPosition {
+            get {
+                return ResourceManager.GetString("DebugTable_CarClassPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carClassShortName.
+        /// </summary>
+        internal static string DebugTable_CarClassShortName {
+            get {
+                return ResourceManager.GetString("DebugTable_CarClassShortName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carCurrentLap.
+        /// </summary>
+        internal static string DebugTable_CarCurrentLap {
+            get {
+                return ResourceManager.GetString("DebugTable_CarCurrentLap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carIdx.
+        /// </summary>
+        internal static string DebugTable_CarIdx {
+            get {
+                return ResourceManager.GetString("DebugTable_CarIdx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carLapsCompleted.
+        /// </summary>
+        internal static string DebugTable_CarLapsCompleted {
+            get {
+                return ResourceManager.GetString("DebugTable_CarLapsCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carNumber.
+        /// </summary>
+        internal static string DebugTable_CarNumber {
+            get {
+                return ResourceManager.GetString("DebugTable_CarNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carOverallPosition.
+        /// </summary>
+        internal static string DebugTable_CarOverallPosition {
+            get {
+                return ResourceManager.GetString("DebugTable_CarOverallPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carPercentAroundTrack.
+        /// </summary>
+        internal static string DebugTable_CarPercentAroundTrack {
+            get {
+                return ResourceManager.GetString("DebugTable_CarPercentAroundTrack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carTrackSurface.
+        /// </summary>
+        internal static string DebugTable_CarTrackSurface {
+            get {
+                return ResourceManager.GetString("DebugTable_CarTrackSurface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to carTrackSurfaceMatrerial.
+        /// </summary>
+        internal static string DebugTable_CarTrackSurfaceMaterial {
+            get {
+                return ResourceManager.GetString("DebugTable_CarTrackSurfaceMaterial", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to driverName.
+        /// </summary>
+        internal static string DebugTable_DriverName {
+            get {
+                return ResourceManager.GetString("DebugTable_DriverName", resourceCulture);
             }
         }
         
@@ -107,65 +218,102 @@ namespace RaceAdmin.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CarNum.
+        ///   Looks up a localized string similar to carClass.
         /// </summary>
-        internal static string TableColumn_CarNum {
+        internal static string IncidentsTable_CarClass {
             get {
-                return ResourceManager.GetString("TableColumn_CarNum", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_CarClass", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DriverLapNum.
+        ///   Looks up a localized string similar to carNumber.
         /// </summary>
-        internal static string TableColumn_DriverLapNum {
+        internal static string IncidentsTable_CarNumber {
             get {
-                return ResourceManager.GetString("TableColumn_DriverLapNum", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_CarNumber", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DriverName.
+        ///   Looks up a localized string similar to driverLapNumber.
         /// </summary>
-        internal static string TableColumn_DriverName {
+        internal static string IncidentsTable_DriverLapNumber {
             get {
-                return ResourceManager.GetString("TableColumn_DriverName", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_DriverLapNumber", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incident.
+        ///   Looks up a localized string similar to driverName.
         /// </summary>
-        internal static string TableColumn_Incident {
+        internal static string IncidentsTable_DriverName {
             get {
-                return ResourceManager.GetString("TableColumn_Incident", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_DriverName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Team.
+        ///   Looks up a localized string similar to hiddenTimeStamp.
         /// </summary>
-        internal static string TableColumn_Team {
+        internal static string IncidentsTable_HiddenTimeStamp {
             get {
-                return ResourceManager.GetString("TableColumn_Team", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_HiddenTimeStamp", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Time.
+        ///   Looks up a localized string similar to incidentValue.
         /// </summary>
-        internal static string TableColumn_Time {
+        internal static string IncidentsTable_IncidentValue {
             get {
-                return ResourceManager.GetString("TableColumn_Time", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_IncidentValue", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Total.
+        ///   Looks up a localized string similar to localTime.
         /// </summary>
-        internal static string TableColumn_Total {
+        internal static string IncidentsTable_LocalTime {
             get {
-                return ResourceManager.GetString("TableColumn_Total", resourceCulture);
+                return ResourceManager.GetString("IncidentsTable_LocalTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sessionTime.
+        /// </summary>
+        internal static string IncidentsTable_SessionTime {
+            get {
+                return ResourceManager.GetString("IncidentsTable_SessionTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to teamName.
+        /// </summary>
+        internal static string IncidentsTable_TeamName {
+            get {
+                return ResourceManager.GetString("IncidentsTable_TeamName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to totalIncidents.
+        /// </summary>
+        internal static string IncidentsTable_TotalIncidents {
+            get {
+                return ResourceManager.GetString("IncidentsTable_TotalIncidents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ResetArrow {
+            get {
+                object obj = ResourceManager.GetObject("ResetArrow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }
