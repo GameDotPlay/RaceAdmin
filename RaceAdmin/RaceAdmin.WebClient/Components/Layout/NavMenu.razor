@@ -1,0 +1,39 @@
+﻿<div class="top-row ps-3 navbar" style="background-color: #8BB3E8">
+    <div class="container-fluid text-dark">
+        <a class="navbar-brand" href="">
+            <img src="/resources/iracing/iRacing-Brandmarks-2022-RGB/iRacing-Icon-Color-White.svg" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+            Race Admin
+        </a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <div class="text-center text-dark">
+                    <i class="bi bi-speedometer2"></i> Live
+                </div>
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="incidents">
+                <div class="text-center text-dark">
+                    <i class="bi bi-exclamation-triangle"></i> Incidents
+                </div>
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="settings">
+                <div class="text-center  text-dark">
+                    <i class="bi bi-gear"></i> Settings
+                </div>
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
