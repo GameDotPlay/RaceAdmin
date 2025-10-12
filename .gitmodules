@@ -1,3 +1,4 @@
 [submodule "iRacingSdkWrapper"]
 	path = iRacingSdkWrapper
 	url = https://github.com/GameDotPlay/iRacingSdkWrapper.git
+	branch = master
